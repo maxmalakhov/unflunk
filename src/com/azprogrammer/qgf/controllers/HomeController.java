@@ -1149,7 +1149,7 @@ public class HomeController
         
         UserService userService = UserServiceFactory.getUserService();
         User user = userService.getCurrentUser(); // req.getUserPrincipal()?!?
-        userService.isUserAdmin()
+        userService.isUserAdmin();
         
         if(user != null){
             String nick = user.getNickname ().toUpperCase ();

@@ -22,7 +22,7 @@ public class WhiteBoard
 {
     public static final String STATUS_ACTIVE = "A";
     public static final String STATUS_INACTIVE = "I";
-    
+
     
     @PrimaryKey
     @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
