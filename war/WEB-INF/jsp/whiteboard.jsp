@@ -34,6 +34,11 @@ var error = '${errorMsg}';
 
 <!--<script src="/js/azp/BBCodeEditor.js"></script>-->
 
+<!--WebRTC libs  -->
+<script src="/js/webrtc/common.js"></script>
+<!-- Load the polyfill to switch-hit between Chrome and Firefox -->
+<script src="/js/webrtc/adapter.js"></script>
+
 <style>
 #header{
 	font-size: 3em;
@@ -99,24 +104,46 @@ showButtons="false" style="width:500px;"></div><br> <button dojoType="dijit.form
 
 
 <div id="applicationArea" style="width: 100%; height: 100%; display: none; position: absolute; top: 0; bottom: 0;" dojoType="dijit.layout.BorderContainer" liveSplitters="true">
-	<div region="leading"  style="width: 40em; height: 100%" dojoType="dijit.layout.ContentPane" splitter="true">
-		<div id="chatArea" style="width: 100%; height: 100%" dojoType="dijit.layout.BorderContainer" liveSplitters="true">
-			
-			<div id="output" style="overflow: auto; width: 37em;" region="center" dojoType="dijit.layout.ContentPane" splitter="true">
-			</div>
-			<div style="width: 37em;" region="bottom" dojoType="dijit.layout.ContentPane" splitters="true">
-				<table border="0" cellspacing="5"><tr><td>
-				<textarea dojoType="azp.BBCodeEditor" cols="40" rows="3" id="chatText"></textarea> <span id="chatBtn" dojoType="dijit.form.Button">Say</span><span id="chatWaitMessage"></span>
-				
-				</td>
-				<td>
-				Users:<br>
-				<div style="width: 10em; overflow: auto;border: 1px solid #888888;" id="userListDiv"></div>
-				</td>				
-				</tr></table>
-			</div>
-		</div>
-	</div>
+    <div id="videoChatArea" region="leading" style="width: 40em; height: 100%;" dojoType="dijit.layout.BorderContainer" liveSplitters="true">
+        <div region="top"  style="width: 40em; height: 50%" dojoType="dijit.layout.ContentPane" splitter="true">
+            <div id="videoArea" style="width: 100%; height: 100%" dojoType="dijit.layout.BorderContainer" liveSplitters="true">
+                <div id="video" style="overflow: auto; width: 37em;" region="center" dojoType="dijit.layout.ContentPane" splitter="true">
+                    <div id="card">
+                        <div id="local">
+                            <video width="100%" height="100%" id="localVideo" autoplay="autoplay" muted="true"/>
+                        </div>
+                        <div id="remote">
+                            <video width="100%" height="100%" id="remoteVideo" autoplay="autoplay">
+                            </video>
+                            <div id="mini">
+                                <video width="100%" height="100%" id="miniVideo" autoplay="autoplay" muted="true"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="footer"></div>
+                </div>
+            </div>
+        </div>
+        <div region="center"  style="width: 40em; height: 50%" dojoType="dijit.layout.ContentPane" splitter="true">
+            <div id="chatArea" style="width: 100%; height: 100%" dojoType="dijit.layout.BorderContainer" liveSplitters="true">
+
+                <div id="output" style="overflow: auto; width: 37em;" region="center" dojoType="dijit.layout.ContentPane" splitter="true">
+                </div>
+                <div style="width: 37em;" region="bottom" dojoType="dijit.layout.ContentPane" splitters="true">
+                    <table border="0" cellspacing="5"><tr><td>
+                    <textarea dojoType="azp.BBCodeEditor" cols="40" rows="3" id="chatText"></textarea> <span id="chatBtn" dojoType="dijit.form.Button">Say</span><span id="chatWaitMessage"></span>
+
+                    </td>
+                    <td>
+                    Users:<br>
+                    <div style="width: 10em; overflow: auto;border: 1px solid #888888;" id="userListDiv"></div>
+                    </td>
+                    </tr></table>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
 <div region="center" dojoType="dijit.layout.ContentPane"  splitter="true">
 	draw: 
