@@ -1,6 +1,7 @@
 package com.azprogrammer.qgf.model;
 
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.PersistenceCapable;
@@ -32,6 +33,18 @@ public class VideoRoom {
     private boolean user2Connected = false;
 
 
+    public boolean addUser(String user) {
+        boolean success = true;
+        if (!isUser1Exist()) {
+            setUser1(user);
+        } else if (!isUser2Exist()) {
+            setUser2(user);
+        } else {
+            success = false; // room is crowded
+        }
+        return success;
+    }
+
     public void setUserConnected(String user){
         if(isUser1Equal(user)) {
             setUser1Connected(true);
@@ -47,18 +60,83 @@ public class VideoRoom {
         return false;
     }
 
+    public String getOtherUser(String user) {
+        String otherUser = null;
+        if(isUser1Equal(user)) {
+            otherUser = getUser2();
+        } else if(isUser2Equal(user)) {
+            otherUser = getUser1();
+        }
+        return otherUser;
+    }
+
+    public void removeUser(String user) {
+        if(isUser2Equal(user)) {
+            removeUser2();
+        } else if(isUser1Equal(user)) {
+            if (isUser2Exist()) {
+                setUser1(getUser2());
+                setUser1Connected(isUser2Connected());
+
+                removeUser2();
+            } else {
+                removeUser1();
+            }
+        }
+    }
+
+    public int getOccupancy() {
+        int occupancy = 0;
+        if(isUser1Exist()) {
+            ++occupancy;
+        }
+        if(isUser2Exist()) {
+            ++occupancy;
+        }
+        return occupancy;
+    }
+
+    public boolean isConnectedUser(String user) {
+        boolean connected = false;
+        if (isUser1Equal(user)) {
+            connected = isUser1Connected();
+        }
+        if (isUser2Equal(user)) {
+            connected = isUser2Connected();
+        }
+        return connected;
+    }
+
     private boolean isUser1Equal(String user) {
-        if (getUser1() != null && getUser1().equals(user)) {
+        if (isUser1Exist() && getUser1().equals(user)) {
             return true;
         }
         return false;
     }
 
     private boolean isUser2Equal(String user) {
-        if (getUser2() != null && getUser2().equals(user)) {
+        if (isUser2Exist() && getUser2().equals(user)) {
             return true;
         }
         return false;
+    }
+
+    private void removeUser1() {
+        setUser1(null);
+        setUser1Connected(false);
+    }
+
+    private void removeUser2() {
+        setUser2(null);
+        setUser2Connected(false);
+    }
+
+    private boolean isUser1Exist() {
+        return getUser1() != null && getUser1().length() > 0;
+    }
+
+    private boolean isUser2Exist() {
+        return getUser2() != null && getUser2().length() > 0;
     }
 
     // getters and setters
@@ -103,4 +181,14 @@ public class VideoRoom {
         this.user2Connected = user2Connected;
     }
 
+    @Override
+    public String toString() {
+        return "VideoRoom{" +
+                "key=" + KeyFactory.keyToString(key)+
+                ", user2Connected=" + user2Connected +
+                ", user1Connected=" + user1Connected +
+                ", user2='" + user2 + '\'' +
+                ", user1='" + user1 + '\'' +
+                '}';
+    }
 }

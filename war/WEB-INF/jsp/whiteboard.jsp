@@ -109,6 +109,8 @@ showButtons="false" style="width:500px;"></div><br> <button dojoType="dijit.form
             <div id="videoArea" style="width: 100%; height: 100%" dojoType="dijit.layout.BorderContainer" liveSplitters="true">
                 <div id="video" style="overflow: auto; width: 37em;" region="center" dojoType="dijit.layout.ContentPane" splitter="true">
                     <div id="card">
+                        <span id="callBtn" dojoType="dijit.form.Button" onclick="videoCall()">Call</span>
+                        <span id="callStatus"></span>
                         <div id="local">
                             <video width="100%" height="100%" id="localVideo" autoplay="autoplay" muted="true"/>
                         </div>
@@ -120,7 +122,6 @@ showButtons="false" style="width:500px;"></div><br> <button dojoType="dijit.form
                             </div>
                         </div>
                     </div>
-                    <div id="footer"></div>
                 </div>
             </div>
         </div>

@@ -1,10 +1,114 @@
-/**
- * Created with IntelliJ IDEA.
- * User: max
- * Date: 2/21/13
- * Time: 11:24 PM
- * To change this template use File | Settings | File Templates.
- */
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+    <title>WebRTC Reference App</title>
+    <link rel="canonical" href="{{ room_link }}"/>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1"/>
+    <script src="/_ah/channel/jsapi"></script>
+
+    <!-- Load the polyfill to switch-hit between Chrome and Firefox -->
+    <script src="/js/webrtc/adapter.js"></script>
+
+    <script TYPE="text/javascript" src="http://ajax.googleapis.com/ajax/libs/dojo/1.6/dojo/dojo.xd.js" djConfig="parseOnLoad: true, baseUrl: '/js/', modulePaths:{azp:'azp'}, gfxRenderer:'canvas,svg,vml,silverlight',defaultDuration:1"></script>
+
+
+    <style type="text/css">
+        a:link { color: #ffffff; }
+        a:visited {color: #ffffff; }
+        html, body {
+            background-color: #000000;
+            height: 100%;
+            font-family:Verdana, Arial, Helvetica, sans-serif;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+        }
+        #container {
+            background-color: #000000;
+            position: relative;
+            min-height: 100%;
+            width: 100%;
+            margin: 0px auto;
+            -webkit-perspective: 1000;
+        }
+        #card {
+            -webkit-transition-property: rotation;
+            -webkit-transition-duration: 2s;
+            -webkit-transform-style: preserve-3d;
+        }
+        #local {
+            position: absolute;
+            width: 100%;
+            -webkit-transform: scale(-1, 1);
+            -webkit-backface-visibility: hidden;
+        }
+        #remote {
+            position: absolute;
+            width: 100%;
+            -webkit-transform: rotateY(180deg);
+            -webkit-backface-visibility: hidden;
+        }
+        #mini {
+            position: absolute;
+            height: 30%;
+            width: 30%;
+            bottom: 32px;
+            right: 4px;
+            -webkit-transform: scale(-1, 1);
+            opacity: 1.0;
+        }
+        #localVideo {
+            opacity: 0;
+            -webkit-transition-property: opacity;
+            -webkit-transition-duration: 2s;
+        }
+        #remoteVideo {
+            opacity: 0;
+            -webkit-transition-property: opacity;
+            -webkit-transition-duration: 2s;
+        }
+        #miniVideo {
+            opacity: 0;
+            -webkit-transition-property: opacity;
+            -webkit-transition-duration: 2s;
+        }
+        #footer {
+            spacing: 4px;
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 28px;
+            background-color: #3F3F3F;
+            color: rgb(255, 255, 255);
+            font-size:13px; font-weight: bold;
+            line-height: 28px;
+            text-align: center;
+        }
+        #hangup {
+            font-size:13px; font-weight:bold;
+            color:#FFFFFF;
+            width:128px;
+            height:24px;
+            background-color:#808080;
+            border-style:solid;
+            border-color:#FFFFFF;
+            margin:2px;
+        }
+        #logo {
+            display: block;
+            top:4;
+            right:4;
+            position:absolute;
+            float:right;
+            opacity: 0.5;
+        }
+
+    </style>
+</head>
+<body>
+<script type="text/javascript">
 
 var localVideo;
 var miniVideo;
@@ -27,7 +131,7 @@ var me = false;
 var token = false;
 var initiator = false; // {{ initiator }}; // 0
 var roomLink = false;
-var roomKey = false;
+var roomKey = '<c:out value="${roomKey}"/>';
 var mediaConstraints = false;
 var pcConfig = false;
 var pcConstraints = false;
@@ -37,7 +141,7 @@ function videoCall(callee) {
     console.debug("videoCall");
 
     dojo.xhrGet({
-        url: "/_ah/channel/init",
+        url: "/_ah/channel/init/?roomKey="+roomKey,
         handleAs: "json",
         //timeout: 5000,
         load: function(response, ioArgs){
@@ -95,7 +199,7 @@ function openVideoChannel(channelToken) {
 function resetStatus() {
     console.debug("resetStatus");
     if (!initiator) {
-        setStatus("Waiting for someone to join: <a href=\""+roomLink+"\">"+roomLink+"</a>");
+        setStatus("Waiting for someone to join: <a href=\""+roomLink+"\" TARGET=\"_blank\">"+roomLink+"</a>");
     } else {
         setStatus("Initializing...");
     }
@@ -107,9 +211,9 @@ function doGetUserMedia() {
     var constraints = mediaConstraints; //{{ media_constraints|safe }}; // {"mandatory": {}, "optional": []};
     try {
         getUserMedia({'audio':true, 'video':constraints}, onUserMediaSuccess,
-            onUserMediaError);
+                onUserMediaError);
         console.log("Requested access to local media with mediaConstraints:\n" +
-            "  \"" + JSON.stringify(constraints) + "\"");
+                "  \"" + JSON.stringify(constraints) + "\"");
     } catch (e) {
         alert("getUserMedia() failed. Is this a WebRTC capable browser?");
         console.log("getUserMedia failed with exception: " + e.message);
@@ -129,8 +233,8 @@ function createPeerConnection() {
         pc = new RTCPeerConnection(pc_config, pc_constraints);
         pc.onicecandidate = onIceCandidate;
         console.log("Created RTCPeerConnnection with:\n" +
-            "  config: \"" + JSON.stringify(pc_config) + "\";\n" +
-            "  constraints: \"" + JSON.stringify(pc_constraints) + "\".");
+                "  config: \"" + JSON.stringify(pc_config) + "\";\n" +
+                "  constraints: \"" + JSON.stringify(pc_constraints) + "\".");
     } catch (e) {
         console.log("Failed to create PeerConnection, exception: " + e.message);
         alert("Cannot create RTCPeerConnection object; WebRTC is not supported by this browser.");
@@ -159,7 +263,7 @@ function maybeStart() {
 
 function setStatus(state) {
     console.debug("initialize");
-    callStatus.innerHTML = state;
+    footer.innerHTML = state;
 }
 
 function doCall() {
@@ -175,7 +279,7 @@ function doCall() {
     }
     constraints = mergeConstraints(constraints, sdpConstraints);
     console.log("Sending offer to peer, with constraints: \n" +
-        "  \"" + JSON.stringify(constraints) + "\".");
+            "  \"" + JSON.stringify(constraints) + "\".");
     pc.createOffer(setLocalAndSendMessage, null, constraints);
 }
 
@@ -540,3 +644,26 @@ function removeCN(sdpLines, mLineIndex) {
     sdpLines[mLineIndex] = mLineElements.join(' ');
     return sdpLines;
 }
+
+// RUNNING
+setTimeout(videoCall, 10);
+
+</script>
+<div id="container" ondblclick="enterFullScreen()">
+    <div id="card">
+        <div id="local">
+            <video width="100%" height="100%" id="localVideo" autoplay="autoplay" muted="true"/>
+        </div>
+        <div id="remote">
+            <video width="100%" height="100%" id="remoteVideo" autoplay="autoplay">
+            </video>
+            <div id="mini">
+                <video width="100%" height="100%" id="miniVideo" autoplay="autoplay" muted="true"/>
+            </div>
+        </div>
+    </div>
+    <div id="footer">
+    </div>
+</div>
+</body>
+</html>
