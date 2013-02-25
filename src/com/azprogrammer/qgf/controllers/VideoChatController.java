@@ -128,35 +128,25 @@ public class VideoChatController {
             // New
             if(room == null && !"full".equals(debug)) {
                 user = generateName(10);
+                //roomKey = generateName(10);
                 room = new VideoRoom();
-                if (room.addUser(user)) {
-                    persistenceManager.makePersistent(room);
-                } else {
-                    // TODO: Room is full
-                    LOG.warning("Room "+roomKey+" is full");
-                }
+                //room.setKey(KeyFactory.createKey("", roomKey));
+                room.addUser(user);
+                persistenceManager.makePersistent(room);
 
                 if (!"loopback".equals(debug)) {
                     initiator = 0;
                 } else {
-                    if (room.addUser(user)) {
-                        persistenceManager.makePersistent(room);
-                        initiator = 1;
-                    } else {
-                        // TODO: Room is full
-                        LOG.warning("Room "+roomKey+" is full");
-                    }
-                }
-            // Free
-            } else if (room !=null && room.getOccupancy() == 1 &&  !"full".equals(debug)) {
-                user = generateName(10);
-                if (room.addUser(user)) {
+                    room.addUser(user); // add the same user
                     persistenceManager.makePersistent(room);
                     initiator = 1;
-                } else {
-                    // TODO: Room is full
-                    LOG.warning("Room "+roomKey+" is full");
                 }
+            // Free
+            } else if (room !=null && room.getOccupancy() < 3 &&  !"full".equals(debug)) {
+                user = generateName(10);
+                room.addUser(user);
+                persistenceManager.makePersistent(room);
+                initiator = 1;
             // Full
             } else {
                 // TODO: Room is full
@@ -209,28 +199,34 @@ public class VideoChatController {
             log.append("ROOM by key "+roomKey+" found "+room);
             if (room != null) {
                 JSONObject jsonObject = JSONObject.fromObject(message);
-                if("bye".equalsIgnoreCase((String) jsonObject.get("type"))) {
+                String type =(String) jsonObject.get("type");
+                if("bye".equalsIgnoreCase(type)) {
                     room.removeUser(user);
                     LOG.info("User " + user + " quit from room " + roomKey);
                     LOG.info("Room " + roomKey + " has state " + room);
                 }
                 String otherUser = room.getOtherUser(user);
                 if(otherUser != null && room.hasUser(otherUser)) {
-                    if(otherUser.equals(user)) {
-                        message = message.replace("\"offer\"", "\"answer\"");
-                        message = message.replace("a=ice-options:google-ice\\r\\n", "");
+                    if ("offer".equalsIgnoreCase(type)) {
+                        // Special case the loopback scenario
+                        if(otherUser.equals(user)) {
+                            message = message.replace("\"offer\"", "\"answer\"");
+                            message = message.replace("a=ice-options:google-ice\\r\\n", "");
+                        }
+                        message = maybeAddFakeCrypto(message);
                     }
                     String clientId = makeClientId(room.getKey(), user);
-                    if (room.isConnectedUser(user)) {
+                    //if (room.isConnectedUser(user)) {   // TODO: All of users should be connected
+                        channelService = ChannelServiceFactory.getChannelService();
                         channelService.sendMessage(new ChannelMessage(clientId, message));
                         LOG.info("Delivered message to user " + user);
-                    } else {
-                        VideoMessage newMessage = new VideoMessage();
-                        newMessage.setClientId(clientId);
-                        newMessage.setText(new Text(message));
-                        persistenceManager.makePersistent(newMessage);
-                        LOG.info("Saved message for user " + user);
-                    }
+//                    } else {
+//                        VideoMessage newMessage = new VideoMessage();
+//                        newMessage.setClientId(clientId);
+//                        newMessage.setText(new Text(message));
+//                        persistenceManager.makePersistent(newMessage);
+//                        LOG.info("Saved message for user " + user);
+//                    }
                 }
             } else {
                 LOG.warning("Unknown room " + roomKey);
@@ -290,9 +286,23 @@ public class VideoChatController {
         }
     }
 
+
+    private String maybeAddFakeCrypto(String message) {
+        if ( message.indexOf("a=crypto") == -1 ) {
+            String cryptoLine = "a=crypto:1 AES_CM_128_HMAC_SHA1_80 inline:BAADBAADBAADBAADBAADBAADBAADBAADBAADBAAD\\r\\n";
+            // reverse find for multiple find and insert operations.
+            int index = message.indexOf("c=IN", 0);
+            while (index != -1) {
+                message = message.substring(0, index) + cryptoLine + message.substring(index);
+                index = message.indexOf("c=IN", 0);
+            }
+        }
+        return message;
+    }
+
     private String createChannel(VideoRoom room, String user, int duration) {
         String clientId = makeClientId(room.getKey(), user);
-        return ChannelServiceFactory.getChannelService().createChannel(clientId, duration);
+        return ChannelServiceFactory.getChannelService().createChannel(clientId);//, duration);
     }
 
     private String generateName(int length) {
@@ -309,7 +319,7 @@ public class VideoChatController {
     }
 
     private StringBuffer buildMediaConstraints(String hdVideo) {
-        StringBuffer constraints = new StringBuffer("{ \"optional\": [], \"mandatory\": {");
+        StringBuffer constraints = new StringBuffer("{ \"mandatory\": {");
         // Demo 16:9 video with media constraints.
         if ("true".equals(hdVideo)) {
             // Demo with WHD by setting size with 1280x720.
@@ -321,7 +331,7 @@ public class VideoChatController {
             //constraints['mandatory']['maxAspectRatio'] = 1.778
             //constraints['mandatory']['minAspectRatio'] = 1.777
         }
-        constraints.append("} }");
+        constraints.append("}, \"optional\": [] }");
         return constraints;
     }
 
@@ -329,7 +339,7 @@ public class VideoChatController {
         StringBuffer constraints = new StringBuffer("{ \"mandatory\": {");
         // # For interop with FireFox. Disable Data Channel in createOffer.
         if ("TRUE".equals(compat.toUpperCase())) {
-            constraints.append("\"MozDontOfferDataChannel\":\"true\"");
+            constraints.append("\"MozDontOfferDataChannel\": true ");
         }
         constraints.append("}, \"optional\": [] }");
         return constraints;
@@ -338,7 +348,7 @@ public class VideoChatController {
     private StringBuffer buildPcConstraints(String compat) {
         StringBuffer constraints = new StringBuffer("{ \"optional\": [");
         if ("TRUE".equals(compat.toUpperCase())) {
-            constraints.append("{\"DtlsSrtpKeyAgreement\": \"true\"}");
+            constraints.append("{\"DtlsSrtpKeyAgreement\": true}");
         }
         constraints.append("] }");
         return constraints;
@@ -388,8 +398,8 @@ public class VideoChatController {
     }
 
     private String makeClientId(Key key, String user) {
-        return keyToString(key)+"/"+user;
-
+        //return keyToString(key)+"/"+user;
+        return KeyFactory.keyToString(key);//+"/"+user;
     }
 
     private String keyToString(Key key) {

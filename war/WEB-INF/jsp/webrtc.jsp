@@ -185,7 +185,7 @@ function initialize() {
 
 function openVideoChannel(channelToken) {
     console.debug("openVideoChannel");
-    console.log("Opening channel.");
+    console.log("Opening channel with token = "+channelToken);
     var channel = new goog.appengine.Channel(channelToken);
     var handler = {
         'onopen': onChannelOpened,

@@ -27,22 +27,24 @@ public class VideoRoom {
     private String user2 = null;
 
     @Persistent
+    private String guest = null;
+
+    @Persistent
     private boolean user1Connected = false;
 
     @Persistent
     private boolean user2Connected = false;
 
 
-    public boolean addUser(String user) {
+    public void addUser(String user) {
         boolean success = true;
         if (!isUser1Exist()) {
             setUser1(user);
         } else if (!isUser2Exist()) {
             setUser2(user);
         } else {
-            success = false; // room is crowded
+            setGuest(user);
         }
-        return success;
     }
 
     public void setUserConnected(String user){
@@ -179,6 +181,14 @@ public class VideoRoom {
 
     public void setUser2Connected(boolean user2Connected) {
         this.user2Connected = user2Connected;
+    }
+
+    public String getGuest() {
+        return guest;
+    }
+
+    public void setGuest(String guest) {
+        this.guest = guest;
     }
 
     @Override
