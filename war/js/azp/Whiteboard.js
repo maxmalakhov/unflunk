@@ -151,7 +151,13 @@ var	populateUserList = function(userList){
 		try{
 			var output = '';
 			dojo.forEach(userList,function(user){
-				output += ('<span id=\"userListItem' + user + '\" style=\"background-color: #FFFFFF;\">' + user + '</span><br>'); 
+				output += ('<span id=\"userListItem' + user + '\" style=\"background-color: #FFFFFF;\">' + user + '</span>');
+                if(userName.toLowerCase() != user.toLowerCase()) {
+                    output += (' - <a style=\"color: green;\" id=\"callBtn'+user+'\" onclick=\"call(\''+user+'\')\">Call</a>');
+                } else {
+                    output += (' - <a style=\"color: grey;\" id=\"answerBtn'+userName+'\">Answer</a>');
+                }
+                output += ('<br>');
 			});
 			dojo.byId("userListDiv").innerHTML = output;
 		}catch(e){
@@ -230,7 +236,29 @@ var onOpened = function() {
 		
 		var messageListStr = '';
 		for(var i=0; i < chatMessageList.length; i++){
-			messageListStr += chatMessageList[i];
+            var text = chatMessageList[i].split('###')[0];
+
+			messageListStr += text;
+
+            var roomKey = chatMessageList[i].split('###')[1];
+            // little hack if roomKey exists
+            if(roomKey) {
+                messageListStr += '</pre><br>';
+            }
+            // set answer action
+            var sender = text.match('<span.*>(.*)</span>')[1];
+            var answerBtn = dojo.byId('answerBtn'+userName);
+            if(roomKey && answerBtn) {
+                if (sender.toLowerCase() !== userName.toLowerCase()) {
+                    answerBtn.setAttribute('style','color: red;');
+                    answerBtn.setAttribute('onclick','answer("'+roomKey.replace('</pre><br>', '')+'")');
+                } else {
+                    // TODO: mark red color user call button
+                }
+            }
+
+            console.debug('from: '+sender+', to: '+userName);
+            console.debug('text: '+text+', roomKey: '+roomKey);
 		}
 		dojo.byId('output').innerHTML= messageListStr;
 		dojo.byId('output').scrollTop = dojo.byId('output').scrollHeight;
@@ -256,7 +284,7 @@ var onOpened = function() {
 	{
 		messageList.push(obj);
 	}
-	
+
 	if(obj.userList && (obj.userList.length > 0)){
 		populateUserList(obj.userList);
 	}

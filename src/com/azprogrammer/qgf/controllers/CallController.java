@@ -42,7 +42,6 @@ import com.google.appengine.api.channel.ChannelService;
 import com.google.appengine.api.channel.ChannelServiceFactory;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
-import com.google.appengine.api.datastore.Text;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 import net.sf.json.JSONObject;
@@ -58,24 +57,25 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 import java.util.logging.Logger;
 
 /**
- * Serves web requests for operations with Video Sharing over P2P.
+ * Serves web requests for operations with Call over P2P.
  *
  * @author Max Malakhov <malakhovbox@gmail.com>
  * @since 2013-02-21
  */
 @Controller
-public class VideoChatController {
+public class CallController {
 
-    private static Logger LOG = Logger.getLogger("VideoChatController");
+    private static Logger LOG = Logger.getLogger("CallController");
 
 
-    private static final String URL_DEMO_PAGE = "/webrtc";
+    private static final String URL_DEMO_PAGE = "/call";
 
     private static  final String URL_INIT = "/_ah/channel/init";
     private static final String URL_MESSAGE = "/_ah/channel/message";
@@ -90,7 +90,7 @@ public class VideoChatController {
 
     private ChannelService channelService;
 
-    public VideoChatController() {
+    public CallController() {
         userService = UserServiceFactory.getUserService();
         //persistenceManager = PMF.get().getPersistenceManager();
         channelService = ChannelServiceFactory.getChannelService();
@@ -103,31 +103,38 @@ public class VideoChatController {
 
 
     @RequestMapping(value = URL_DEMO_PAGE, method = RequestMethod.GET)
-    public ModelAndView showDemoPage(@RequestParam(required = false) String roomKey) {
-        return new ModelAndView("webrtc", "roomKey", roomKey);
+    public ModelAndView showTestPage(@RequestParam(required = false) String roomKey) {
+        return new ModelAndView("call", "roomKey", roomKey);
     }
 
     @RequestMapping(value = URL_INIT, method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
     @ResponseBody
-    public String init(@RequestParam(required = false) String otherUser, @RequestParam(required = false) String roomKey,
-                     @RequestParam(required = false) String ss, @RequestParam(required = false) String ts,
-                     @RequestParam(required = false) String tp, @RequestParam(required = false) String compat,
-                     @RequestParam(required = false) String debug, @RequestParam(required = false) String hd,
-                     HttpServletRequest request, HttpServletResponse response) {
+    public String init(@RequestParam(required = false) String callee, @RequestParam(required = false) String roomKey,
+                       @RequestParam(required = false) String token,
+                       @RequestParam(required = false) String ss, @RequestParam(required = false) String ts,
+                       @RequestParam(required = false) String tp, @RequestParam(required = false) String compat,
+                       @RequestParam(required = false) String debug, @RequestParam(required = false) String hd,
+                       HttpServletRequest request, HttpServletResponse response, HttpSession session) {
 
         String server = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
-        String baseUrl = server + request.getContextPath() + "/webrtc/";
+        String baseUrl = server + request.getContextPath() + "/call/";
 
-        String user = null;
+        String user = (String) session.getAttribute("userName");
         int initiator = 0;
         VideoRoom room = null;
         synchronized (this) {
             if ( roomKey != null) {
-                room = persistenceManager.getObjectById(VideoRoom.class, KeyFactory.stringToKey(roomKey));
+                //room = persistenceManager.getObjectById(VideoRoom.class, KeyFactory.stringToKey(roomKey));
+                List<VideoRoom> rooms = (List<VideoRoom>) persistenceManager.find(VideoRoom.class, "this.roomKey == roomKey", "String roomKey", roomKey);
+                if (rooms != null && !rooms.isEmpty()) {
+                    room = rooms.get(0);
+                }
             }
             // New
             if(room == null && !"full".equals(debug)) {
-                user = generateName(10);
+                if(user == null) {
+                    user = generateName(10);
+                }
                 //roomKey = generateName(10);
                 room = new VideoRoom();
                 //room.setKey(KeyFactory.createKey("", roomKey));
@@ -143,23 +150,33 @@ public class VideoChatController {
                 }
             // Free
             } else if (room !=null && room.getOccupancy() < 3 &&  !"full".equals(debug)) {
-                user = generateName(10);
+                if(user == null) {
+                    user = generateName(10);
+                }
                 room.addUser(user);
                 persistenceManager.makePersistent(room);
-                initiator = 1;
+                if (room.getOccupancy() == 1) {
+                    initiator = 0;
+                } else {
+                    initiator = 1;
+                }
             // Full
             } else {
                 // TODO: Room is full
                 LOG.warning("Room "+roomKey+" is full");
             }
 
-
+            if(roomKey == null) {
+                roomKey = KeyFactory.keyToString(room.getKey());
+            }
+            room.setRoomKey(roomKey);
+            persistenceManager.makePersistent(room);
+            roomKey = KeyFactory.keyToString(room.getKey());
         }
 
-        roomKey = KeyFactory.keyToString(room.getKey());
-        String roomLink = baseUrl + "?roomKey=" + roomKey;
-        String token = createChannel(room, user, 30);
+        token = createChannel(room, user, 30);
 
+        String roomLink = baseUrl + "?roomKey=" + roomKey;
         if(compat == null) {
             compat = "TRUE";
         }
@@ -213,7 +230,7 @@ public class VideoChatController {
                             message = message.replace("\"offer\"", "\"answer\"");
                             message = message.replace("a=ice-options:google-ice\\r\\n", "");
                         }
-                        message = maybeAddFakeCrypto(message);
+                        //message = maybeAddFakeCrypto(message);
                     }
                     String clientId = makeClientId(room.getKey(), user);
                     //if (room.isConnectedUser(user)) {   // TODO: All of users should be connected

@@ -21,6 +21,12 @@ public class VideoRoom {
     protected Key key;
 
     @Persistent
+    private String roomKey = null;
+
+    @Persistent
+    private String token = null;
+
+    @Persistent
     private String user1 = null;
 
     @Persistent
@@ -151,6 +157,22 @@ public class VideoRoom {
         this.key = key;
     }
 
+    public String getRoomKey() {
+        return roomKey;
+    }
+
+    public void setRoomKey(String roomKey) {
+        this.roomKey = roomKey;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
     public String getUser1() {
         return user1;
     }
@@ -195,10 +217,13 @@ public class VideoRoom {
     public String toString() {
         return "VideoRoom{" +
                 "key=" + KeyFactory.keyToString(key)+
-                ", user2Connected=" + user2Connected +
-                ", user1Connected=" + user1Connected +
-                ", user2='" + user2 + '\'' +
+                ", roomKey='" + roomKey + '\'' +
+                ", token='" + token + '\'' +
                 ", user1='" + user1 + '\'' +
+                ", user2='" + user2 + '\'' +
+                ", guest='" + guest + '\'' +
+                ", user1Connected=" + user1Connected +
+                ", user2Connected=" + user2Connected +
                 '}';
     }
 }

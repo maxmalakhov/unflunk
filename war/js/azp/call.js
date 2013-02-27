@@ -24,26 +24,28 @@ var isVideoMuted = false;
 var isAudioMuted = false;
 
 var me = false;
-var token = false;
+var callee = '';
+var channelToken = '';
 var initiator = false; // {{ initiator }}; // 0
 var roomLink = false;
-var roomKey = false;
+var roomKey = '';
 var mediaConstraints = false;
 var pcConfig = false;
 var pcConstraints = false;
 var offerConstraints = false;
 
-function videoCall(callee) {
+function call(localRoomKey) {
     console.debug("videoCall");
 
+    roomKey = localRoomKey || roomKey;
+
     dojo.xhrGet({
-        url: "/_ah/channel/init",
+        url: "/_ah/channel/init/?roomKey="+roomKey,
         handleAs: "json",
-        //timeout: 5000,
+        //timeout: 10000,
         load: function(response, ioArgs){
             console.debug("Form submitted successfully.");
             console.debug(dojo.toJson(response));
-
 
             initiator = response.initiator;
             me = response.me;
@@ -62,7 +64,6 @@ function videoCall(callee) {
             return response;
         }
     });
-
 }
 
 // Methods
@@ -81,7 +82,7 @@ function initialize() {
 
 function openVideoChannel(channelToken) {
     console.debug("openVideoChannel");
-    console.log("Opening channel.");
+    console.log("Opening channel with token = "+channelToken);
     var channel = new goog.appengine.Channel(channelToken);
     var handler = {
         'onopen': onChannelOpened,
@@ -95,7 +96,7 @@ function openVideoChannel(channelToken) {
 function resetStatus() {
     console.debug("resetStatus");
     if (!initiator) {
-        setStatus("Waiting for someone to join: <a href=\""+roomLink+"\">"+roomLink+"</a>");
+        setStatus("Waiting for someone to join: <a href=\""+roomLink+"\" TARGET=\"_blank\">"+roomLink+"</a>");
     } else {
         setStatus("Initializing...");
     }
@@ -425,8 +426,6 @@ function toggleAudioMute() {
 
     isAudioMuted = !isAudioMuted;
 }
-
-// setTimeout(initialize, 1); // Run Script
 
 // Send BYE on refreshing(or leaving) a demo page
 // to ensure the room is cleaned for next session.
