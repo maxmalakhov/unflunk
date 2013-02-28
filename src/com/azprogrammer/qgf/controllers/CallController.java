@@ -35,8 +35,8 @@ package com.azprogrammer.qgf.controllers;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
-import com.azprogrammer.qgf.model.VideoMessage;
-import com.azprogrammer.qgf.model.VideoRoom;
+import com.azprogrammer.qgf.model.Call;
+import com.azprogrammer.qgf.model.CallMessage;
 import com.google.appengine.api.channel.ChannelMessage;
 import com.google.appengine.api.channel.ChannelService;
 import com.google.appengine.api.channel.ChannelServiceFactory;
@@ -60,7 +60,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.util.List;
 import java.util.Random;
-import java.util.UUID;
 import java.util.logging.Logger;
 
 /**
@@ -121,11 +120,11 @@ public class CallController {
 
         String user = (String) session.getAttribute("userName");
         int initiator = 0;
-        VideoRoom room = null;
+        Call room = null;
         synchronized (this) {
             if ( roomKey != null) {
-                //room = persistenceManager.getObjectById(VideoRoom.class, KeyFactory.stringToKey(roomKey));
-                List<VideoRoom> rooms = (List<VideoRoom>) persistenceManager.find(VideoRoom.class, "this.roomKey == roomKey", "String roomKey", roomKey);
+                //room = persistenceManager.getObjectById(Call.class, KeyFactory.stringToKey(roomKey));
+                List<Call> rooms = (List<Call>) persistenceManager.find(Call.class, "this.roomKey == roomKey", "String roomKey", roomKey);
                 if (rooms != null && !rooms.isEmpty()) {
                     room = rooms.get(0);
                 }
@@ -136,7 +135,7 @@ public class CallController {
                     user = generateName(10);
                 }
                 //roomKey = generateName(10);
-                room = new VideoRoom();
+                room = new Call();
                 //room.setKey(KeyFactory.createKey("", roomKey));
                 room.addUser(user);
                 persistenceManager.makePersistent(room);
@@ -207,9 +206,9 @@ public class CallController {
     public void message(@RequestBody String message, @RequestParam String roomKey, @RequestParam String user) {
         StringBuilder log = new StringBuilder();
         synchronized (this) {
-            VideoRoom room = null;
+            Call room = null;
             try {
-                room = persistenceManager.getObjectById(VideoRoom.class, KeyFactory.stringToKey(roomKey));
+                room = persistenceManager.getObjectById(Call.class, KeyFactory.stringToKey(roomKey));
             } catch (IllegalArgumentException ex) {
                 LOG.warning(ex.getMessage());
             }
@@ -238,7 +237,7 @@ public class CallController {
                         channelService.sendMessage(new ChannelMessage(clientId, message));
                         LOG.info("Delivered message to user " + user);
 //                    } else {
-//                        VideoMessage newMessage = new VideoMessage();
+//                        CallMessage newMessage = new CallMessage();
 //                        newMessage.setClientId(clientId);
 //                        newMessage.setText(new Text(message));
 //                        persistenceManager.makePersistent(newMessage);
@@ -257,7 +256,7 @@ public class CallController {
         String roomKey = from.split("/")[0];
         String user = from.split("/")[1];
         synchronized (this) {
-            VideoRoom room = persistenceManager.getObjectById(VideoRoom.class, KeyFactory.stringToKey(roomKey));
+            Call room = persistenceManager.getObjectById(Call.class, KeyFactory.stringToKey(roomKey));
             if (room != null && room.hasUser(user)) {
                 room.setUserConnected(user);
                 persistenceManager.makePersistent(room);
@@ -278,7 +277,7 @@ public class CallController {
         String roomKey = from.split("/")[0];
         String user = from.split("/")[1];
         synchronized (this) {
-            VideoRoom room = persistenceManager.getObjectById(VideoRoom.class, KeyFactory.stringToKey(roomKey));
+            Call room = persistenceManager.getObjectById(Call.class, KeyFactory.stringToKey(roomKey));
             if (room != null && room.hasUser(user)) {
                 // remove user
                 deleteSavedMessage(room.getKey(), user);
@@ -317,7 +316,7 @@ public class CallController {
         return message;
     }
 
-    private String createChannel(VideoRoom room, String user, int duration) {
+    private String createChannel(Call room, String user, int duration) {
         String clientId = makeClientId(room.getKey(), user);
         return ChannelServiceFactory.getChannelService().createChannel(clientId);//, duration);
     }
@@ -390,7 +389,7 @@ public class CallController {
 
     private void deleteSavedMessage(Key key, String user) {
         String clientId = makeClientId(key, user);
-        for(VideoMessage message: findMessageByClientId(clientId)) {
+        for(CallMessage message: findMessageByClientId(clientId)) {
             persistenceManager.deletePersistent(message);
             LOG.info("Deleted the saved message for " + clientId);
         }
@@ -398,20 +397,20 @@ public class CallController {
 
     private void sendSavedMessages(Key key, String user) {
         String clientId = makeClientId(key, user);
-        for(VideoMessage message: findMessageByClientId(clientId)) {
+        for(CallMessage message: findMessageByClientId(clientId)) {
             channelService.sendMessage(new ChannelMessage(clientId, message.getText().getValue() ));
             LOG.info("Delivered saved message to " + clientId);
             persistenceManager.deletePersistent(message);
         }
     }
 
-    private List<VideoMessage> findMessageByClientId(String clientId) {
-        return (List<VideoMessage>) persistenceManager.find(VideoMessage.class, "this.clientId == clientId", "String clientId", clientId);
+    private List<CallMessage> findMessageByClientId(String clientId) {
+        return (List<CallMessage>) persistenceManager.find(CallMessage.class, "this.clientId == clientId", "String clientId", clientId);
 
-//        Query query = persistenceManager.newQuery(VideoMessage.class, "this.clientId == clientId");
+//        Query query = persistenceManager.newQuery(CallMessage.class, "this.clientId == clientId");
 //        query.declareParameters("String clientId");
 //
-//        return (List<VideoMessage>) query.execute(clientId);
+//        return (List<CallMessage>) query.execute(clientId);
     }
 
     private String makeClientId(Key key, String user) {

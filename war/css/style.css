@@ -290,3 +290,31 @@ button {  width: auto; overflow: visible; }
 	color: #0000FF;	
 }
 
+#header{
+    font-size: 3em;
+    text-align: center;
+
+}
+
+#setUserDiv{
+    text-align: center;
+}
+
+._webstore_badge {
+    width: 128px;
+    height: 190px;
+    top: 0px;
+    right: 0px;
+    position: absolute;
+    margin: 0 50px 0 50px;
+    padding: 5px;
+    box-shadow: #000 0 0 5px;
+    background-color: #eae88c;
+    border: solid 1px #c9c778;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    display: inline;
+    font-family: Arial;
+    opacity: 1;
+    -webkit-transition: all 0.5s ease-in-out;
+}

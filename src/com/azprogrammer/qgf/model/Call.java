@@ -14,7 +14,7 @@ import javax.jdo.annotations.PrimaryKey;
  * @since 2013-02-21
  */
 @PersistenceCapable
-public class VideoRoom {
+public class Call {
 
     @PrimaryKey
     @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
@@ -215,7 +215,7 @@ public class VideoRoom {
 
     @Override
     public String toString() {
-        return "VideoRoom{" +
+        return "Call{" +
                 "key=" + KeyFactory.keyToString(key)+
                 ", roomKey='" + roomKey + '\'' +
                 ", token='" + token + '\'' +

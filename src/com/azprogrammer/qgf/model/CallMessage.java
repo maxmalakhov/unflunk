@@ -14,7 +14,7 @@ import javax.jdo.annotations.PrimaryKey;
  * @since 2013-02-22
  */
 @PersistenceCapable
-public class VideoMessage {
+public class CallMessage {
 
     @PrimaryKey
     @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
