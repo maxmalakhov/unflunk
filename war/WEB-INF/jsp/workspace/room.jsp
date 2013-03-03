@@ -1,5 +1,9 @@
 
-<div dojoType="dijit.layout.ContentPane" closable="true" id="${wbId}">
+<script>
+dojo.require('workspace.BBCodeEditor');
+</script>
+
+<div dojoType="dijit.layout.ContentPane" style="padding:0;" closable="true" id="${wbId}">
 <!-- Room Area -->
 <div style="width: 100%; height: 100%;" dojoType="dijit.layout.BorderContainer" liveSplitters="true" >
 <!-- Left Panel -->
@@ -237,8 +241,6 @@ Or start a new whiteboard: <a href="http://${hostName}/whiteboard">http://${host
 <div id="imgDialog" dojoType="dijit.Dialog" title="Right-click on image to save it">
     <img id="exportedImg" name="exportedImg">
 </div>
-
-
 
 <div id="textDialog" dojoType="dijit.Dialog" title="Type in some text."  style="display: none">
     <input type="text" dojoType="dijit.form.ValidationTextBox" id="wbText" name="wbText"><br>

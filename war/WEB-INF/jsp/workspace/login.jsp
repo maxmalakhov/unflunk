@@ -1,12 +1,10 @@
-<jsp:include page="basicheader.jsp"/>
+<jsp:include page="../basicheader.jsp"/>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%
  String hostName=request.getServerName();
 %>
 
-<script src='/_ah/channel/jsapi'></script>
 <script>
-dojo.require('workspace.BBCodeEditor');
 
 var wbId = '${wbId}';
 var token = '${token}';
@@ -14,18 +12,14 @@ var userName = '${userName}';
 var error = '${errorMsg}';
 </script>
 <%--<script src="/js/azp/WBCommon.js"></script>--%>
-<script src="/js/workspace/whiteboard.js"></script>
+<script src="/js/workspace/login.js"></script>
 
 <script type="text/javascript">
     dojo.require("dijit.layout.TabContainer");
     dojo.require("dojox.layout.TableContainer");
     dojo.require("dijit.layout.ContentPane");
+    dojo.require("dijit.form.ValidationTextBox");
 </script>
-
-<!-- Call specific libs and styles -->
-<script src="/js/azp/adapter.js"></script>
-<script src="/js/azp/call-ext.js"></script>
-<link rel="stylesheet" href="/css/call.css">
 
 <style>
 #header{
@@ -59,8 +53,7 @@ var error = '${errorMsg}';
 
 </style>
 
-
-<div id="setUserDiv" style="display: none; padding: 5px;">
+<div id="setUserDiv" style="padding: 5px;">
 	<div id="header"><h1>Collaborative Whiteboard</h1></div>
 	
 	<br>
@@ -73,10 +66,4 @@ var error = '${errorMsg}';
 
 </div>
 
-<div id="applicationArea" style="width: 100%; height: 100%; display: none; position: absolute; top: 0; bottom: 0;"  dojoType="dijit.layout.TabContainer">
-
-<jsp:include page="room.jsp"/>
-
-</div> <!-- TabsArea -->
-
-<jsp:include page="footer.jsp"/>
+<jsp:include page="../footer.jsp"/>

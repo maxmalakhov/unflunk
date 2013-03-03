@@ -9,7 +9,7 @@ My demo space for playing with AppEngine things.
 <br><br>
 <h2>Demos</h2>
 <a href="/whiteboard">Collaborative Whiteboard</a>
-</br><a href="/workspace">Start Workspace</a>
+</br><a href="/workspace/login">Start Workspace</a>
 
 <br><br>
 <br><br>
