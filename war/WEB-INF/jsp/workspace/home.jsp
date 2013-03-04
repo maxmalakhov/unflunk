@@ -6,7 +6,7 @@
 
 <script src='/_ah/channel/jsapi'></script>
 <script>
-dojo.require('workspace.BBCodeEditor');
+//dojo.require('workspace.BBCodeEditor');
 
 var userName = '${userName}';
 var workspaceId = '${workspaceId}';
@@ -22,13 +22,14 @@ var error = '${errorMsg}';
     dojo.require("dijit.layout.ContentPane");
     dojo.require("dijit.Toolbar");
     dojo.require("dijit.form.Button");
+    dojo.require("dijit.form.Textarea");
     dojo.require("dijit.form.ToggleButton");
     dojo.require("dijit.ToolbarSeparator");
 </script>
 
 <!-- Call specific libs and styles -->
 <script src="/js/azp/adapter.js"></script>
-<script src="/js/azp/call-ext.js"></script>
+<script src="/js/workspace/call.js"></script>
 <link rel="stylesheet" href="/css/call.css">
 
 <style>

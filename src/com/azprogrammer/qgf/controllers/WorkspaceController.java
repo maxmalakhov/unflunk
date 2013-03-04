@@ -212,8 +212,9 @@ public class WorkspaceController {
             String[] exlcudes = new String[] {"key","wbKey","userList","shapeId"};
             jsconfig.setExcludes (exlcudes);
             HashMap<String, Object> messagesMap = new HashMap <String, Object>();
-            messagesMap.put("messages", messages);
-            model.put("messageMapJSON", JSONObject.fromObject(messagesMap, jsconfig).toString());
+            //messagesMap.put("messages", messages);
+            //model.put("messageMapJSON", JSONObject.fromObject(messagesMap, jsconfig).toString());
+            model.put("messages", messages);
 
             wbKeyStr = KeyFactory.keyToString(whiteboard.getKey ());
 
@@ -293,8 +294,8 @@ public class WorkspaceController {
                 String[] exlcudes = new String[] {"key","wbKey","userList","shapeId"};
                 jsconfig.setExcludes (exlcudes);
                 HashMap<String, Object> messagesMap = new HashMap <String, Object>();
-                messagesMap.put("messages", messages);
-                model.put("messageMapJSON", JSONObject.fromObject(messagesMap,jsconfig).toString());
+                model.put("messages", messages);
+                //model.put("messageMapJSON", JSONObject.fromObject(messagesMap,jsconfig).toString());
 
                 wbKeyStr = KeyFactory.keyToString(whiteboard.getKey ());
 

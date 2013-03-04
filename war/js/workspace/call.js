@@ -1,13 +1,26 @@
 /**
  * Created with IntelliJ IDEA.
  * User: max
- * Date: 2/21/13
+ * Date: 3/04/13
  * Time: 11:24 PM
  * To change this template use File | Settings | File Templates.
  */
 
-(function (){
+function Call(wbId, callId) {
+    this.wbId = wbId;
+    this.callId = callId;
 
+    this.getNode = function(clazz) {
+        return dojo.query("."+clazz, this.wbId)[0];
+    };
+    this.getWidget = function(clazz) {
+        return dijit.getEnclosingWidget(this.getNode(clazz));
+    };
+}
+
+Call.prototype.call = function() {
+    var call = this;
+    var card;
     var localVideo;
     var miniVideo;
     var remoteVideo;
@@ -28,34 +41,16 @@
     var me = false;
     var callee = '';
     var initiator = false; // {{ initiator }}; // 0
-    var roomLink = false;
-    var roomKey = '';
+    //var roomLink = false;
+    var roomKey = call.wbId;
     var mediaConstraints = false;
     var pcConfig = false;
     var pcConstraints = false;
     var offerConstraints = false;
 
     //================== User Action =====================
-
-    //function call(localRoomKey) {
-    this.call = function(user) {
-        console.debug("call");
-
-        callee = user || callee;
-
-        start("/_ah/channel/init/?callee="+callee);
-    };
-
-    this.answer = function(localRoomKey) {
-        console.debug("answer()");
-
-        roomKey = localRoomKey || roomKey;
-
-        start("/_ah/channel/init/?roomKey="+roomKey);
-    };
-
     this.hangup = function() {
-    //function onHangup() {
+        //function onHangup() {
         console.debug("onHangup");
         console.log("Hanging up.");
         transitionToDone();
@@ -65,8 +60,7 @@
     };
 
     //================== Private Methods =====================
-
-    function start(url) {
+    var start = function(url) {
         dojo.xhrGet({
             url: url,
             handleAs: "json",
@@ -82,7 +76,7 @@
                 pcConfig = response.pcConfig;
                 pcConstraints = response.pcConstraints;
                 roomKey = response.roomKey;
-                roomLink = response.roomLink;
+                //roomLink = response.roomLink;
                 var channelToken = response.token;
                 initialize(channelToken);
             },
@@ -93,21 +87,19 @@
                 return response;
             }
         });
-    }
-
-    function initialize(channelToken) {
+    };
+    var initialize = function(channelToken) {
         console.debug("initialize");
         console.log("Initializing; room="+roomKey+".");
-        card = document.getElementById("card");
-        localVideo = document.getElementById("localVideo");
-        miniVideo = document.getElementById("miniVideo");
-        remoteVideo = document.getElementById("remoteVideo");
+        card = call.getNode("card");
+        localVideo = call.getNode("localVideo");
+        miniVideo = call.getNode("miniVideo");
+        remoteVideo = call.getNode("remoteVideo");
         resetStatus();
         openChannel(channelToken);
         doGetUserMedia();
-    }
-
-    function openChannel(channelToken) {
+    };
+    var openChannel = function(channelToken) {
         console.debug("openVideoChannel");
         console.log("Opening channel with token = "+channelToken);
         var channel = new goog.appengine.Channel(channelToken);
@@ -118,21 +110,17 @@
             'onclose': onChannelClosed
         };
         socket = channel.open(handler);
-    }
-
-    function resetStatus() {
+    };
+    var resetStatus = function() {
         console.debug("resetStatus");
         if (!initiator) {
-            setStatus("Waiting for someone to join: <a href=\""+roomLink+"\" TARGET=\"_blank\">"+roomLink+"</a>");
-            if(typeof(dijit.byId) !== "undefined") {
-                dijit.byId('chatText').textArea.setValue(' is calling '+callee+' ###'+roomKey);
-            }
+            setStatus("Waiting for someone to join");//: <a href=\""+roomLink+"\" TARGET=\"_blank\">"+roomLink+"</a>");
+            call.getNode('chatText').innerHTML = " is calling you";//textArea.setValue(' is calling ');
         } else {
             setStatus("Initializing...");
         }
-    }
-
-    function doGetUserMedia() {
+    };
+    var doGetUserMedia = function() {
         console.debug("doGetUserMedia");
         // Call into getUserMedia via the polyfill (adapter.js).
         var constraints = mediaConstraints; //{{ media_constraints|safe }}; // {"mandatory": {}, "optional": []};
@@ -145,9 +133,8 @@
             alert("getUserMedia() failed. Is this a WebRTC capable browser?");
             console.log("getUserMedia failed with exception: " + e.message);
         }
-    }
-
-    function createPeerConnection() {
+    };
+    var createPeerConnection = function() {
         console.debug("createPeerConnection");
         var pc_config =  pcConfig; // {{ pc_config|safe }}; // {"iceServers": [{"url": "stun:stun.l.google.com:19302"}]};
         var pc_constraints = pcConstraints; // {{ pc_constraints|safe }}; // {"optional": [{"DtlsSrtpKeyAgreement": true}]};
@@ -170,9 +157,8 @@
 
         pc.onaddstream = onRemoteStreamAdded;
         pc.onremovestream = onRemoteStreamRemoved;
-    }
-
-    function maybeStart() {
+    };
+    var maybeStart = function () {
         console.debug("maybeStart");
         if (!started && localStream && channelReady) {
             setStatus("Connecting...");
@@ -186,18 +172,12 @@
                 doCall();
             }
         }
-    }
-
-    function setStatus(state) {
+    };
+    var setStatus = function(state) {
         console.debug("setStatus ");//+chatWaitMessage+' or '+callStatus);
-        if(typeof(callWaitMessage) !== "undefined") {
-            callWaitMessage.innerHTML = state;
-        } else {
-            callStatus.innerHTML = state;
-        }
-    }
-
-    function doCall() {
+        call.getNode('callWaitMessage').innerHTML = state;
+    };
+    var doCall = function() {
         console.debug("doCall");
         var constraints =  offerConstraints; // {{ offer_constraints | safe }}; // {"optional": [], "mandatory": {"MozDontOfferDataChannel": true}};
         // temporary measure to remove Moz* constraints in Chrome
@@ -212,15 +192,13 @@
         console.log("Sending offer to peer, with constraints: \n" +
             "  \"" + JSON.stringify(constraints) + "\".");
         pc.createOffer(setLocalAndSendMessage, null, constraints);
-    }
-
-    function doAnswer() {
+    };
+    var doAnswer = function() {
         console.debug("doAnswer");
         console.log("Sending answer to peer.");
         pc.createAnswer(setLocalAndSendMessage, null, sdpConstraints);
-    }
-
-    function mergeConstraints(cons1, cons2) {
+    };
+    var mergeConstraints = function(cons1, cons2) {
         console.debug("mergeConstraints");
         var merged = cons1;
         for (var name in cons2.mandatory) {
@@ -228,17 +206,15 @@
         }
         merged.optional.concat(cons2.optional);
         return merged;
-    }
-
-    function setLocalAndSendMessage(sessionDescription) {
+    };
+    var setLocalAndSendMessage = function(sessionDescription) {
         console.debug("setLocalAndSendMessage");
         // Set Opus as the preferred codec in SDP if Opus is present.
         sessionDescription.sdp = preferOpus(sessionDescription.sdp);
         pc.setLocalDescription(sessionDescription);
         sendMessage(sessionDescription);
-    }
-
-    function sendMessage(message) {
+    };
+    var sendMessage = function(message) {
         console.debug("sendMessage");
         var msgString = JSON.stringify(message);
         console.log('C->S: ' + msgString);
@@ -246,9 +222,8 @@
         var xhr = new XMLHttpRequest();
         xhr.open('POST', path, true);
         xhr.send(msgString);
-    }
-
-    function processSignalingMessage(message) {
+    };
+    var processSignalingMessage = function(message) {
         console.debug("processSignalingMessage");
         var msg = JSON.parse(message);
 
@@ -257,7 +232,6 @@
             if (!initiator && !started) {
                 maybeStart();
             }
-
             pc.setRemoteDescription(new RTCSessionDescription(msg));
             doAnswer();
         } else if (msg.type === 'answer' && started) {
@@ -269,33 +243,30 @@
         } else if (msg.type === 'bye' && started) {
             onRemoteHangup();
         }
-    }
-
+    };
     //================== Inner Event Handlers ==================
-
-    function onChannelOpened() {
+    var onChannelOpened = function() {
         console.debug("onChannelOpened");
         console.log('Channel opened.');
         channelReady = true;
         if (initiator) {
             maybeStart();
         }
-    }
-    function onChannelMessage(message) {
+    };
+    var onChannelMessage = function(message) {
         console.debug("onChannelMessage");
         console.log('S->C: ' + message.data);
         processSignalingMessage(message.data);
-    }
-    function onChannelError() {
+    };
+    var onChannelError = function() {
         console.debug("onChannelError");
         console.log('Channel error.');
-    }
-    function onChannelClosed() {
+    };
+    var onChannelClosed = function() {
         console.debug("onChannelClosed");
         console.log('Channel closed.');
-    }
-
-    function onUserMediaSuccess(stream) {
+    };
+    var onUserMediaSuccess = function(stream) {
         console.debug("onUserMediaSuccess");
         console.log("User has granted access to local media.");
         // Call the polyfill wrapper to attach the media stream to this element.
@@ -306,15 +277,13 @@
         if (initiator) {
             maybeStart();
         }
-    }
-
-    function onUserMediaError(error) {
+    };
+    var onUserMediaError = function(error) {
         console.debug("onUserMediaError");
         console.log("Failed to get access to local media. Error code was " + error.code);
         alert("Failed to get access to local media. Error code was " + error.code + ".");
-    }
-
-    function onIceCandidate(event) {
+    };
+    var onIceCandidate = function(event) {
         console.debug("onIceCandidate");
         if (event.candidate) {
             sendMessage({type: 'candidate',
@@ -324,39 +293,35 @@
         } else {
             console.log("End of candidates.");
         }
-    }
-
-    function onRemoteStreamAdded(event) {
+    };
+    var onRemoteStreamAdded = function(event) {
         console.debug("onRemoteStreamAdded");
         console.log("Remote stream added.");
         reattachMediaStream(miniVideo, localVideo);
         attachMediaStream(remoteVideo, event.stream);
         remoteStream = event.stream;
         waitForRemoteVideo();
-    }
-    function onRemoteStreamRemoved(event) {
+    };
+    var onRemoteStreamRemoved = function(event) {
         console.debug("onRemoteStreamRemoved");
         console.log("Remote stream removed.");
-    }
-
-    function onRemoteHangup() {
+    };
+    var onRemoteHangup = function() {
         console.debug("onRemoteHangup");
         console.log('Session terminated.');
         transitionToWaiting();
         stop();
         initiator = 0;
-    }
-
-    function stop() {
+    };
+    var stop = function() {
         console.debug("stop");
         started = false;
         isAudioMuted = false;
         isVideoMuted = false;
         pc.close();
         pc = null;
-    }
-
-    function waitForRemoteVideo() {
+    };
+    var waitForRemoteVideo = function() {
         console.debug("waitForRemoteVideo");
         // Call the getVideoTracks method via adapter.js.
         var videoTracks = remoteStream.getVideoTracks();
@@ -365,18 +330,16 @@
         } else {
             setTimeout(waitForRemoteVideo, 100);
         }
-    }
-
-    function transitionToActive() {
+    };
+    var transitionToActive = function() {
         console.debug("transitionToActive");
         remoteVideo.style.opacity = 1;
         card.style.webkitTransform = "rotateY(180deg)";
         setTimeout(function() { localVideo.src = ""; }, 500);
         setTimeout(function() { miniVideo.style.opacity = 1; }, 1000);
         setStatus("<input type=\"button\" id=\"hangup\" value=\"Hang up\" onclick=\"hangup()\" />");
-    }
-
-    function transitionToWaiting() {
+    };
+    var transitionToWaiting = function() {
         console.debug("transitionToWaiting");
         card.style.webkitTransform = "rotateY(0deg)";
         setTimeout(function() {
@@ -387,33 +350,28 @@
         miniVideo.style.opacity = 0;
         remoteVideo.style.opacity = 0;
         resetStatus();
-    }
-
-    function transitionToDone() {
+    };
+    var transitionToDone = function() {
         console.debug("transitionToDone");
         localVideo.style.opacity = 0;
         remoteVideo.style.opacity = 0;
         miniVideo.style.opacity = 0;
-        setStatus("You have left the call. <a href=\""+roomLink+"\">Click here</a> to rejoin.");
-    }
-
+        setStatus("You have left the call. <a href=\"#TODO:\">Click here</a> to rejoin.");
+    };
     //================== External Event Handlers ==================
-    this.enterFullScreen = function () {
-    //function enterFullScreen() {
+    this.enterFullScreen = function() {
+        //function enterFullScreen() {
         console.debug("enterFullScreen");
         container.webkitRequestFullScreen();
     };
-
-    function toggleVideoMute() {
+    var toggleVideoMute = function() {
         console.debug("toggleVideoMute");
         // Call the getVideoTracks method via adapter.js.
         var videoTracks = localStream.getVideoTracks();
-
         if (videoTracks.length === 0) {
             console.log("No local video available.");
             return;
         }
-
         if (isVideoMuted) {
             for (i = 0; i < videoTracks.length; i++) {
                 videoTracks[i].enabled = true;
@@ -425,20 +383,16 @@
             }
             console.log("Video muted.");
         }
-
         isVideoMuted = !isVideoMuted;
-    }
-
-    function toggleAudioMute() {
+    };
+    var toggleAudioMute = function() {
         console.debug("toggleAudioMute");
         // Call the getAudioTracks method via adapter.js.
         var audioTracks = localStream.getAudioTracks();
-
         if (audioTracks.length === 0) {
             console.log("No local audio available.");
             return;
         }
-
         if (isAudioMuted) {
             for (i = 0; i < audioTracks.length; i++) {
                 audioTracks[i].enabled = true;
@@ -450,17 +404,14 @@
             }
             console.log("Audio muted.");
         }
-
         isAudioMuted = !isAudioMuted;
-    }
-
+    };
     // Send BYE on refreshing(or leaving) a demo page
     // to ensure the room is cleaned for next session.
     window.onbeforeunload = function() {
         console.debug("onbeforeunload");
         sendMessage({type: 'bye'});
     };
-
     // Ctrl-D: toggle audio mute; Ctrl-E: toggle video mute.
     // On Mac, Command key is instead of Ctrl.
     // Return false to screen out original Chrome shortcuts.
@@ -486,11 +437,9 @@
             }
         }
     };
-
     //================== Util Methods ==================
-
     // Set Opus as the default audio codec if it's present.
-    function preferOpus(sdp) {
+    var preferOpus = function(sdp) {
         console.debug("preferOpus");
         var sdpLines = sdp.split('\r\n');
 
@@ -505,7 +454,6 @@
         if (mLineIndex === null) {
             return sdp;
         }
-
         // If Opus is available, set it as the default in m line.
         for (i = 0; i < sdpLines.length; i++) {
             if (sdpLines[i].search('opus/48000') !== -1) {
@@ -522,16 +470,14 @@
 
         sdp = sdpLines.join('\r\n');
         return sdp;
-    }
-
-    function extractSdp(sdpLine, pattern) {
+    };
+    var extractSdp = function(sdpLine, pattern) {
         console.debug("extractSdp");
         var result = sdpLine.match(pattern);
         return (result && result.length === 2)? result[1]: null;
-    }
-
+    };
     // Set the selected codec to the first in m line.
-    function setDefaultCodec(mLine, payload) {
+    var setDefaultCodec = function(mLine, payload) {
         console.debug("setDefaultCodec");
         var elements = mLine.split(' ');
         var newLine = [];
@@ -545,10 +491,9 @@
             }
         }
         return newLine.join(' ');
-    }
-
+    };
     // Strip CN from sdp before CN constraints is ready.
-    function removeCN(sdpLines, mLineIndex) {
+    var removeCN = function(sdpLines, mLineIndex) {
         console.debug("removeCN");
         var mLineElements = sdpLines[mLineIndex].split(' ');
         // Scan from end for the convenience of removing an item.
@@ -567,5 +512,8 @@
 
         sdpLines[mLineIndex] = mLineElements.join(' ');
         return sdpLines;
-    }
-}());
+    };
+
+    console.debug("call()");
+    start("/_ah/channel/init/?roomKey="+roomKey);
+};

@@ -41,7 +41,6 @@ dojo.declare("workspace.BBCodeEditor",
             "<span dojoType=\"dijit.Tooltip\" connectid=\"quoteBtn\">Quote</span>"+
             "</span><br><textarea name=\"${name}\" dojoType=\"${areaType}\" rows=\"${rows}\" cols=\"${cols}\" style=\"${style}\" dojoAttachPoint=\"textArea\">${value}</textarea></div>",
 
-
         //maps the buttons to their tags
         bClick: function(evt){ this.handleButton('b'); },
         iClick: function(evt){ this.handleButton('i'); },
@@ -80,30 +79,22 @@ dojo.declare("workspace.BBCodeEditor",
                 tan.scrollLeft = scrollLeft;
             }
         },
-        
         postMixInProperties : function(){
             // If rows is spsecified, don't use the flexible textarea
             if(this.rows > 0){
                 this.areaType = "dijit.form.SimpleTextarea";
             }            
-            
-            // this is to get the value between the textarea tags 
+            // this is to get the value between the textarea tags
             // when the BBCodeEditor is added to a page in markup 
             if(this.srcNodeRef && this.srcNodeRef.value){
                 this.value = this.srcNodeRef.value;
             }
         },
-        
         getValue: function(){
             return this.textArea.getValue();            
         },
-        
         setValue: function(text){
             this.textArea.setValue(text);
         }
-        
-
     }
 );
-
-

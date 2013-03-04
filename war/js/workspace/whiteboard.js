@@ -45,7 +45,7 @@ function Workspace(workspaceId) {
 }
 
 // Whiteboard Entity
-function Whiteboard(wbId, token) {
+function Whiteboard(wbId, token, messages) {
     this.width = 700;
     this.height = 400;
     this.container = null;
@@ -64,7 +64,7 @@ function Whiteboard(wbId, token) {
 
     this.chatMessageList = [];
     this.geomMessageList = [];
-    this.messageList = [];
+    this.messageList = messages;
     this.messageMax = 200;
     this.lastMessage = '';
     this.userList = [];
@@ -401,8 +401,8 @@ Whiteboard.prototype.openChannel = function() {
         }else if(msg === whiteboard.lastMessage){
             cwm.innerHTML = 'That\'s what you said last time.';
         }else{
-            ct.setAttribute('disabled',true);
-            cb.setAttribute('disabled',true);
+            //ct.setAttribute('disabled',true);
+            //cb.setAttribute('disabled',true);
             whiteboard.lastMessage = msg;
             whiteboard.getNode('chatWaitMessage').innerHTML = 'sending...';
             whiteboard.sendMessage({chatMessage:msg});
@@ -1149,8 +1149,21 @@ Whiteboard.prototype.loadFunction = function(){
             console.error(e);
         }
     };
+    var call = function(){
+        try{
+            var call = new Call(whiteboard.wbId);
+            call.call();
+        }catch(e) {
+            console.error(e);
+        }
+    };
+
 
     // binding events
+    dojo.connect(whiteboard.getWidget('callBtn'),'onClick',function(){
+        call();
+    });
+
     dojo.connect(whiteboard.getWidget('lineColorPaletteOkBtn'),'onClick',function(){
         chooseColor('line');
     });    
@@ -1356,7 +1369,7 @@ var newRoom = function(roomKey) {
                     href: "/workspace/"+workspaceId+"/room/?wbId="+resp.wbId,
                     onDownloadEnd: function() {
                         var curRoom = this;
-                        var whiteboard = new Whiteboard(resp.wbId, resp.token);
+                        var whiteboard = new Whiteboard(resp.wbId, resp.token, resp.messages);
                         if (whiteboard.token) {
                             whiteboard.openChannel();
                             whiteboard.loadFunction();

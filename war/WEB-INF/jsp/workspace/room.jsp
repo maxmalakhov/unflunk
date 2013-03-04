@@ -1,6 +1,7 @@
 
 <script>
-dojo.require('workspace.BBCodeEditor');
+//dojo.require('workspace.BBCodeEditor');
+
 </script>
 
 <div dojoType="dijit.layout.ContentPane" style="padding:0;" closable="true" id="${wbId}">
@@ -27,7 +28,7 @@ dojo.require('workspace.BBCodeEditor');
                 </div>
             </div>
             <div region="bottom" class="toolbar" style="overflow: auto; width: 37em; padding:0;" dojoType="dijit.layout.ContentPane" >
-                <span class="callBtn" dojoType="dijit.form.Button" onclick="answer('${wbId}')">Call</span><span class="callWaitMessage"></span>
+                <span class="callBtn" dojoType="dijit.form.Button">Call</span><span class="callWaitMessage"></span>
             </div>
         </div>
     </div>
@@ -40,7 +41,21 @@ dojo.require('workspace.BBCodeEditor');
             <div style="width: 37em; border: 1px solid #888888; padding:0;" region="bottom" dojoType="dijit.layout.ContentPane" >
                 <table border="0" cellspacing="5">
                     <tr><td>
-                        <textarea dojoType="workspace.BBCodeEditor" cols="40" rows="3" class="chatText"></textarea>
+                        <%--<textarea dojoType="workspace.BBCodeEditor" cols="40" rows="3" class="chatText"></textarea>--%>
+
+                        <div><span>
+                            <button dojoType="dijit.form.Button" showLabel="false" iconClass="dijitEditorIcon dijitEditorIconBold" dojoAttachEvent="onClick: bClick" class="bBtn"></button>
+                            <button dojoType="dijit.form.Button" showLabel="false" iconClass="dijitEditorIcon dijitEditorIconItalic" dojoAttachEvent="onClick: iClick" class="iBtn"></button>
+                            <button dojoType="dijit.form.Button" showLabel="false" iconClass="dijitEditorIcon dijitEditorIconUnderline" dojoAttachEvent="onClick: uClick" class="uBtn"></button>
+                            <button dojoType="dijit.form.Button" showLabel="false" iconClass="dijitEditorIcon dijitEditorIconStrikethrough" dojoAttachEvent="onClick: sClick" class="sBtn"></button>
+                            <button dojoType="dijit.form.Button" showLabel="false" iconClass="dijitEditorIcon dijitEditorIconSuperscript" dojoAttachEvent="onClick: supClick" class="supBtn"></button>
+                            <button dojoType="dijit.form.Button" showLabel="false" iconClass="dijitEditorIcon dijitEditorIconSubscript" dojoAttachEvent="onClick: subClick" class="subBtn"></button>
+                            <button dojoType="dijit.form.Button" showLabel="false" iconClass="dijitEditorIcon dijitEditorIconSelectAll" dojoAttachEvent="onClick: quoteClick" class="quoteBtn"></button>
+                            </span>
+                            <br>
+                            <textarea class="chatText" name="" dojoType="dijit.form.Textarea" rows="3" cols="40" dojoAttachPoint="textArea"></textarea>
+                        </div>
+
                         <span class="chatBtn" dojoType="dijit.form.Button">Say</span><span class="chatWaitMessage"></span>
                     </td>
                         <td>
@@ -217,8 +232,7 @@ dojo.require('workspace.BBCodeEditor');
             
             <button dojoType="dijit.form.Button" class="showMovieBtn"><img src="/images/movie-icon.png"></button>
             <div dojoType="dijit.Tooltip" connectId="showMovieBtn" position="below" showDelay="0">View all steps that made this drawing.</div>
-            
-            
+
             <div class="clearDrawingDisplay" dojoType="dijit.form.DropDownButton">
                <span class="colorText">clear</span>
                <div dojoType="dijit.TooltipDialog" class="clearDrawingDialog" title="Clear Drawing">
@@ -229,12 +243,13 @@ dojo.require('workspace.BBCodeEditor');
            </div>
         </form>
     <BR><BR>
-    Share this link with your friends to have them join:<br>
-<a href="http://${hostName}/whiteboard/${wbId}">http:/${hostName}/whiteboard/${wbId}</a><br>
+    Share this room key with your friends to have them join:<br>
+<%--<a href="http://${hostName}/whiteboard/${wbId}">http:/${hostName}/whiteboard/${wbId}</a><br>--%>
+    <p style="color: #006400">${wbId}</p>
 or send them an email:<input dojoType="dijit.form.ValidationTextBox" style="width:20em;" class="email"
                                                              regExp="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$"
                                                              maxlength="128" placeHolder="enter an email address"/><button class="sendMailButton" dojoType="dijit.form.Button">send</button><br><br>
-Or start a new whiteboard: <a href="http://${hostName}/whiteboard">http://${hostName}/whiteboard</a><br>
+<%--Or start a new whiteboard: <a href="http://${hostName}/whiteboard">http://${hostName}/whiteboard</a><br>--%>
 <a href="http://twitter.com/monteslu">@monteslu</a>
 </div>
 
