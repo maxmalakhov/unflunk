@@ -53,7 +53,7 @@
                             <button dojoType="dijit.form.Button" showLabel="false" iconClass="dijitEditorIcon dijitEditorIconSelectAll" dojoAttachEvent="onClick: quoteClick" class="quoteBtn"></button>
                             </span>
                             <br>
-                            <textarea class="chatText" name="" dojoType="dijit.form.Textarea" rows="3" cols="40" dojoAttachPoint="textArea"></textarea>
+                            <textarea class="chatText" name="" dojoType="dijit.form.Textarea" rows="3" cols="40" style="min-height: 4em;" dojoAttachPoint="textArea"></textarea>
                         </div>
 
                         <span class="chatBtn" dojoType="dijit.form.Button">Say</span><span class="chatWaitMessage"></span>
@@ -117,18 +117,18 @@
            
            <div class="lineColorDisplay" style="background-color: #FFFFFF; border-color: black; border-width: 1px;" dojoType="dijit.form.DropDownButton">
                <span class="colorText">color <span class="lineSwatch" style="height: 10px; width: 10px; border: 1px solid black; background-color: black;">&nbsp;&nbsp;</span></span>
-               <div dojoType="dijit.TooltipDialog" class="lineColorPaletteDialog" title="Color Palette">
-                   <div dojoType="dojox.widget.ColorPicker" class="lineColorPaletteWidget"></div>
-                   <button dojoType="dijit.form.Button" class="lineColorPaletteOkBtn">OK</button>
-                   <button dojoType="dijit.form.Button" class="lineColorPaletteCancelBtn">Cancel</button>
+               <div dojoType="dijit.TooltipDialog" class="lineColorPaletteDialog  ${wbId}" title="Color Palette">
+                   <div dojoType="dojox.widget.ColorPicker" class="lineColorPaletteWidget  ${wbId}"></div>
+                   <button dojoType="dijit.form.Button" class="lineColorPaletteOkBtn  ${wbId}">OK</button>
+                   <button dojoType="dijit.form.Button" class="lineColorPaletteCancelBtn  ${wbId}">Cancel</button>
                </div>
            </div>
            <div class="fillColorDisplay" style="background-color: #FFFFFF; border-color: black; border-width: 1px;" dojoType="dijit.form.DropDownButton">
                <span class="colorText">fill <span class="fillSwatch" style="height: 10px; width: 10px; border: 1px solid black; background-color: white;">&nbsp;&nbsp;</span></span>
-               <div dojoType="dijit.TooltipDialog" class="fillColorPaletteDialog" title="Color Palette">
-                   <div dojoType="dojox.widget.ColorPicker" class="fillColorPaletteWidget"></div>
-                   <button dojoType="dijit.form.Button" class="fillColorPaletteOkBtn">OK</button>
-                   <button dojoType="dijit.form.Button" class="fillColorPaletteCancelBtn">Cancel</button>
+               <div dojoType="dijit.TooltipDialog" class="fillColorPaletteDialog  ${wbId}" title="Color Palette">
+                   <div dojoType="dojox.widget.ColorPicker" class="fillColorPaletteWidget  ${wbId}"></div>
+                   <button dojoType="dijit.form.Button" class="fillColorPaletteOkBtn  ${wbId}">OK</button>
+                   <button dojoType="dijit.form.Button" class="fillColorPaletteCancelBtn  ${wbId}">Cancel</button>
                </div>
            </div>
            <select name="select" dojoType="dijit.form.Select" class="lineStrokeSelect">
@@ -235,10 +235,10 @@
 
             <div class="clearDrawingDisplay" dojoType="dijit.form.DropDownButton">
                <span class="colorText">clear</span>
-               <div dojoType="dijit.TooltipDialog" class="clearDrawingDialog" title="Clear Drawing">
+               <div dojoType="dijit.TooltipDialog" class="clearDrawingDialog ${wbId}" title="Clear Drawing">
                        Clear Drawing?<br>
-                    <button class="clearDrawingYesBtn" dojoType="dijit.form.Button">Yes</button> &nbsp;&nbsp;&nbsp;
-                    <button class="clearDrawingNoBtn" dojoType="dijit.form.Button">No</button>
+                    <button class="clearDrawingYesBtn  ${wbId}" dojoType="dijit.form.Button">Yes</button> &nbsp;&nbsp;&nbsp;
+                    <button class="clearDrawingNoBtn  ${wbId}" dojoType="dijit.form.Button">No</button>
                </div>
            </div>
         </form>
@@ -248,27 +248,9 @@
     <p style="color: #006400">${wbId}</p>
 or send them an email:<input dojoType="dijit.form.ValidationTextBox" style="width:20em;" class="email"
                                                              regExp="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$"
-                                                             maxlength="128" placeHolder="enter an email address"/><button class="sendMailButton" dojoType="dijit.form.Button">send</button><br><br>
+                                                             maxlength="128" placeHolder="enter an email address"/><button class="sendMailButton" dojoType="dijit.form.Button">send</button><br>
 <%--Or start a new whiteboard: <a href="http://${hostName}/whiteboard">http://${hostName}/whiteboard</a><br>--%>
 <a href="http://twitter.com/monteslu">@monteslu</a>
-</div>
-
-<div id="imgDialog" dojoType="dijit.Dialog" title="Right-click on image to save it">
-    <img id="exportedImg" name="exportedImg">
-</div>
-
-<div id="textDialog" dojoType="dijit.Dialog" title="Type in some text."  style="display: none">
-    <input type="text" dojoType="dijit.form.ValidationTextBox" id="wbText" name="wbText"><br>
-    <button dojoType="dijit.form.Button" id="okTextBtn">OK</button>&nbsp;&nbsp;&nbsp;<button dojoType="dijit.form.Button" id="cancelTextBtn">Cancel</button>
-</div>
-
-<div id="movieDialog" dojoType="dijit.Dialog" title="Move slider to see drawing steps."  style="display: none">
-    <div id="movieWhiteboardContainer" style="border: 2px blue solid; background-color: white;"></div><br>
-    <div id="movieSlider" dojoType="dijit.form.HorizontalSlider" value="0"
-         minimum="0" maximum="1" discreteValues="2" intermediateChanges="true"
-         showButtons="false" style="width:500px;"></div><br> <button dojoType="dijit.form.Button" id="exportMovieImgBtn"><img src="/images/export-icon.png"></button>
-    <div dojoType="dijit.Tooltip" connectId="exportMovieImgBtn">Export this snapshot of the drawing surface.</div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    user: <span id="movieUser">user</span><br>
 </div>
 
 </div> <!-- RoomArea -->

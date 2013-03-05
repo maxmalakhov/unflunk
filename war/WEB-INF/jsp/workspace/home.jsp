@@ -82,4 +82,22 @@ var error = '${errorMsg}';
 
 </div> <!-- TabsArea -->
 
+<div id="imgDialog" dojoType="dijit.Dialog" title="Right-click on image to save it">
+    <img id="exportedImg" name="exportedImg">
+</div>
+
+<div id="textDialog" dojoType="dijit.Dialog" title="Type in some text."  style="display: none">
+    <input type="text" dojoType="dijit.form.ValidationTextBox" id="wbText" name="wbText"><br>
+    <button dojoType="dijit.form.Button" id="okTextBtn">OK</button>&nbsp;&nbsp;&nbsp;<button dojoType="dijit.form.Button" id="cancelTextBtn">Cancel</button>
+</div>
+
+<div id="movieDialog" dojoType="dijit.Dialog" title="Move slider to see drawing steps."  style="display: none">
+    <div id="movieWhiteboardContainer" style="border: 2px blue solid; background-color: white;"></div><br>
+    <div id="movieSlider" dojoType="dijit.form.HorizontalSlider" value="0"
+         minimum="0" maximum="1" discreteValues="2" intermediateChanges="true"
+         showButtons="false" style="width:500px;"></div><br> <button dojoType="dijit.form.Button" id="exportMovieImgBtn"><img src="/images/export-icon.png"></button>
+    <div dojoType="dijit.Tooltip" connectId="exportMovieImgBtn">Export this snapshot of the drawing surface.</div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    user: <span id="movieUser">user</span><br>
+</div>
+
 <jsp:include page="../footer.jsp"/>

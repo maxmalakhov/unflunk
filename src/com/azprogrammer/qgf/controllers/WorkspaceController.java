@@ -50,6 +50,7 @@ import net.sf.json.JSONObject;
 import net.sf.json.JsonConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
+import org.springframework.http.HttpStatus;
 import org.springframework.orm.jdo.JdoTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.WebDataBinder;
@@ -81,10 +82,10 @@ public class WorkspaceController {
 
     private static final String URL_WORKSPACE_ROOT = "/workspace";
     private static final String URL_WORKSPACE_LOGIN = URL_WORKSPACE_ROOT + "/login";
+    private static final String URL_WORKSPACE_LOGOUT = URL_WORKSPACE_ROOT + "/logout";
     private static final String URL_WORKSPACE_HOME = URL_WORKSPACE_ROOT + "/{"+PARAM_WORKSPACE_ID+"}";
     private static final String URL_WORKSPACE_ROOM = URL_WORKSPACE_HOME + "/room";
     private static final String URL_WORKSPACE_JOIN = URL_WORKSPACE_ROOM + "/{"+PARAM_ROOM_ID+"}";
-
 
     private UserService userService;
 
@@ -111,7 +112,13 @@ public class WorkspaceController {
                               HttpSession session) {
 
         return "workspace/login";
+    }
 
+    @RequestMapping(value = URL_WORKSPACE_LOGOUT, method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.OK)
+    public void logout(HttpSession session) {
+
+        session.removeAttribute("userName");
     }
 
     @RequestMapping(value = URL_WORKSPACE_LOGIN, method = RequestMethod.POST, consumes = APPLICATION_JSON_VALUE)
@@ -140,7 +147,7 @@ public class WorkspaceController {
                 } else {
                     workspaceId = workspaces.get(0).getStringKey();
                 }
-                session.setAttribute ("userName", userName);
+                session.setAttribute("userName", userName);
             } catch(Exception ex) {
                 model.put("error", ex.getMessage());
             }

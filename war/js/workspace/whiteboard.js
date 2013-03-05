@@ -84,11 +84,91 @@ function Whiteboard(wbId, token, messages) {
 
 // --------------- Entity methods -------------------
 Whiteboard.prototype.initCommon = function() {
+    var removeShape = function(geom, drawing){
+        var shape = getShapeFromGeom(geom,drawing);
+        if(shape){
+            drawing.remove(shape);
+        }
+    };
+    var moveShape = function(geom, drawing){
+        var shape = getShapeFromGeom(geom,drawing);
+        if(shape){
+            shape.applyTransform({dx: geom.xPts[0], dy: geom.yPts[0]});
+            if(shape.wbbb){
+                shape.wbbb.x1 += geom.xPts[0];
+                shape.wbbb.x2 += geom.xPts[0];
+                shape.wbbb.y1 += geom.yPts[0];
+                shape.wbbb.y2 += geom.yPts[0];
+            }
+        }
+    };
+    var moveShapeUp = function(geom, drawing){
+        var shape = getShapeFromGeom(geom,drawing);
+        if(shape){
+            shape.moveToFront();
+        }
+    };
+    var moveShapeDown = function(geom, drawing){
+        var shape = getShapeFromGeom(geom,drawing);
+        if(shape){
+            shape.moveToBack();
+        }
+    };
+    var getShapeFromGeom = function(geom, drawing){
+        var retVal = null;
+        dojo.every(drawing.children, function(shape){
+            if((shape.cRand === geom.cRand) && (shape.cTime === geom.cTime)){
+                retVal = shape;
+                return false;
+            }
+            return true; // keep going until we find one that isn't
+        });
+        return retVal;
+    };
+    var getBoundingBox = function(geom){
+        if(geom.xPts && geom.yPts){
+            var xs = geom.xPts;
+            var ys = geom.yPts;
+            var bb = {x1: 0, x2: -1, y1: 0, y2: -1 };
+
+            if(xs.length > 1){
+                bb.x1 = xs[0];
+                bb.x2 = xs[1];
+                dojo.forEach(xs, function(x){
+                    if(x < bb.x1){
+                        bb.x1 = x;
+                    }
+                    else if(x > bb.x2){
+                        bb.x2 = x;
+                    }
+                });
+            }
+            if(ys.length > 1){
+                bb.y1 = ys[0];
+                bb.y2 = ys[1];
+                dojo.forEach(ys, function(y){
+                    if(y < bb.y1){
+                        bb.y1 = y;
+                    }
+                    else if(y > bb.y2){
+                        bb.y2 = y;
+                    }
+                });
+            }
+            return bb;
+        } else {
+            return null;
+        }
+    };
+
     this.getNode = function(clazz) {
         return dojo.query("."+clazz, this.wbId)[0];
     };
     this.getWidget = function(clazz) {
         return dijit.getEnclosingWidget(this.getNode(clazz));
+    };
+    this.getDialogWidget = function(clazz) {
+        return  dijit.getEnclosingWidget(dojo.query('.'+clazz+'.'+this.wbId)[0]);
     };
     this.drawFromJSON = function(geom,drawing) {
         if(geom && geom.shapeType){
@@ -138,7 +218,6 @@ Whiteboard.prototype.initCommon = function() {
                             var lineShape = drawing.createLine({x1: geom.xPts[i], y1: geom.yPts[i], x2: geom.xPts[i + 1], y2: geom.yPts[i + 1]});
                             stroke.cap = 'round';
                             lineShape.setStroke(stroke);
-
                             shape.add(lineShape);
                         }
                     }
@@ -158,6 +237,8 @@ Whiteboard.prototype.initCommon = function() {
                 shape = drawing.createRect({x: geom.xPts[0] - 3, y: geom.yPts[0] - 3, width: (geom.xPts[1] - geom.xPts[0] + 6), height: (geom.yPts[1] - geom.yPts[0] + 6) });
                 shape.setStroke({color: new dojo.Color([0,0,255,0.75]), width: 2});
                 shape.setFill(new dojo.Color([0,0,255,0.25]));
+
+                return shape;
             }else if(geom.shapeType === 'deleteOverlay'){
                 shape = drawing.createRect({x: geom.xPts[0] - 3, y: geom.yPts[0] - 3, width: (geom.xPts[1] - geom.xPts[0] + 6), height: (geom.yPts[1] - geom.yPts[0] + 6) });
                 shape.setStroke({color: new dojo.Color([255,0,0,0.75]), width: 2});
@@ -168,10 +249,14 @@ Whiteboard.prototype.initCommon = function() {
 
                 line = drawing.createLine({x1: geom.xPts[1] + 3, y1: geom.yPts[0] - 3, x2: geom.xPts[0] - 3, y2: geom.yPts[1] + 3});
                 line.setStroke({color: "#FF0000", width: 2});
+
+                return shape;
             }else if(geom.shapeType === 'moveOverlay'){
                 shape = drawing.createRect({x: geom.xPts[0] - 3, y: geom.yPts[0] - 3, width: (geom.xPts[1] - geom.xPts[0] + 6), height: (geom.yPts[1] - geom.yPts[0] + 6) });
                 shape.setStroke({color: new dojo.Color([0,0,255,0.75]), width: 2});
                 shape.setFill(new dojo.Color([0,0,255,0.25]));
+
+                return shape;
             }else if(geom.shapeType === 'moveUpOverlay'){
                 shape = drawing.createRect({x: geom.xPts[0] - 3, y: geom.yPts[0] - 3, width: (geom.xPts[1] - geom.xPts[0] + 6), height: (geom.yPts[1] - geom.yPts[0] + 6) });
                 //shape.setStroke({color: new dojo.Color([0,0,255,0.75]), width: 2});
@@ -185,6 +270,8 @@ Whiteboard.prototype.initCommon = function() {
 
                 line = drawing.createLine({x1: geom.xPts[0] + ((geom.xPts[1] - geom.xPts[0]) / 2), y1: geom.yPts[0] -5, x2: geom.xPts[1] + 5, y2: geom.yPts[0] + ((geom.yPts[1] - geom.yPts[0]) / 2)});
                 line.setStroke({color: "#0000FF", width: 2});
+
+                return shape;
             }else if(geom.shapeType === 'moveDownOverlay'){
                 shape = drawing.createRect({x: geom.xPts[0] - 3, y: geom.yPts[0] - 3, width: (geom.xPts[1] - geom.xPts[0] + 6), height: (geom.yPts[1] - geom.yPts[0] + 6) });
                 //shape.setStroke({color: new dojo.Color([0,0,255,0.75]), width: 2});
@@ -198,7 +285,9 @@ Whiteboard.prototype.initCommon = function() {
 
                 line = drawing.createLine({x1: geom.xPts[0] + ((geom.xPts[1] - geom.xPts[0]) / 2), y1: geom.yPts[1] + 5, x2: geom.xPts[1] + 5, y2: geom.yPts[0] + ((geom.yPts[1] - geom.yPts[0]) / 2)});
                 line.setStroke({color: "#0000FF", width: 2});
-            } else {
+
+                return shape;
+            }
                 if(shape){
                     shape.cRand = geom.cRand;
                     shape.cTime = geom.cTime;
@@ -214,7 +303,7 @@ Whiteboard.prototype.initCommon = function() {
                         shape.setStroke(stroke);
                     }
                 }
-            }
+
             return shape;
         }
     };
@@ -224,19 +313,18 @@ Whiteboard.prototype.sendMessage = function(message){
     var whiteboard = this;
     var clearChatUI = function(){
         try{
-            whiteboard.getNode('chatText').setAttribute('disabled',false);
+            //whiteboard.getNode('chatText').setAttribute('disabled',false);
             whiteboard.getWidget('chatText').setValue('');
-            whiteboard.getNode('chatBtn').setAttribute('disabled',false);
+            //whiteboard.getNode('chatBtn').setAttribute('disabled',false);
             whiteboard.getNode('chatWaitMessage').innerHTML = '';
         }catch(e){
             console.error(e);
         }
     };
-
     dojo.xhrPost({
         url: '/wbpost',
         content: {
-            wbId: this.wbId,
+            wbId: whiteboard.wbId,
             data: dojo.toJson(message)
         },
         load: function(resp){
@@ -256,17 +344,20 @@ Whiteboard.prototype.sendMessage = function(message){
 };
 
 Whiteboard.prototype.pingServer = function() {
+    console.debug('pingServer()');
     var whiteboard = this;
     dojo.xhrPost({
-        url: '/wbping',
+        url: "/whiteboard/ping", //'/wbping',
         content: {
-           wbId: whiteboard.wbId
+            whiteboardId: whiteboard.wbId
         },
         load: function(resp){
             if(resp.error) {
                 console.info("error pinging server",resp.error);
             }
-            setTimeout(whiteboard.pingServer, whiteboard.pingInterval);
+            setTimeout(function(){
+                whiteboard.pingServer();
+            }, whiteboard.pingInterval);
        },
        error: function(e){
             console.info("post error on pinging server",e);
@@ -281,16 +372,18 @@ Whiteboard.prototype.getUserList = function() {
     console.debug('getUserList()');
     var whiteboard = this;
     dojo.xhrPost({
-        url: '/wbgetUsers',
+        url: "/whiteboard/users", //'/wbgetUsers',
         content: {
-           wbId: whiteboard.wbId
+           whiteboardId: whiteboard.wbId
         },
         load: function(resp){
             if(resp.error) {
                 console.info("error getting users",resp.error);
             }
             whiteboard.populateUserList(resp.userList);
-            setTimeout(whiteboard.getUserList, whiteboard.userCheckInterval);
+            setTimeout(function() {
+                whiteboard.getUserList();
+            },whiteboard.userCheckInterval);
        },
        error: function(e){
             console.info("post error on gettingUsers",e);
@@ -355,12 +448,10 @@ Whiteboard.prototype.openChannel = function() {
         }
     };
     var printChatMessage = function(message){
-
         whiteboard.chatMessageList.push('<pre class=\"chatMessage\"><span class=\"chatFrom\">' + message.fromUser + '</span>: ' + message.chatMessage + '</pre><br>');
         if(whiteboard.chatMessageList.length > whiteboard.messageMax){
             whiteboard.chatMessageList.shift();
         }
-
         var messageListStr = '';
         for(var i=0; i < whiteboard.chatMessageList.length; i++){
             var text = whiteboard.chatMessageList[i].split('###')[0];
@@ -560,7 +651,6 @@ Whiteboard.prototype.initGfx = function(){
             return false;
         }
     };
-
     var doGfxMouseUp = function(evt) {
         var pt = getGfxMouse(evt);
         whiteboard.mouseDown = false;
@@ -632,7 +722,6 @@ Whiteboard.prototype.initGfx = function(){
                     whiteboard.getNode('textDialog').show();
                     whiteboard.getNode('wbText').focus();
                 }
-
                 //whiteboard.points = [];
                 if(geom){
                     whiteboard.sendMessage({geometry:geom});
@@ -669,17 +758,6 @@ Whiteboard.prototype.initGfx = function(){
 
         return addTimeRand(geom);
     };
-    var createImageJSON = function(bounds,textData){
-        bounds = normalizeBounds(bounds);
-        var geom = {
-                xPts: [bounds.x1,bounds.x2],
-                yPts: [bounds.y1,bounds.y2],
-                shapeType: 'image'
-        };
-        geom.dataStr = textData;
-
-        return addTimeRand(geom);
-    };
     var createSelectJSON = function(bounds){
         bounds = normalizeBounds(bounds);
         var geom = {
@@ -688,18 +766,6 @@ Whiteboard.prototype.initGfx = function(){
         };
         geom.shapeType = 'select';
         return geom;
-    };
-    var createTextJSON = function(pt,text){
-        var geom = {
-                xPts: [pt.x],
-                yPts: [pt.y]
-        };
-        geom.shapeType = 'text';
-        geom.text = text;
-        geom.lineStroke = whiteboard.fontSize;
-        geom.lineColor = whiteboard.lineColor;
-
-        return addTimeRand(geom);
     };
     var createDeleteOverlayJSON = function(bounds){
         bounds = normalizeBounds(bounds);
@@ -809,10 +875,6 @@ Whiteboard.prototype.initGfx = function(){
 
         return addTimeRand(geom);
     };
-    var  createClearDrawingJSON = function(){
-        var geom = {shapeType: 'clear'};
-        return geom;
-    };
     var createOffsetBB = function(origBB, pointInBB, newPt){
         //console.log('offset',origBB, pointInBB, newPt);
 
@@ -830,83 +892,6 @@ Whiteboard.prototype.initGfx = function(){
 
         return bounds;
     };
-    var getBoundingBox = function(geom){
-        if(geom.xPts && geom.yPts){
-            var xs = geom.xPts;
-            var ys = geom.yPts;
-            var bb = {x1: 0, x2: -1, y1: 0, y2: -1 };
-
-            if(xs.length > 1){
-                bb.x1 = xs[0];
-                bb.x2 = xs[1];
-                dojo.forEach(xs, function(x){
-                    if(x < bb.x1){
-                        bb.x1 = x;
-                    }
-                    else if(x > bb.x2){
-                        bb.x2 = x;
-                    }
-                });
-            }
-            if(ys.length > 1){
-                bb.y1 = ys[0];
-                bb.y2 = ys[1];
-                dojo.forEach(ys, function(y){
-                    if(y < bb.y1){
-                        bb.y1 = y;
-                    }
-                    else if(y > bb.y2){
-                        bb.y2 = y;
-                    }
-                });
-            }
-            return bb;
-        } else {
-            return null;
-        }
-    };
-    var removeShape = function(geom, drawing){
-        var shape = getShapeFromGeom(geom,drawing);
-        if(shape){
-            drawing.remove(shape);
-        }
-    };
-    var moveShape = function(geom, drawing){
-        var shape = getShapeFromGeom(geom,drawing);
-        if(shape){
-            shape.applyTransform({dx: geom.xPts[0], dy: geom.yPts[0]});
-            if(shape.wbbb){
-                shape.wbbb.x1 += geom.xPts[0];
-                shape.wbbb.x2 += geom.xPts[0];
-                shape.wbbb.y1 += geom.yPts[0];
-                shape.wbbb.y2 += geom.yPts[0];
-            }
-        }
-    };
-    var moveShapeUp = function(geom, drawing){
-        var shape = getShapeFromGeom(geom,drawing);
-        if(shape){
-            shape.moveToFront();
-        }
-    };
-    var moveShapeDown = function(geom, drawing){
-        var shape = getShapeFromGeom(geom,drawing);
-        if(shape){
-            shape.moveToBack();
-        }
-    };
-    var getShapeFromGeom = function(geom, drawing){
-        var retVal = null;
-        dojo.every(drawing.children, function(shape){
-            if((shape.cRand === geom.cRand) && (shape.cTime === geom.cTime)){
-                retVal = shape;
-                return false;
-            }
-            return true; // keep going until we find one that isn't
-        });
-        return retVal;
-    };
-
     //first point should be upper left of rect
     var  normalizeBounds = function(bounds){
             if(bounds.x2 < bounds.x1){
@@ -997,30 +982,28 @@ Whiteboard.prototype.initGfx = function(){
 Whiteboard.prototype.loadFunction = function(){
     var whiteboard = this;
 
-    // private methods
     var chooseColor = function(type) {
-        var cp = whiteboard.getNode(type + 'ColorPaletteWidget');
+        var cp = whiteboard.getDialogWidget(type + 'ColorPaletteWidget');
         //console.log(cp);
-        dojo.style(dojo.byId(type + 'Swatch'),{backgroundColor: cp.value});
+        dojo.style(whiteboard.getNode(type + 'Swatch'),{backgroundColor: cp.value});
         whiteboard[type + 'Color'] = cp.value;
-        dijit.popup.close(whiteboard.getNode(type + "ColorPaletteDialog"));
+        dijit.popup.close(whiteboard.getDialogWidget(type + "ColorPaletteDialog"));
     };
     var cancelChooseColor = function(type) {
-        dijit.popup.close(whiteboard.getNode(type + "ColorPaletteDialog"));
+        dijit.popup.close(whiteboard.getDialogWidget(type + "ColorPaletteDialog"));
     };
     var exportImage = function(){
         try{                                      //dojo.query('canvas',whiteboard.getNode('movieDialog'))[0].toDataURL();
-            dojo.byId("exportedImg").src = whiteboard.getWidget('canvas').toDataURL();
-            whiteboard.getNode("imgDialog").show();
-
+            dojo.byId("exportedImg").src = dojo.query('canvas',dojo.byId(whiteboard.wbId))[0].toDataURL();
+            dijit.byId("imgDialog").show();
         }catch(e){
             console.info("canvas not supported",e);
         }
     };
     var exportMovieImage = function(){
         try{
-            dojo.byId("exportedImg").src = dojo.query('canvas',whiteboard.getNode('movieDialog'))[0].toDataURL();
-            whiteboard.getNode("imgDialog").show();
+            dojo.byId("exportedImg").src = dojo.query('canvas',dojo.byId('movieDialog'))[0].toDataURL();
+            dijit.byId("imgDialog").show();
         }catch(e){
             console.info("canvas not supported",e);
         }
@@ -1080,7 +1063,7 @@ Whiteboard.prototype.loadFunction = function(){
     };
     var showMovie = function(){
         try{
-            whiteboard.getNode("movieDialog").show();
+            dijit.byId("movieDialog").show();
 
             if(whiteboard.messageList){
                 whiteboard.geomMessageList = [];
@@ -1090,7 +1073,7 @@ Whiteboard.prototype.loadFunction = function(){
                     }
                 });
             }
-            var mSlider = whiteboard.getNode('movieSlider');
+            var mSlider = dijit.byId('movieSlider');
             mSlider.setAttribute('maximum',whiteboard.geomMessageList.length);
             mSlider.setAttribute('discreteValues',whiteboard.geomMessageList.length);
 
@@ -1100,7 +1083,7 @@ Whiteboard.prototype.loadFunction = function(){
         }
     };
     var incrementMovie = function(){
-        var indexEnd = Math.round(whiteboard.getNode('movieSlider').getValue());
+        var indexEnd = Math.round(dijit.byId('movieSlider').getValue());
         whiteboard.movieDrawing.clear();
         for(var i =0; i < indexEnd; i++){
             whiteboard.drawFromJSON(whiteboard.geomMessageList[i].geometry, whiteboard.movieDrawing);
@@ -1108,7 +1091,6 @@ Whiteboard.prototype.loadFunction = function(){
         if(indexEnd > 0){
             dojo.byId('movieUser').innerHTML = whiteboard.geomMessageList[indexEnd - 1].fromUser;
         }
-
     };
     var doCancelAddText = function(){
         whiteboard.getNode('wbText').setValue('');
@@ -1132,23 +1114,40 @@ Whiteboard.prototype.loadFunction = function(){
         var text = whiteboard.getNode('wbText').getValue();
         if((text !== '') && (whiteboard.textPoint)){
             var geom = createTextJSON(whiteboard.textPoint,text);
-            drawFromJSON(geom,whiteboard.overlayDrawing);
+            whiteboard.drawFromJSON(geom,whiteboard.overlayDrawing);
         }
     };
     var hide = function(id){
         try{
-            whiteboard.getWidget(id).style.display = 'none';
+            whiteboard.getNode(id).style.display = 'none';
         }catch(e) {
             console.error(e);
         }
     };
     var show = function(id){
         try{
-            whiteboard.getWidget(id).style.display = '';
+            whiteboard.getNode(id).style.display = '';
         }catch(e) {
             console.error(e);
         }
     };
+    var  createClearDrawingJSON = function(){
+        var geom = {shapeType: 'clear'};
+        return geom;
+    };
+    var createTextJSON = function(pt,text){
+        var geom = {
+            xPts: [pt.x],
+            yPts: [pt.y]
+        };
+        geom.shapeType = 'text';
+        geom.text = text;
+        geom.lineStroke = whiteboard.fontSize;
+        geom.lineColor = whiteboard.lineColor;
+
+        return addTimeRand(geom);
+    };
+
     var call = function(){
         try{
             var call = new Call(whiteboard.wbId);
@@ -1158,34 +1157,32 @@ Whiteboard.prototype.loadFunction = function(){
         }
     };
 
-
     // binding events
     dojo.connect(whiteboard.getWidget('callBtn'),'onClick',function(){
         call();
     });
-
-    dojo.connect(whiteboard.getWidget('lineColorPaletteOkBtn'),'onClick',function(){
+    dojo.connect(whiteboard.getDialogWidget('lineColorPaletteOkBtn'),'onClick',function(){
         chooseColor('line');
     });    
-    dojo.connect(whiteboard.getWidget('lineColorPaletteCancelBtn'),'onClick',function(){
+    dojo.connect(whiteboard.getDialogWidget('lineColorPaletteCancelBtn'),'onClick',function(){
         cancelChooseColor('line');
     });
-    dojo.connect(whiteboard.getWidget('fillColorPaletteOkBtn'),'onClick',function(){
+    dojo.connect(whiteboard.getDialogWidget('fillColorPaletteOkBtn'),'onClick',function(){
         chooseColor('fill');
     });    
-    dojo.connect(whiteboard.getWidget('fillColorPaletteCancelBtn'),'onClick',function(){
+    dojo.connect(whiteboard.getDialogWidget('fillColorPaletteCancelBtn'),'onClick',function(){
         cancelChooseColor('fill');
     });
     
     if(Modernizr.canvas) {
         dojo.connect(whiteboard.getWidget('exportImgBtn'),'onClick',exportImage);
-        dojo.connect(whiteboard.getWidget('exportMovieImgBtn'),'onClick',exportMovieImage);
+        dojo.connect(dijit.byId('exportMovieImgBtn'),'onClick',exportMovieImage);
     } else {
         dojo.style(whiteboard.getWidget('exportImgBtn'), {'visibility': 'hidden', 'display': 'none'});
-        dojo.style(whiteboard.getWidget('exportMovieImgBtn'), {'visibility': 'hidden', 'display': 'none'});
+        dojo.style(dijit.byId('exportMovieImgBtn'), {'visibility': 'hidden', 'display': 'none'});
     }
     dojo.connect(whiteboard.getWidget('showMovieBtn'),'onClick',showMovie);
-    dojo.connect(whiteboard.getWidget('movieSlider'),'onChange',incrementMovie);
+    dojo.connect(dijit.byId('movieSlider'),'onChange',incrementMovie);
     
     dojo.connect(whiteboard.getWidget('lineStrokeSelect'),'onChange',function(){
         whiteboard.lineStroke = Math.floor(1.0 * whiteboard.getWidget('lineStrokeSelect').getValue());
@@ -1193,14 +1190,14 @@ Whiteboard.prototype.loadFunction = function(){
     dojo.connect(whiteboard.getNode('fontSizeSelect'),'onChange',function(){
         whiteboard.fontSize = Math.floor(1.0 * whiteboard.getWidget('fontSizeSelect').getValue());
     });
-    dojo.connect(whiteboard.getWidget('clearDrawingNoBtn'),'onClick',function(){
+    dojo.connect(whiteboard.getDialogWidget('clearDrawingNoBtn'),'onClick',function(){
         dijit.popup.close(whiteboard.getWidget("clearDrawingDialog"));
     });
-    dojo.connect(whiteboard.getWidget('clearDrawingYesBtn'),'onClick',function(){
-        dijit.popup.close(whiteboard.getWidget("clearDrawingDialog"));
+    dojo.connect(whiteboard.getDialogWidget('clearDrawingYesBtn'),'onClick',function(){
+        dijit.popup.close(whiteboard.getDialogWidget("clearDrawingDialog"));
         var geom = createClearDrawingJSON();
         whiteboard.sendMessage({geometry: geom });
-        drawFromJSON(geom,whiteboard.drawing);
+        whiteboard.drawFromJSON(geom,whiteboard.drawing);
         
     });
     dojo.connect(whiteboard.getWidget('sendMailButton'),'onClick',sendEmail);
@@ -1252,6 +1249,18 @@ Whiteboard.prototype.loadFunction = function(){
 };
 
 function DNDFileController(el_) {
+    var createImageJSON = function(bounds,textData){
+        bounds = normalizeBounds(bounds);
+        var geom = {
+            xPts: [bounds.x1,bounds.x2],
+            yPts: [bounds.y1,bounds.y2],
+            shapeType: 'image'
+        };
+        geom.dataStr = textData;
+
+        return addTimeRand(geom);
+    };
+
     var thumbnails_ = document.getElementById('thumbnails');
 
     this.dragenter = function(e) {
@@ -1259,30 +1268,24 @@ function DNDFileController(el_) {
         e.preventDefault();
         el_.classList.add('rounded');
     };
-
     this.dragover = function(e) {
         e.stopPropagation();
         e.preventDefault();
     };
-
     this.dragleave = function(e) {
         e.stopPropagation();
         e.preventDefault();
         el_.classList.remove('rounded');
     };
-
     this.drop = function(e) {
         try{
             //console.log('dropevent',e);
             var pt = getGfxMouse(e);
-
             e.stopPropagation();
             e.preventDefault();
-
             el_.classList.remove('rounded');
 
             var files = e.dataTransfer.files;
-
             for (var i = 0, file; file = files[i]; i++) {
                 var imageType = /image.*/;
                 if (!file.type.match(imageType)) {
@@ -1293,10 +1296,10 @@ function DNDFileController(el_) {
 
                 reader.onerror = function(evt) {
                     alert('Error code: ' + evt.target.error.code);
-                }
+                };
                 reader.onload = (function(aFile) {
                     return function(evt) {
-                        if (evt.target.readyState == FileReader.DONE) {
+                        if (evt.target.readyState === FileReader.DONE) {
 
                             console.log('rawImg',evt.target.result.length);
                             var img = new Image();
@@ -1322,20 +1325,16 @@ function DNDFileController(el_) {
                                     newH = img.height;
                                     newW = img.width;
                                 }
-
                                 var tempCanvas = document.createElement("canvas");
                                 tempCanvas.height = newH;
                                 tempCanvas.width = newW;
                                 var tempContext = tempCanvas.getContext("2d");
                                 tempContext.drawImage(img,0,0,newW,newH);
-
                                 var bounds = {x1:pt.x, y1:pt.y, x2: pt.x + newW, y2: pt.y + newH};
                                 var imgJSON = createImageJSON(bounds,tempCanvas.toDataURL());
 
                                 //console.log(imgJSON);
-
-                                drawFromJSON(imgJSON,whiteboard.drawing);
-
+                                whiteboard.drawFromJSON(imgJSON,whiteboard.drawing);
                                 whiteboard.sendMessage({geometry:imgJSON});
                             };
                         }
@@ -1392,6 +1391,20 @@ var newRoom = function(roomKey) {
     });
 };
 
+var logout = function() {
+    dojo.xhrPost({
+        url: "/workspace/logout",
+        load: function(resp){
+            window.location.href = "/workspace";
+        },
+        error: function(e){
+            console.info("post error",e);
+        },
+        handleAs: "json",
+        preventCache: true
+    });
+};
+
  dojo.addOnLoad(function() {
      console.log('onLoad');
      dojo.connect(dijit.byId('mainmenu.new'),'onClick',function() {
@@ -1403,9 +1416,11 @@ var newRoom = function(roomKey) {
              newRoom(roomKey);
          }
      });
+     dojo.connect(dijit.byId('mainmenu.exit'),'onClick',function() {
+         logout();
+     });
 
      // global
      workspace = new Workspace(workspaceId);
-
  });
  

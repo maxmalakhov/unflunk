@@ -129,7 +129,7 @@ sub { vertical-align: sub; font-size: smaller; }
 sup { vertical-align: super; font-size: smaller; }
 
 pre { 
-  padding: 15px; 
+  padding: 5px; /* 15 */
   
   /* www.pathf.com/blogs/2008/05/formatting-quoted-code-in-blog-posts-css21-white-space-pre-wrap/ */
   white-space: pre; /* CSS2 */
@@ -284,10 +284,21 @@ button {  width: auto; overflow: visible; }
 .chatMessage{
 	background-color: #EFEFEF;
     border: 1px solid #CCCCCC;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    margin: 1px;
 }
 
 .chatMessage .chatFrom{
 	color: #0000FF;	
+}
+
+.chatText {
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    margin: 1px;
 }
 
 #header{
