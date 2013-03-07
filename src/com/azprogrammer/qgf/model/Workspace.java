@@ -55,8 +55,12 @@ public class Workspace {
         return KeyFactory.keyToString(getKey());
     }
 
-    public void addNewRoom(String roomKey) {
-        roomList.add(roomKey);
+    public void addNewRoom(String roomId) {
+        roomList.add(roomId);
+    }
+
+    public void removeRoom(String roomId) {
+        roomList.remove(roomId);
     }
 
     // getters and setters by default

@@ -21,7 +21,7 @@ public class Call {
     protected Key key;
 
     @Persistent
-    private String roomKey = null;
+    private String roomId = null;
 
     @Persistent
     private String token = null;
@@ -148,6 +148,9 @@ public class Call {
     }
 
     // getters and setters
+    public String getStringKey() {
+        return KeyFactory.keyToString(key);
+    }
 
     public Key getKey() {
         return key;
@@ -157,12 +160,12 @@ public class Call {
         this.key = key;
     }
 
-    public String getRoomKey() {
-        return roomKey;
+    public String getRoomId() {
+        return roomId;
     }
 
-    public void setRoomKey(String roomKey) {
-        this.roomKey = roomKey;
+    public void setRoomId(String roomId) {
+        this.roomId = roomId;
     }
 
     public String getToken() {
@@ -217,7 +220,7 @@ public class Call {
     public String toString() {
         return "Call{" +
                 "key=" + KeyFactory.keyToString(key)+
-                ", roomKey='" + roomKey + '\'' +
+                ", roomId='" + roomId + '\'' +
                 ", token='" + token + '\'' +
                 ", user1='" + user1 + '\'' +
                 ", user2='" + user2 + '\'' +

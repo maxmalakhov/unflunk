@@ -70,7 +70,8 @@ public class WorkspaceController {
 
     //how long ago does a user have to have pinged before not being in room anymore?
     protected long lastPingMillis = 1000 * 60 * 7;
-    static final char[] validChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890".toCharArray();
+    private static final char[] validChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890".toCharArray();
+    private static final char[] validDigits = "1234567890".toCharArray();
 
     private static Logger LOG = Logger.getLogger("WorkspaceController");
 
@@ -130,8 +131,8 @@ public class WorkspaceController {
             try {
                 List<Workspace> workspaces = (List<Workspace>) persistenceManager.find(
                         Workspace.class,
-                        "this.user == key",
-                        "String key",
+                        "this.user == userName",
+                        "String userName",
                         new Object[] { userName },
                         "creationDate desc");
 
@@ -199,25 +200,30 @@ public class WorkspaceController {
                               HttpSession session) throws IOException {
 
         Map<String, Object> model = new HashMap<String, Object>();
-        WhiteBoard whiteboard = null;
         List<WBMessage> messages = new ArrayList<WBMessage>();
         String roomId;
 
         synchronized (this) {
-            whiteboard = new WhiteBoard();
-            whiteboard.setCreatedBySessionId(session.getId());
-            whiteboard.setCreationDate(new Date());
-            whiteboard.setReferer(referer);
-            whiteboard.setUserAgent(userAgent);
-            persistenceManager.makePersistent(whiteboard);
+            String worksheetId = "WS_"+generateName(7, validDigits);
+
+            WhiteBoard room = new WhiteBoard();
+            room.setCreatedBySessionId(session.getId());
+            room.setCreationDate(new Date());
+            room.setReferer(referer);
+            room.setUserAgent(userAgent);
+            room.addNewWorksheet(worksheetId);
+            persistenceManager.makePersistent(room);
 
             Workspace workspace = persistenceManager.getObjectById(Workspace.class, workspaceId);
-            workspace.addNewRoom(whiteboard.getKeyString());
+            workspace.addNewRoom(room.getKeyString());
             persistenceManager.makePersistent(workspace);
 
-            model.put("messages", messages);
+            persistenceManager.makePersistent(room);
 
-            roomId = KeyFactory.keyToString(whiteboard.getKey ());
+            model.put("messages", messages);
+            model.put("worksheets", room.getWorksheetList());
+
+            roomId = KeyFactory.keyToString(room.getKey ());
 
             Object userNameObj = session.getAttribute("userName");
             String userName = null;
@@ -229,7 +235,7 @@ public class WorkspaceController {
                             WBChannel.class,
                             "this.wbKey == key && this.sessionId == sessId",
                             "com.google.appengine.api.datastore.Key key, String sessId",
-                            new Object[] { whiteboard.getKey(), session.getId() } );
+                            new Object[] { room.getKey(), session.getId() } );
 
                     if ((channels != null) && (channels.size () > 0)){
                         channel = channels.get(0);
@@ -242,7 +248,7 @@ public class WorkspaceController {
                 if(channel == null){
                     channel = new WBChannel();
                     channel.setSessionId(session.getId());
-                    channel.setWbKey(whiteboard.getKey());
+                    channel.setWbKey(room.getKey());
                     channel.setUserName(userName);
                     channel.setTime(System.currentTimeMillis());
                     channel.setUserAgent(userAgent);
@@ -267,35 +273,33 @@ public class WorkspaceController {
                           HttpSession session) throws IOException {
 
         Map<String, Object> model = new HashMap<String, Object>();
-        WhiteBoard whiteboard = null;
         List<WBMessage> messages = new ArrayList<WBMessage>();
-        String wbKeyStr = null;
 
         synchronized (this) {
-            if((roomId != null) && (!"".equals (roomId.trim()))){
-                roomId = cleanupWbId(roomId);
-                try {
-                    Key key = KeyFactory.stringToKey(roomId);
-                    whiteboard = persistenceManager.getObjectById(WhiteBoard.class, key);
+            WhiteBoard room = null;
+            //roomId = cleanupWbId(roomId);
+            try {
+                Key key = KeyFactory.stringToKey(roomId);
+                room = persistenceManager.getObjectById(WhiteBoard.class, key);
 
-                    Workspace workspace = persistenceManager.getObjectById(Workspace.class, workspaceId);
-                    workspace.addNewRoom(whiteboard.getKeyString());
-                    persistenceManager.makePersistent(workspace);
+                Workspace workspace = persistenceManager.getObjectById(Workspace.class, workspaceId);
+                workspace.addNewRoom(room.getKeyString());
+                persistenceManager.makePersistent(workspace);
 
-                    messages.addAll(persistenceManager.find(
-                            WBMessage.class,
-                            "this.wbKey == key",
-                            "com.google.appengine.api.datastore.Key key",
-                            new Object[] { key },
-                            "creationTime asc"));
-                } catch(Exception e) {
-                    model.put("errorMsg", e.getMessage());
-                }
+                messages.addAll(persistenceManager.find(
+                        WBMessage.class,
+                        "this.wbKey == key",
+                        "com.google.appengine.api.datastore.Key key",
+                        new Object[] { key },
+                        "creationTime asc"));
+            } catch(Exception e) {
+                model.put("errorMsg", e.getMessage());
             }
-            model.put("messages", messages);
-            model.put("worksheets", whiteboard.getWorksheetList());
 
-            roomId = KeyFactory.keyToString(whiteboard.getKey ());
+            model.put("messages", messages);
+            model.put("worksheets", room.getWorksheetList());
+
+            roomId = KeyFactory.keyToString(room.getKey ());
 
                 Object userNameObj = session.getAttribute("userName");
                 String userName = null;
@@ -307,7 +311,7 @@ public class WorkspaceController {
                                 WBChannel.class,
                                 "this.wbKey == key && this.sessionId == sessId",
                                 "com.google.appengine.api.datastore.Key key, String sessId",
-                                new Object[] { whiteboard.getKey(), session.getId() } );
+                                new Object[] { room.getKey(), session.getId() } );
 
                         if ((channels != null) && (channels.size () > 0)){
                             channel = channels.get(0);
@@ -321,7 +325,7 @@ public class WorkspaceController {
                     if(channel == null){
                         channel = new WBChannel();
                         channel.setSessionId(session.getId());
-                        channel.setWbKey(whiteboard.getKey());
+                        channel.setWbKey(room.getKey());
                         channel.setUserName(userName);
                         channel.setTime(System.currentTimeMillis());
                         channel.setUserAgent(userAgent);
@@ -337,11 +341,44 @@ public class WorkspaceController {
         return new ObjectMapper().writeValueAsString(model);
     }
 
+    @RequestMapping(value = URL_WORKSPACE_ROOM, method = RequestMethod.DELETE)
+    @ResponseBody
+    public String removeRoom(@RequestHeader String referer,
+                           @RequestHeader("User-Agent") String userAgent,
+                           @PathVariable String workspaceId,
+                           @PathVariable String roomId) {
+
+        String response = null;
+        try {
+            synchronized (this) {
+                Workspace workspace = persistenceManager.getObjectById(Workspace.class, workspaceId);
+                workspace.removeRoom(roomId);
+                persistenceManager.makePersistent(workspace);
+            }
+            response = "{\"status\":\"ok\"}";
+        } catch (Exception ex) {
+            response = "{ \"error\" : \""+ex.getMessage()+"\" }";
+        }
+        return response;
+    }
+
     private String cleanupWbId(String wbId) {
         if(wbId != null && (wbId.indexOf ("'") > -1 || wbId.indexOf ("\"") > -1)) {
             return null;
         }
         return wbId;
+    }
+
+
+    private String generateName(int length, char[] chars) {
+        final Random randomGenerator = new Random();
+        StringBuilder name = new StringBuilder();
+
+        for(int i = 0; i < length; i ++) {
+            name.append(chars[randomGenerator.nextInt(chars.length-1)]);
+        }
+
+        return name.toString();
     }
 
     private void pushNewUserList(String roomId) {
@@ -350,14 +387,16 @@ public class WorkspaceController {
         for (WBChannel wbChannel : channels) {
             userNames.add (wbChannel.getUserName ());
         }
-        for (WBChannel wbChannel : channels) {
+        //for (WBChannel wbChannel : channels) {
             try  {
                 WBMessage message = new WBMessage ();
                 message.setUserList (userNames);
                 channelService.sendMessage(new ChannelMessage(roomId, JSONObject.fromObject(message).toString() ));
 
-            } catch(Exception e) {}
-        }
+            } catch(Exception ex) {
+                ex.printStackTrace();
+            }
+        //}
     }
 
     protected List <WBChannel> getLiveChannels(String roomId) {
@@ -371,7 +410,9 @@ public class WorkspaceController {
                     "com.google.appengine.api.datastore.Key key, Long lastPing",
                     new Object[] { KeyFactory.stringToKey(roomId), time }));
 
-        } catch(Exception e) {}
+        } catch(Exception ex) {
+            ex.printStackTrace();
+        }
 
         return channels;
     }

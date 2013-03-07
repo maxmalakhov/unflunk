@@ -19,7 +19,7 @@ function Room(id, token, messages, worksheets) {
         this.worksheetList[worksheet.id] = worksheet;
     };
 
-    this.newWorksheet = function(worksheetId) {
+    this.newWorksheet = function(worksheetId, show) {
         console.debug("newWorksheet()");
         var room = this;
         var worksheetTabs = room.getWidget('worksheets');
@@ -39,6 +39,9 @@ function Room(id, token, messages, worksheets) {
             closable: true
         });
         worksheetTabs.addChild(worksheetTab);
+        if(show) {
+            worksheetTabs.selectChild(worksheetTab);
+        }
     };
 }
 // --------------- Entity methods -------------------
@@ -84,7 +87,7 @@ Room.prototype.init = function(){
                 if(resp.error) {
                     console.info("error on new worksheet",resp.error);
                 }
-                room.newWorksheet(resp.worksheetId);
+                room.newWorksheet(resp.worksheetId, true);
             },
             error: function(e){
                 console.info("post error new worksheet server",e);
@@ -95,8 +98,8 @@ Room.prototype.init = function(){
     };
     var call = function(){
         try{
-            var call = new Call(room.wbId);
-            call.call();
+            var call = new Call(room.id);
+            call.new();
         }catch(e) {
             console.error(e);
         }
@@ -109,8 +112,16 @@ Room.prototype.init = function(){
 
     dojo.connect(room.getWidget('newWorksheetButton'),'onClick', createWorksheet);
 
-    dojo.forEach(room.worksheetIdList, function(worksheetId) {
-        room.newWorksheet(worksheetId);
+    if(room.worksheetIdList.length > 0) {
+        dojo.forEach(room.worksheetIdList, function(worksheetId) {
+            room.newWorksheet(worksheetId, false);
+        });
+    } else {
+        createWorksheet();
+    }
+
+    dojo.connect(dijit.byId(room.id),'onClose', function() {
+        workspace.removeRoom(room.id);
     });
 };
 Room.prototype.drawFromJSON = function(worksheetId, geom) {

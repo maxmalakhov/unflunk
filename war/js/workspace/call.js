@@ -6,19 +6,19 @@
  * To change this template use File | Settings | File Templates.
  */
 
-function Call(wbId, callId) {
-    this.wbId = wbId;
-    this.callId = callId;
+function Call(roomId) {
+    this.roomId = roomId;
 
     this.getNode = function(clazz) {
-        return dojo.query("."+clazz, this.wbId)[0];
+        return dojo.query("."+clazz, this.roomId)[0];
     };
     this.getWidget = function(clazz) {
         return dijit.getEnclosingWidget(this.getNode(clazz));
     };
 }
 
-Call.prototype.call = function() {
+Call.prototype.new = function() {
+    var callId;
     var call = this;
     var card;
     var localVideo;
@@ -41,8 +41,6 @@ Call.prototype.call = function() {
     var me = false;
     var callee = '';
     var initiator = false; // {{ initiator }}; // 0
-    //var roomLink = false;
-    var roomKey = call.wbId;
     var mediaConstraints = false;
     var pcConfig = false;
     var pcConstraints = false;
@@ -75,8 +73,7 @@ Call.prototype.call = function() {
                 offerConstraints = response.offerConstraints;
                 pcConfig = response.pcConfig;
                 pcConstraints = response.pcConstraints;
-                roomKey = response.roomKey;
-                //roomLink = response.roomLink;
+                callId = response.callId;
                 var channelToken = response.token;
                 initialize(channelToken);
             },
@@ -90,7 +87,7 @@ Call.prototype.call = function() {
     };
     var initialize = function(channelToken) {
         console.debug("initialize");
-        console.log("Initializing; room="+roomKey+".");
+        console.log("Initializing; call="+callId+".");
         card = call.getNode("card");
         localVideo = call.getNode("localVideo");
         miniVideo = call.getNode("miniVideo");
@@ -218,7 +215,7 @@ Call.prototype.call = function() {
         console.debug("sendMessage");
         var msgString = JSON.stringify(message);
         console.log('C->S: ' + msgString);
-        path = '/_ah/channel/message?roomKey='+roomKey + '&user='+me;
+        path = '/call/'+callId+'/message/?user='+me;
         var xhr = new XMLHttpRequest();
         xhr.open('POST', path, true);
         xhr.send(msgString);
@@ -515,5 +512,5 @@ Call.prototype.call = function() {
     };
 
     console.debug("call()");
-    start("/_ah/channel/init/?roomKey="+roomKey);
+    start("/call/new/?roomId="+call.roomId);
 };

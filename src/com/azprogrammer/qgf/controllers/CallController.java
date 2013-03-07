@@ -73,11 +73,12 @@ public class CallController {
 
     private static Logger LOG = Logger.getLogger("CallController");
 
+    private static final String PARAM_CALL_ID = "callId";
+    private static final String URL_CALL_HOME = "/call";
 
-    private static final String URL_DEMO_PAGE = "/call";
+    private static  final String URL_CALL_NEW = URL_CALL_HOME+"/new";
+    private static  final String URL_CALL_MESSAGE = URL_CALL_HOME+"/{"+PARAM_CALL_ID+"}/message";
 
-    private static  final String URL_INIT = "/_ah/channel/init";
-    private static final String URL_MESSAGE = "/_ah/channel/message";
     private static final String URL_CONNECTED = "/_ah/channel/connected";
     private static final String URL_DISCONNECTED = "/_ah/channel/disconnected";
 
@@ -101,60 +102,55 @@ public class CallController {
     }
 
 
-    @RequestMapping(value = URL_DEMO_PAGE, method = RequestMethod.GET)
+    @RequestMapping(value = URL_CALL_HOME, method = RequestMethod.GET)
     public ModelAndView showTestPage(@RequestParam(required = false) String roomKey) {
         return new ModelAndView("call", "roomKey", roomKey);
     }
 
-    @RequestMapping(value = URL_INIT, method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
+    @RequestMapping(value = URL_CALL_NEW, method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
     @ResponseBody
-    public String init(@RequestParam(required = false) String callee, @RequestParam(required = false) String roomKey,
+    public String newCall(@RequestParam(required = false) String callee, @RequestParam(required = false) String roomId,
                        @RequestParam(required = false) String token,
                        @RequestParam(required = false) String ss, @RequestParam(required = false) String ts,
                        @RequestParam(required = false) String tp, @RequestParam(required = false) String compat,
                        @RequestParam(required = false) String debug, @RequestParam(required = false) String hd,
                        HttpServletRequest request, HttpServletResponse response, HttpSession session) {
 
-        String server = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
-        String baseUrl = server + request.getContextPath() + "/call/";
-
         String user = (String) session.getAttribute("userName");
         int initiator = 0;
-        Call room = null;
+        Call call = null;
         synchronized (this) {
-            if ( roomKey != null) {
+            if ( roomId != null) {
                 //room = persistenceManager.getObjectById(Call.class, KeyFactory.stringToKey(roomKey));
-                List<Call> rooms = (List<Call>) persistenceManager.find(Call.class, "this.roomKey == roomKey", "String roomKey", roomKey);
-                if (rooms != null && !rooms.isEmpty()) {
-                    room = rooms.get(0);
+                List<Call> calls = (List<Call>) persistenceManager.find(
+                        Call.class,
+                        "this.roomId == roomId",
+                        "String roomId",
+                        new Object[] { roomId });
+                if (calls != null && !calls.isEmpty()) {
+                    call = calls.get(0);
                 }
             }
             // New
-            if(room == null && !"full".equals(debug)) {
+            if(call == null && !"full".equals(debug)) {
                 if(user == null) {
                     user = generateName(10);
-                }
-                //roomKey = generateName(10);
-                room = new Call();
-                //room.setKey(KeyFactory.createKey("", roomKey));
-                room.addUser(user);
-                persistenceManager.makePersistent(room);
-
+                };
+                call = new Call();
+                call.addUser(user);
                 if (!"loopback".equals(debug)) {
                     initiator = 0;
                 } else {
-                    room.addUser(user); // add the same user
-                    persistenceManager.makePersistent(room);
+                    call.addUser(user); // add the same user
                     initiator = 1;
                 }
             // Free
-            } else if (room !=null && room.getOccupancy() < 3 &&  !"full".equals(debug)) {
+            } else if (call !=null && call.getOccupancy() < 3 &&  !"full".equals(debug)) {
                 if(user == null) {
                     user = generateName(10);
                 }
-                room.addUser(user);
-                persistenceManager.makePersistent(room);
-                if (room.getOccupancy() == 1) {
+                call.addUser(user);
+                if (call.getOccupancy() == 1) {
                     initiator = 0;
                 } else {
                     initiator = 1;
@@ -162,20 +158,13 @@ public class CallController {
             // Full
             } else {
                 // TODO: Room is full
-                LOG.warning("Room "+roomKey+" is full");
+                LOG.warning("Room "+roomId+" is full");
             }
 
-            if(roomKey == null) {
-                roomKey = KeyFactory.keyToString(room.getKey());
-            }
-            room.setRoomKey(roomKey);
-            persistenceManager.makePersistent(room);
-            roomKey = KeyFactory.keyToString(room.getKey());
+            call.setRoomId(roomId);
+            persistenceManager.makePersistent(call);
         }
 
-        token = createChannel(room, user, 30);
-
-        String roomLink = baseUrl + "?roomKey=" + roomKey;
         if(compat == null) {
             compat = "TRUE";
         }
@@ -183,46 +172,44 @@ public class CallController {
          // set compat to false as DTLS does not work for loopback.
             compat = "FALSE";
         }
-
+        token = createChannel(call, user, 30);
         String params = "{\"token\": \""+token+"\""+
                 ",\"me\": \""+user+"\""+
-                ",\"roomKey\": \""+roomKey+"\""+
-                ",\"roomLink\": \""+roomLink+"\""+
+                ",\"callId\": \""+call.getStringKey()+"\""+
                 ",\"initiator\": "+initiator+""+  // first user
                 ",\"pcConfig\": "+buildPcConfig(ss, ts, tp)+
                 ",\"pcConstraints\": "+buildPcConstraints(compat)+
                 ",\"offerConstraints\": "+buildOfferConstraints(compat)+
                 ",\"mediaConstraints\": "+buildMediaConstraints(hd)+
-                ",\"room\": \""+room+"\""+
+                ",\"call\": \""+call+"\""+
                 "}";
-
 
         response.setContentType(APPLICATION_JSON_VALUE);
         return params;
     }
 
-    @RequestMapping(value = URL_MESSAGE, method = RequestMethod.POST)
+    @RequestMapping(value = URL_CALL_MESSAGE, method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
-    public void message(@RequestBody String message, @RequestParam String roomKey, @RequestParam String user) {
+    public void message(@RequestBody String message, @PathVariable String callId, @RequestParam String user) {
         StringBuilder log = new StringBuilder();
         synchronized (this) {
-            Call room = null;
+            Call call = null;
             try {
-                room = persistenceManager.getObjectById(Call.class, KeyFactory.stringToKey(roomKey));
+                call = persistenceManager.getObjectById(Call.class, KeyFactory.stringToKey(callId));
             } catch (IllegalArgumentException ex) {
                 LOG.warning(ex.getMessage());
             }
-            log.append("ROOM by key "+roomKey+" found "+room);
-            if (room != null) {
+            log.append("CALL by key "+callId+" found "+call);
+            if (call != null) {
                 JSONObject jsonObject = JSONObject.fromObject(message);
                 String type =(String) jsonObject.get("type");
                 if("bye".equalsIgnoreCase(type)) {
-                    room.removeUser(user);
-                    LOG.info("User " + user + " quit from room " + roomKey);
-                    LOG.info("Room " + roomKey + " has state " + room);
+                    call.removeUser(user);
+                    LOG.info("User " + user + " quit from room " + callId);
+                    LOG.info("Call " + callId + " has state " + call);
                 }
-                String otherUser = room.getOtherUser(user);
-                if(otherUser != null && room.hasUser(otherUser)) {
+                String otherUser = call.getOtherUser(user);
+                if(otherUser != null && call.hasUser(otherUser)) {
                     if ("offer".equalsIgnoreCase(type)) {
                         // Special case the loopback scenario
                         if(otherUser.equals(user)) {
@@ -231,9 +218,8 @@ public class CallController {
                         }
                         //message = maybeAddFakeCrypto(message);
                     }
-                    String clientId = makeClientId(room.getKey(), user);
+                    String clientId = makeClientId(call.getKey(), user);
                     //if (room.isConnectedUser(user)) {   // TODO: All of users should be connected
-                        channelService = ChannelServiceFactory.getChannelService();
                         channelService.sendMessage(new ChannelMessage(clientId, message));
                         LOG.info("Delivered message to user " + user);
 //                    } else {
@@ -245,7 +231,7 @@ public class CallController {
 //                    }
                 }
             } else {
-                LOG.warning("Unknown room " + roomKey);
+                LOG.warning("Unknown call " + callId);
             }
         }
         //return log.toString();
@@ -316,9 +302,9 @@ public class CallController {
         return message;
     }
 
-    private String createChannel(Call room, String user, int duration) {
-        String clientId = makeClientId(room.getKey(), user);
-        return ChannelServiceFactory.getChannelService().createChannel(clientId);//, duration);
+    private String createChannel(Call call, String user, int duration) {
+        String clientId = makeClientId(call.getKey(), user);
+        return channelService.createChannel(clientId);//, duration);
     }
 
     private String generateName(int length) {

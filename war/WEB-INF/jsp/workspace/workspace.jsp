@@ -10,7 +10,10 @@
 
 var userName = '${userName}';
 var workspaceId = '${workspaceId}';
-var roomIdList = ${roomList}; // json array
+var roomIdList = [];
+<c:if test="${not empty roomList}">
+roomIdList = ${roomList}; // json array
+</c:if>
 var error = '${errorMsg}';
 var workspace; // window scope
 

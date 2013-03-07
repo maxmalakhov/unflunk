@@ -10,6 +10,26 @@ function Workspace(id, roomIdList) {
         this.roomList[room.id] = room;
     };
 
+    this.removeRoom = function(roomId) {
+        var workspace = this;
+        console.debug('removeRoom()');
+        dojo.xhrDelete({
+            url: "/workspace/"+workspace.id+"/room/"+roomId,
+            load: function(resp){
+                if(resp.error){
+                    console.error(resp.error);
+                } else {
+                    // ok
+                }
+            },
+            error: function(e){
+                console.info("post error",e);
+            },
+            handleAs: "json",
+            preventCache: true
+        });
+    };
+
     this.newRoom = function(roomId) {
         var workspace = this;
         console.debug('newRoom()');
@@ -38,6 +58,9 @@ function Workspace(id, roomIdList) {
                         closable: true
                     });
                     roomTabs.addChild(roomTab);
+                    if(!roomId) {
+                        roomTabs.selectChild(roomTab);
+                    }
                 }
             },
             error: function(e){

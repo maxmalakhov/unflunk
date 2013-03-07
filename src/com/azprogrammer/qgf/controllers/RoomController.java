@@ -74,6 +74,7 @@ public class RoomController {
     //how long ago does a user have to have pinged before not being in room anymore?
     private long lastPingMillis = 1000 * 60 * 7;
     private static final char[] validChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890".toCharArray();
+    private static final char[] validDigits = "1234567890".toCharArray();
 
     private static Logger LOG = Logger.getLogger("RoomController");
 
@@ -117,10 +118,10 @@ public class RoomController {
 
     @RequestMapping(value = URL_ROOM_WORKSHEET_NEW, method = RequestMethod.POST, produces = APPLICATION_JSON_VALUE)
     @ResponseBody
-    public String ping(@PathVariable String roomId) {
+    public String createWorksheet(@PathVariable String roomId) {
         String response = null;
         try {
-            String worksheetId = "WS_"+generateName(7);
+            String worksheetId = "WS_"+generateName(7, validDigits);
             synchronized (this) {
                 WhiteBoard room = persistenceManager.getObjectById(WhiteBoard.class, roomId);
                 room.addNewWorksheet(worksheetId);
@@ -288,8 +289,7 @@ public class RoomController {
         return channels;
     }
 
-    private String generateName(int length) {
-        final char[] chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890".toCharArray(); // 62
+    private String generateName(int length, char[] chars) {
         final Random randomGenerator = new Random();
         StringBuilder name = new StringBuilder();
 

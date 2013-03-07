@@ -9,14 +9,14 @@
     <div region="top"  style="height: 50%;  padding:0;" dojoType="dijit.layout.ContentPane" splitter="true" >
         <div style="width: 100%; height: 100%;  padding:0;" dojoType="dijit.layout.BorderContainer" gutters="false" >
             <div region="center" dojoType="dijit.layout.ContentPane" splitter="true" ondblclick="enterFullScreen()" class="call">
-                <div class="card">
-                    <div class="local">
+                <div class="card" style="width: 100%; height: 100%;  padding:0;">
+                    <div class="local" style="width: 100%; height: 100%;  padding:0;">
                         <video width="100%" height="100%" class="localVideo" autoplay="autoplay" muted="true"/>
                     </div>
-                    <div class="remote">
+                    <div class="remote" style="width: 100%; height: 100%;  padding:0;">
                         <video width="100%" height="100%" class="remoteVideo" autoplay="autoplay">
                         </video>
-                        <div class="mini">
+                        <div class="mini" style="width: 100%; height: 100%;  padding:0;">
                             <video width="100%" height="100%" class="miniVideo" autoplay="autoplay" muted="true"/>
                         </div>
                     </div>
