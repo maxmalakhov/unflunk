@@ -36,7 +36,6 @@ package com.azprogrammer.qgf.controllers;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 import com.azprogrammer.qgf.model.*;
-import com.azprogrammer.qgf.views.ExternalRedirectView;
 import com.google.appengine.api.channel.ChannelMessage;
 import com.google.appengine.api.channel.ChannelService;
 import com.google.appengine.api.channel.ChannelServiceFactory;
@@ -44,10 +43,8 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
-import com.google.appengine.repackaged.org.codehaus.jackson.JsonGenerationException;
 import com.google.appengine.repackaged.org.codehaus.jackson.map.ObjectMapper;
 import net.sf.json.JSONObject;
-import net.sf.json.JsonConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.http.HttpStatus;
@@ -84,20 +81,18 @@ public class WorkspaceController {
     private static final String URL_WORKSPACE_LOGIN = URL_WORKSPACE_ROOT + "/login";
     private static final String URL_WORKSPACE_LOGOUT = URL_WORKSPACE_ROOT + "/logout";
     private static final String URL_WORKSPACE_HOME = URL_WORKSPACE_ROOT + "/{"+PARAM_WORKSPACE_ID+"}";
-    private static final String URL_WORKSPACE_ROOM = URL_WORKSPACE_HOME + "/room";
-    private static final String URL_WORKSPACE_JOIN = URL_WORKSPACE_ROOM + "/{"+PARAM_ROOM_ID+"}";
+    private static final String URL_WORKSPACE_ROOM = URL_WORKSPACE_HOME + "/room/{"+PARAM_ROOM_ID+"}";
+    private static final String URL_WORKSPACE_ROOM_NEW = URL_WORKSPACE_HOME + "/room";
 
     private UserService userService;
 
     @Autowired
     protected JdoTemplate persistenceManager;
-    //private PersistenceManager persistenceManager;
 
     private ChannelService channelService;
 
     public WorkspaceController() {
         userService = UserServiceFactory.getUserService();
-        //persistenceManager = PMF.get().getPersistenceManager();
         channelService = ChannelServiceFactory.getChannelService();
     }
 
@@ -167,9 +162,9 @@ public class WorkspaceController {
     public ModelAndView showWorkspacePage(@RequestHeader(required = false) String referer,
                                     @RequestHeader("User-Agent") String userAgent,
                                     @PathVariable String workspaceId,
-                                    HttpSession session) {
+                                    HttpSession session) throws IOException {
 
-        ModelAndView view = new ModelAndView("workspace/home");
+        ModelAndView view = new ModelAndView("workspace/workspace");
 
         Workspace workspace = null;
         synchronized (this) {
@@ -183,6 +178,8 @@ public class WorkspaceController {
         if (workspace != null) {
             view.addObject("userName",workspace.getUser());
             view.addObject("workspaceId",workspace.getStringKey());
+            view.addObject("roomList",  new ObjectMapper().writeValueAsString(workspace.getRoomList()));
+            session.setAttribute("userName", workspace.getUser());
         }
 
         return view;
@@ -190,11 +187,11 @@ public class WorkspaceController {
 
 
     @RequestMapping(value = URL_WORKSPACE_ROOM, method = RequestMethod.GET)
-    public ModelAndView getRoomPage(@PathVariable String workspaceId, @RequestParam String wbId) {
-        return new ModelAndView("workspace/room", "wbId", wbId);
+    public ModelAndView getRoomPage(@PathVariable String workspaceId, @PathVariable String roomId) {
+        return new ModelAndView("workspace/room", "roomId", roomId);
     }
 
-    @RequestMapping(value = URL_WORKSPACE_ROOM, method = RequestMethod.POST)
+    @RequestMapping(value = URL_WORKSPACE_ROOM_NEW, method = RequestMethod.POST)
     @ResponseBody
     public String newRoom(@RequestHeader String referer,
                               @RequestHeader("User-Agent") String userAgent,
@@ -204,7 +201,7 @@ public class WorkspaceController {
         Map<String, Object> model = new HashMap<String, Object>();
         WhiteBoard whiteboard = null;
         List<WBMessage> messages = new ArrayList<WBMessage>();
-        String wbKeyStr;
+        String roomId;
 
         synchronized (this) {
             whiteboard = new WhiteBoard();
@@ -214,16 +211,13 @@ public class WorkspaceController {
             whiteboard.setUserAgent(userAgent);
             persistenceManager.makePersistent(whiteboard);
 
-            //don't need key data in JSON
-            JsonConfig jsconfig = new JsonConfig();
-            String[] exlcudes = new String[] {"key","wbKey","userList","shapeId"};
-            jsconfig.setExcludes (exlcudes);
-            HashMap<String, Object> messagesMap = new HashMap <String, Object>();
-            //messagesMap.put("messages", messages);
-            //model.put("messageMapJSON", JSONObject.fromObject(messagesMap, jsconfig).toString());
+            Workspace workspace = persistenceManager.getObjectById(Workspace.class, workspaceId);
+            workspace.addNewRoom(whiteboard.getKeyString());
+            persistenceManager.makePersistent(workspace);
+
             model.put("messages", messages);
 
-            wbKeyStr = KeyFactory.keyToString(whiteboard.getKey ());
+            roomId = KeyFactory.keyToString(whiteboard.getKey ());
 
             Object userNameObj = session.getAttribute("userName");
             String userName = null;
@@ -256,21 +250,20 @@ public class WorkspaceController {
                 }
             }
         }
-        pushNewUserList(wbKeyStr);
+        pushNewUserList(roomId);
 
-        model.put("token", channelService.createChannel(session.getId()));
-        model.put("wbId", wbKeyStr);
+        model.put("token", channelService.createChannel(roomId));//session.getId()));
+        model.put("roomId", roomId);
 
         return new ObjectMapper().writeValueAsString(model);
     }
 
-
-    @RequestMapping(value = URL_WORKSPACE_JOIN, method = RequestMethod.POST)
+    @RequestMapping(value = URL_WORKSPACE_ROOM, method = RequestMethod.POST)
     @ResponseBody
     public String joinRoom(@RequestHeader String referer,
                           @RequestHeader("User-Agent") String userAgent,
                           @PathVariable String workspaceId,
-                          @PathVariable(PARAM_ROOM_ID) String wbId,
+                          @PathVariable String roomId,
                           HttpSession session) throws IOException {
 
         Map<String, Object> model = new HashMap<String, Object>();
@@ -279,11 +272,15 @@ public class WorkspaceController {
         String wbKeyStr = null;
 
         synchronized (this) {
-            if((wbId != null) && (!"".equals (wbId.trim()))){
-                wbId = cleanupWbId(wbId);
+            if((roomId != null) && (!"".equals (roomId.trim()))){
+                roomId = cleanupWbId(roomId);
                 try {
-                    Key key = KeyFactory.stringToKey(wbId);
+                    Key key = KeyFactory.stringToKey(roomId);
                     whiteboard = persistenceManager.getObjectById(WhiteBoard.class, key);
+
+                    Workspace workspace = persistenceManager.getObjectById(Workspace.class, workspaceId);
+                    workspace.addNewRoom(whiteboard.getKeyString());
+                    persistenceManager.makePersistent(workspace);
 
                     messages.addAll(persistenceManager.find(
                             WBMessage.class,
@@ -295,16 +292,10 @@ public class WorkspaceController {
                     model.put("errorMsg", e.getMessage());
                 }
             }
+            model.put("messages", messages);
+            model.put("worksheets", whiteboard.getWorksheetList());
 
-                //don't need key data in JSON
-                JsonConfig jsconfig = new JsonConfig();
-                String[] exlcudes = new String[] {"key","wbKey","userList","shapeId"};
-                jsconfig.setExcludes (exlcudes);
-                HashMap<String, Object> messagesMap = new HashMap <String, Object>();
-                model.put("messages", messages);
-                //model.put("messageMapJSON", JSONObject.fromObject(messagesMap,jsconfig).toString());
-
-                wbKeyStr = KeyFactory.keyToString(whiteboard.getKey ());
+            roomId = KeyFactory.keyToString(whiteboard.getKey ());
 
                 Object userNameObj = session.getAttribute("userName");
                 String userName = null;
@@ -338,10 +329,10 @@ public class WorkspaceController {
                     }
                 }
         }
-        pushNewUserList(wbKeyStr);
+        pushNewUserList(roomId);
 
-        model.put("token", channelService.createChannel(session.getId()));
-        model.put("wbId", wbKeyStr);
+        model.put("token", channelService.createChannel(roomId));//session.getId()));
+        model.put("roomId", roomId);
 
         return new ObjectMapper().writeValueAsString(model);
     }
@@ -353,24 +344,23 @@ public class WorkspaceController {
         return wbId;
     }
 
-    private void pushNewUserList(String wbId) {
-        List <WBChannel> channels = getLiveChannels(wbId);
+    private void pushNewUserList(String roomId) {
+        List <WBChannel> channels = getLiveChannels(roomId);
         HashSet <String> userNames = new HashSet <String> ();
         for (WBChannel wbChannel : channels) {
             userNames.add (wbChannel.getUserName ());
         }
-        ChannelService channelService = ChannelServiceFactory.getChannelService();
         for (WBChannel wbChannel : channels) {
             try  {
                 WBMessage message = new WBMessage ();
                 message.setUserList (userNames);
-                channelService.sendMessage(new ChannelMessage(wbChannel.getSessionId (),JSONObject.fromObject (message).toString () ));
+                channelService.sendMessage(new ChannelMessage(roomId, JSONObject.fromObject(message).toString() ));
 
             } catch(Exception e) {}
         }
     }
 
-    protected List <WBChannel> getLiveChannels(String wbId) {
+    protected List <WBChannel> getLiveChannels(String roomId) {
         List <WBChannel> channels = new ArrayList <WBChannel> ();
         try{
             long time = System.currentTimeMillis () - lastPingMillis;
@@ -379,7 +369,7 @@ public class WorkspaceController {
                     WBChannel.class,
                     "this.wbKey == key && this.time > lastPing",
                     "com.google.appengine.api.datastore.Key key, Long lastPing",
-                    new Object[] { KeyFactory.stringToKey(wbId), time }));
+                    new Object[] { KeyFactory.stringToKey(roomId), time }));
 
         } catch(Exception e) {}
 

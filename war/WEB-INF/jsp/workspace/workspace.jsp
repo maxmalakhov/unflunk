@@ -10,11 +10,11 @@
 
 var userName = '${userName}';
 var workspaceId = '${workspaceId}';
+var roomIdList = ${roomList}; // json array
 var error = '${errorMsg}';
+var workspace; // window scope
 
 </script>
-<%--<script src="/js/azp/WBCommon.js"></script>--%>
-<script src="/js/workspace/whiteboard.js"></script>
 
 <script type="text/javascript">
     dojo.require("dijit.layout.TabContainer");
@@ -25,7 +25,31 @@ var error = '${errorMsg}';
     dojo.require("dijit.form.Textarea");
     dojo.require("dijit.form.ToggleButton");
     dojo.require("dijit.ToolbarSeparator");
+
+    dojo.require('dijit.form.ValidationTextBox');
+    dojo.require('dijit.form.Button');
+    dojo.require('dijit.Dialog');
+    dojo.require('dijit.layout.BorderContainer');
+    dojo.require('dijit.layout.ContentPane');
+    dojo.require("dojox.gfx");
+    dojo.require("dojo.fx");
+    dojo.require("dojox.gfx.move");
+    dojo.require("dojo.NodeList-fx");
+    //dojo.require("dijit.ColorPalette");
+    dojo.require("dojox.widget.ColorPicker");
+    dojo.require("dijit.form.DropDownButton");
+    dojo.require("dijit.TooltipDialog");
+    dojo.require("dijit.form.RadioButton");
+    dojo.require("dijit.form.Select");
+    dojo.require("dijit.form.Form");
+    dojo.require("dijit.form.Slider");
+    dojo.require("dijit.form.TextBox");
 </script>
+
+<%--<script src="/js/azp/WBCommon.js"></script>--%>
+<script src="/js/workspace/worksheet.js"></script>
+<script src="/js/workspace/room.js"></script>
+<script src="/js/workspace/workspace.js"></script>
 
 <!-- Call specific libs and styles -->
 <script src="/js/azp/adapter.js"></script>
@@ -74,6 +98,8 @@ var error = '${errorMsg}';
              data-dojo-props="iconClass:'dijitIcon dijitIconEdit'">Join</div>
         <div data-dojo-type="dijit.form.Button" id="mainmenu.exit"
              data-dojo-props="iconClass:'dijitEditorIcon dijitEditorIconRedo'">Exit</div>
+        <div data-dojo-type="dijit.ToolbarSeparator"></div>
+        <input id="value1Box" dojoType="dijit.form.TextBox" readonly="readonly" value="Current user: ${userName}"/>
     </div>
 </div>
 <div id="rooms" region="center" dojoType="dijit.layout.TabContainer">

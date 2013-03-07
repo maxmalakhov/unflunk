@@ -40,6 +40,9 @@ public class WBMessage
     
     @Persistent
     protected Key wbKey;
+
+    @Persistent
+    private String worksheetId;
     
     
     protected Set <String> userList;
@@ -164,6 +167,13 @@ public class WBMessage
     {
         this.creationTime = creationTime;
     }
-    
-    
+
+
+    public String getWorksheetId() {
+        return worksheetId;
+    }
+
+    public void setWorksheetId(String worksheetId) {
+        this.worksheetId = worksheetId;
+    }
 }

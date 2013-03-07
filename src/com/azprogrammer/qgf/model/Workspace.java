@@ -7,7 +7,10 @@ import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author Max Malakhov <malakhovbox@gmail.com>
@@ -39,6 +42,9 @@ public class Workspace {
     @Persistent
     private Date creationDate;
 
+    @Persistent
+    private Set<String> roomList = new HashSet<String>();
+
 
     public Workspace(String user) {
         this.user = user;
@@ -47,6 +53,10 @@ public class Workspace {
 
     public String getStringKey() {
         return KeyFactory.keyToString(getKey());
+    }
+
+    public void addNewRoom(String roomKey) {
+        roomList.add(roomKey);
     }
 
     // getters and setters by default
@@ -105,5 +115,13 @@ public class Workspace {
 
     public void setCreationDate(Date creationDate) {
         this.creationDate = creationDate;
+    }
+
+    public Set<String> getRoomList() {
+        return roomList;
+    }
+
+    public void setRoomList(Set<String> roomList) {
+        this.roomList = roomList;
     }
 }
