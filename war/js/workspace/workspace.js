@@ -102,6 +102,12 @@ Workspace.prototype.init = function() {
     dojo.connect(dijit.byId('mainmenu.exit'),'onClick',function() {
         workspace.exit();
     });
+    dojo.connect(dijit.byId('wbEquation'),'onkeyup',function() {
+        Preview.Update();
+    });
+
+    Preview.Init();
+    Preview.Update();
 };
 
 // drag and drop common method

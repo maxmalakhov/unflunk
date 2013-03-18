@@ -37,6 +37,7 @@ var workspace; // window scope
     dojo.require("dojox.gfx");
     dojo.require("dojo.fx");
     dojo.require("dojox.gfx.move");
+    dojo.require("dojox.gfx.utils");
     dojo.require("dojo.NodeList-fx");
     //dojo.require("dijit.ColorPalette");
     dojo.require("dojox.widget.ColorPicker");
@@ -47,6 +48,7 @@ var workspace; // window scope
     dojo.require("dijit.form.Form");
     dojo.require("dijit.form.Slider");
     dojo.require("dijit.form.TextBox");
+    dojo.require("dijit.form.SimpleTextarea");
 </script>
 
 <%--<script src="/js/azp/WBCommon.js"></script>--%>
@@ -58,6 +60,15 @@ var workspace; // window scope
 <script src="/js/azp/adapter.js"></script>
 <script src="/js/workspace/call.js"></script>
 <link rel="stylesheet" href="/css/call.css">
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+    tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+    });
+</script>
+<%--HTMLorMML--%>
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script type="text/javascript" src="/js/workspace/equation.js"></script>
 
 <style>
 #header{
@@ -118,6 +129,15 @@ var workspace; // window scope
 <div id="textDialog" dojoType="dijit.Dialog" title="Type in some text."  style="display: none">
     <input type="text" dojoType="dijit.form.ValidationTextBox" id="wbText" name="wbText"><br>
     <button dojoType="dijit.form.Button" id="okTextBtn">OK</button>&nbsp;&nbsp;&nbsp;<button dojoType="dijit.form.Button" id="cancelTextBtn">Cancel</button>
+</div>
+
+<div id="equationDialog" dojoType="dijit.Dialog" title="Type in some equation in LaTeX"  style="display: none;">
+    <textarea id="MathInput" data-dojo-type="dijit.form.SimpleTextarea" name="wbEquation" rows="10" cols="100">
+        $\left( \sum_{k=1}^n a_k b_k \right)^2 \leq \left( \sum_{k=1}^n a_k^2 \right) \left( \sum_{k=1}^n b_k^2 \right)$
+    </textarea><br>
+    <div id="MathPreview" style="border:1px solid; padding: 3px; width:95%; margin-top:5px"></div>
+    <div id="MathBuffer" style="border:1px solid; padding: 3px; width:95%; margin-top:5px; visibility:hidden; position:absolute; top:0; left: 0"></div>
+    <button dojoType="dijit.form.Button" id="okEquationBtn">OK</button>&nbsp;&nbsp;&nbsp;<button dojoType="dijit.form.Button" id="cancelEquationBtn">Cancel</button>
 </div>
 
 <div id="movieDialog" dojoType="dijit.Dialog" title="Move slider to see drawing steps."  style="display: none">

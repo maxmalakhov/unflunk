@@ -28,6 +28,9 @@
         <button dojoType="dijit.form.Button" class="textToolBtn"><img border="0" src="/images/text.png"></button>
         <div dojoType="dijit.Tooltip" connectId="textToolBtn" position="above" showDelay="0">Draw Text</div>
 
+        <button dojoType="dijit.form.Button" class="equationToolBtn"  title="Equation Input"><img border="0" src="/images/edit-mathematics.png"></button>
+        <div dojoType="dijit.Tooltip" connectId="equationToolBtn" position="above" showDelay="0">Equation Input</div>
+
         <button dojoType="dijit.form.Button" class="moveToolBtn"><img border="0" src="/images/move.png"></button>
         <div dojoType="dijit.Tooltip" connectId="moveToolBtn" position="above" showDelay="0">Move a shape</div>
 

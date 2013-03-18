@@ -5,6 +5,7 @@ var tools = [{name: 'line', showLineColor: true, showLineThickness: true}
             ,{name: 'filledRect', showFillColor: true, showLineColor: true, showLineThickness: true}
             ,{name: 'filledEllipse', showFillColor: true, showLineColor: true, showLineThickness: true}
             ,{name: 'text', showLineColor: true, showFontSize: true}
+            ,{name: 'equation', showLineColor: true}
             ,{name: 'delete'}
             ,{name: 'move'}
             ,{name: 'moveUp'}
@@ -136,12 +137,24 @@ Worksheet.prototype.drawFromJSON = function(geom,drawing) {
             shape = drawing.createRect({x: geom.xPts[0], y: geom.yPts[0], width: (geom.xPts[1] - geom.xPts[0]), height: (geom.yPts[1] - geom.yPts[0]) });
         }
         else if(geom.shapeType === 'image'){
-            //var img = new Image();
-            //img.src = geom.text;
-            var imgData = geom.dataStr;
-            //console.log('drawImage',imgData);
+            var imgData = geom.data; // dataStr
             if(imgData){
-                shape =  drawing.createImage({src:imgData,x: geom.xPts[0], y: geom.yPts[0], width: (geom.xPts[1] - geom.xPts[0]), height: (geom.yPts[1] - geom.yPts[0]) });
+                var DOMURL = self.URL || self.webkitURL || self;
+                var url = DOMURL.createObjectURL(imgData);
+                var img = new Image();
+                var xSize = geom.xPts;
+                var ySize = geom.yPts;
+                img.onload = function() {
+                    shape = drawing.createImage({
+                        x:xSize[0],
+                        y:ySize[0],
+                        width: xSize[1],
+                        height: ySize[1],
+                        src: url
+                    });
+                    DOMURL.revokeObjectURL(url);
+                };
+                img.src = url;
             }
         }
         else if(geom.shapeType === 'line'){
@@ -448,6 +461,10 @@ Worksheet.prototype.initGfx = function(){
                     worksheet.textPoint = pt;
                     dijit.byId('textDialog').show();
                     dijit.byId('wbText').focus();
+                }else if(worksheet.tool === 'equation'){
+                    worksheet.textPoint = pt;
+                    dijit.byId('equationDialog').show();
+                    dijit.byId('MathInput').focus();
                 }
                 //worksheet.points = [];
                 if(geom){
@@ -811,6 +828,37 @@ Worksheet.prototype.init = function(){
         }
         worksheet.overlayDrawing.clear();
     };
+    var doCancelEquationInput = function(){
+        //dijit.byId('MathInput').setValue('');
+        dijit.byId('equationDialog').hide();
+        worksheet.overlayDrawing.clear();
+        worksheet.textPoint = null;
+    };
+    var doEquationInput = function(){
+        var mathElement = dojo.query("nobr")[0];     // nobr, .math, .MathJax
+        //var mathElement = dojo.query("g", dojo.query(".MathJax_SVG")[0])[0];
+        //var mathSvg = dojo.query("svg", dojo.query(".MathJax_SVG")[0])[0];
+
+        var height = 100; //dojo.style(mathSvg, "height");
+        var width = 500;//dojo.style(mathSvg, "width");
+
+
+        if(mathElement && (worksheet.textPoint)){
+            dijit.byId('equationDialog').hide();
+            var data = "<svg xmlns='http://www.w3.org/2000/svg' width='"+width+"' height='"+height+"'>" +
+                "<foreignObject width='100%' height='100%'>" +
+                (new XMLSerializer).serializeToString(mathElement)+
+                "</foreignObject>" +
+                "</svg>";
+            var blob = new Blob([data], {type: "image/svg+xml;charset=utf-8"});
+
+            var geom = createImageJSON(worksheet.textPoint,{height: height, width: width},blob);
+            worksheet.drawFromJSON(geom,worksheet.drawing);
+            worksheet.textPoint = null;
+            //worksheet.sendMessage({geometry:geom});
+        }
+        worksheet.overlayDrawing.clear();
+    };
     var doIncrementalText = function(){
         worksheet.overlayDrawing.clear();
         var text = dijit.byId('wbText').getValue();
@@ -844,6 +892,18 @@ Worksheet.prototype.init = function(){
         };
         geom.shapeType = 'text';
         geom.text = text;
+        geom.lineStroke = worksheet.fontSize;
+        geom.lineColor = worksheet.lineColor;
+
+        return worksheet.addTimeRand(geom);
+    };
+    var createImageJSON = function(pt, size, blob){
+        var geom = {
+            xPts: [pt.x, size.width],
+            yPts: [pt.y, size.height]
+        };
+        geom.shapeType = 'image';
+        geom.data = blob;
         geom.lineStroke = worksheet.fontSize;
         geom.lineColor = worksheet.lineColor;
 
@@ -903,9 +963,6 @@ Worksheet.prototype.init = function(){
             doAddText();
         }
     });
-    dojo.connect(dijit.byId("okTextBtn"), 'onClick', function(evt) {
-        doAddText();
-    });
     dojo.connect(dijit.byId("cancelTextBtn"), 'onClick', function(evt) {
         doCancelAddText();
     });
@@ -923,6 +980,16 @@ Worksheet.prototype.init = function(){
         worksheet.overlayDrawing.clear();
         worksheet.getWidget("wbText").setValue('');
     });
+    dojo.connect(dijit.byId("okTextBtn"), 'onClick', function(evt) {
+        doAddText();
+    });
+    dojo.connect(dijit.byId("okEquationBtn"), 'onClick', function(evt) {
+        doEquationInput();
+    });
+    dojo.connect(dijit.byId("cancelEquationBtn"), 'onClick', function(evt) {
+        doCancelEquationInput();
+    });
+
     try{
         var reader = new FileReader();
         reader.onload = function(e) {
