@@ -1,6 +1,7 @@
 package com.azprogrammer.qgf.model;
 
 import java.io.Serializable;
+import java.util.Map;
 
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.NotPersistent;
@@ -10,7 +11,13 @@ import javax.jdo.annotations.PrimaryKey;
 
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.Text;
+import com.google.appengine.repackaged.com.google.api.client.json.Json;
+import com.google.appengine.repackaged.org.codehaus.jackson.JsonNode;
+import com.google.appengine.repackaged.org.codehaus.jackson.annotate.JsonAnySetter;
 import com.google.appengine.repackaged.org.codehaus.jackson.annotate.JsonIgnore;
+import com.google.appengine.repackaged.org.codehaus.jackson.annotate.JsonProperty;
+import com.google.appengine.repackaged.org.codehaus.jackson.annotate.JsonRawValue;
+import net.sf.json.JSON;
 
 
 /**
@@ -297,8 +304,6 @@ public class WBGeometry  implements Serializable
     {
         return data;
     }
-    
-   
 
     /**
      * @param data the data to set

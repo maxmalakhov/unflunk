@@ -29,6 +29,8 @@ var workspace; // window scope
     dojo.require("dijit.form.ToggleButton");
     dojo.require("dijit.ToolbarSeparator");
 
+    dojo.require("dojox.html.entities");
+
     dojo.require('dijit.form.ValidationTextBox');
     dojo.require('dijit.form.Button');
     dojo.require('dijit.Dialog');
@@ -66,8 +68,8 @@ var workspace; // window scope
     tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
     });
 </script>
-<%--HTMLorMML--%>
-<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<%--HTMLorMML TeX-AMS-MML_HTMLorMML--%>
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
 <script type="text/javascript" src="/js/workspace/equation.js"></script>
 
 <style>

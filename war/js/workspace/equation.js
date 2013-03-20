@@ -76,6 +76,10 @@ var Preview = {
     PreviewDone: function () {
         this.mjRunning = false;
         this.SwapBuffers();
+    },
+
+    getSize: function() {
+        return { width: this.preview.offsetWidth, height: this.preview.offsetHeight };
     }
 
 };

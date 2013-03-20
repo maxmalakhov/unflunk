@@ -228,7 +228,7 @@ public class RoomController {
 
                     //don't need data twice on messages sent to channels
                     if((message.getGeometry () != null) && (message.getGeometry ().getData () != null) && (message.getGeometry ().getDataStr () != null)){
-                        message.getGeometry ().setData (null);
+                        //TODO: message.getGeometry ().setData (null);
                     }
                     //List<WBChannel> channels = getLiveChannels(roomId);
                     String channelError = null;
