@@ -6,6 +6,7 @@ var tools = [{name: 'line', showLineColor: true, showLineThickness: true}
             ,{name: 'filledEllipse', showFillColor: true, showLineColor: true, showLineThickness: true}
             ,{name: 'text', showLineColor: true, showFontSize: true}
             ,{name: 'equation', showLineColor: true}
+            ,{name: 'curve', showLineColor: true}
             ,{name: 'delete'}
             ,{name: 'move'}
             ,{name: 'moveUp'}
@@ -137,33 +138,49 @@ Worksheet.prototype.drawFromJSON = function(geom,drawing,strong) {
         if(geom.shapeType === 'rect'){
             shape = drawing.createRect({x: geom.xPts[0], y: geom.yPts[0], width: (geom.xPts[1] - geom.xPts[0]), height: (geom.yPts[1] - geom.yPts[0]) });
         }
+        else if (geom.shapeType === 'curve' && geom.data) {
+            var data = geom.data.value || geom.data;
+
+            var formula = Formula.equation.parse('(((-1+2)*5+-10)/3*2)+100/2/3/4/-5+(90*5)');
+            console.log('Answer'+formula.answer);
+
+        }
         else if (geom.shapeType === 'equation' && geom.data) {
             var data = dojox.html.entities.decode(geom.data.value || geom.data);
             window.URL = window.URL || window.webkitURL;
 
             var div = dojo.create("div", {
                 innerHTML: data,
-                xmlns: "http://www.w3.org/1999/xhtml", // !!! hack for Chrome
-                style: { display: "inline-block" }
+                //xmlns: "http://www.w3.org/1999/xhtml", // !!! hack for Chrome
+                style: "border: 1px dashed; width: 100%; height: 100%;"
             });
 
             MathJax.Hub.Queue(
                 ["Typeset",MathJax.Hub,div],
                 [function() { // call after rendering
+
                     var xSize = geom.xPts;
                     var ySize = geom.yPts;
-                    xSize[1]=(xSize[1])?(xSize[1]+50):500;
-                    ySize[1]=ySize[1]||100;
+                    xSize[1]=(xSize[1])?(xSize[1]+60):500;
+                    ySize[1]=(ySize[1])?(ySize[1]+8):100;
+
+                    //var nobr = dojo.query("nobr",div)[0];
+                    //svg.xmlns="http://www.w3.org/2000/svg";
+                    //var svg_xml = (new XMLSerializer).serializeToString(svg);
 
                     var svg_xml = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"'+
                         ' color="'+geom.lineColor+'" width="'+xSize[1]+'" height="'+ySize[1]+'">'+
                         '<foreignObject width="100%" height="100%">'+
+                        '<body xmlns="http://www.w3.org/1999/xhtml">'+
                         (new XMLSerializer).serializeToString(div)+
+                        '</body>'+
                         '</foreignObject>'+
                         '</svg>';
 
                     var blob = new Blob([svg_xml], {type: "image/svg+xml"});
                     var href = window.URL.createObjectURL(blob);
+//                    var href = "data:image/svg+xml;base64,"+btoa(svg_xml); // svg_xml, mysvg
+//                    var href = "data:image/svg+xml,"+svg_xml; // svg_xml, mysvg
 
                     // TODO: It's work fine
                     try {
@@ -548,6 +565,16 @@ Worksheet.prototype.initGfx = function(){
                     worksheet.textPoint = pt;
                     dijit.byId('equationDialog').show();
                     dijit.byId('MathInput').focus();
+                }else if(worksheet.tool === 'curve'){
+                    worksheet.textPoint = pt;
+                    //dijit.byId('curveDialog').show();
+                    //dijit.byId('GraphInput').focus();
+                    //geom  = createCurveJSON(bounds,true);
+                    geom = createRectJSON(bounds,false);
+                    geom.shapeType = 'curve';
+                    geom.data = "x^2+x-2";
+
+                    worksheet.drawFromJSON(geom,worksheet.drawing);
                 }
                 //worksheet.points = [];
                 if(geom){
@@ -929,6 +956,19 @@ Worksheet.prototype.init = function(){
         }
         worksheet.overlayDrawing.clear();
     };
+    var doCurveInput = function(){
+        var data = document.getElementById("GraphInput").value;
+        data = dojo.string.trim(data);
+        if((data !== '') && worksheet.textPoint){
+            var geom = createEquationJSON(worksheet.textPoint, Preview.getSize(), data);
+            worksheet.drawFromJSON(geom,worksheet.drawing, true);
+            worksheet.textPoint = null;
+            //worksheet.sendMessage({geometry:geom});
+            dijit.byId('equationDialog').hide();
+        }
+        worksheet.overlayDrawing.clear();
+    };
+
     var doIncrementalText = function(){
         worksheet.overlayDrawing.clear();
         var text = dijit.byId('wbText').getValue();

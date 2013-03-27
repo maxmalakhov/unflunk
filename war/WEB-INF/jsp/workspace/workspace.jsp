@@ -63,14 +63,21 @@ var workspace; // window scope
 <script src="/js/workspace/call.js"></script>
 <link rel="stylesheet" href="/css/call.css">
 
-<script type="text/x-mathjax-config">
+<%-- MathJax, http://www.mathjax.org --%>
+<%--HTMLorMML TeX-AMS-MML_HTMLorMML--%>
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
     MathJax.Hub.Config({
-    tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+        tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]},
+        "HTML-CSS": { scale: 90 }
     });
 </script>
-<%--HTMLorMML TeX-AMS-MML_HTMLorMML--%>
-<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
 <script type="text/javascript" src="/js/workspace/equation.js"></script>
+
+<%-- JSXGraph, http://jsxgraph.uni-bayreuth.de --%>
+<%--<link rel="stylesheet" type="text/css" href="http://jsxgraph.uni-bayreuth.de/distrib/jsxgraph.css" />--%>
+<%--<script type="text/javascript" src="http://jsxgraph.uni-bayreuth.de/distrib/jsxgraphcore.js"></script>--%>
+<script type="text/javascript" src="/js/workspace/curve.js"></script>
+<script type="text/javascript" src="/js/workspace/formula.js"></script>
 
 <style>
 #header{
@@ -140,6 +147,15 @@ var workspace; // window scope
     <div id="MathPreview" style="border:1px solid; padding: 3px; width:95%; margin-top:5px"></div>
     <div id="MathBuffer" style="border:1px solid; padding: 3px; width:95%; margin-top:5px; visibility:hidden; position:absolute; top:0; left: 0"></div>
     <button dojoType="dijit.form.Button" id="okEquationBtn">OK</button>&nbsp;&nbsp;&nbsp;<button dojoType="dijit.form.Button" id="cancelEquationBtn">Cancel</button>
+</div>
+
+<div id="curveDialog" dojoType="dijit.Dialog" title="Type in some graph relation"  style="display: none;">
+    <textarea id="GraphInput" data-dojo-type="dijit.form.SimpleTextarea" name="wbEquation" rows="10" cols="100">
+        $\graph{y=x^2 + x - 2}$
+    </textarea><br>
+    <div id="GraphPreview" style="border:1px solid; padding: 3px; width:95%; margin-top:5px"></div>
+    <div id="GraphBuffer" style="border:1px solid; padding: 3px; width:95%; margin-top:5px; visibility:hidden; position:absolute; top:0; left: 0"></div>
+    <button dojoType="dijit.form.Button" id="okCurveBtn">OK</button>&nbsp;&nbsp;&nbsp;<button dojoType="dijit.form.Button" id="cancelCurveBtn">Cancel</button>
 </div>
 
 <div id="movieDialog" dojoType="dijit.Dialog" title="Move slider to see drawing steps."  style="display: none">
