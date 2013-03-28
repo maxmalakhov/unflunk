@@ -567,14 +567,14 @@ Worksheet.prototype.initGfx = function(){
                     dijit.byId('MathInput').focus();
                 }else if(worksheet.tool === 'curve'){
                     worksheet.textPoint = pt;
-                    //dijit.byId('curveDialog').show();
-                    //dijit.byId('GraphInput').focus();
-                    //geom  = createCurveJSON(bounds,true);
-                    geom = createRectJSON(bounds,false);
-                    geom.shapeType = 'curve';
-                    geom.data = "x^2+x-2";
-
-                    worksheet.drawFromJSON(geom,worksheet.drawing);
+                    dijit.byId('curveDialog').show();
+                    dijit.byId('GraphInput').focus();
+                    CurvePreview.Update();
+//                    geom = createRectJSON(bounds,false);
+//                    geom.shapeType = 'curve';
+//                    geom.data = "x^2+x-2";
+//
+//                    worksheet.drawFromJSON(geom,worksheet.drawing);
                 }
                 //worksheet.points = [];
                 if(geom){

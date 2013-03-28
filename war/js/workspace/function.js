@@ -347,9 +347,3 @@ var Formula = function() {
     
     return ns;
 }();
-
-
-
-
-
-
