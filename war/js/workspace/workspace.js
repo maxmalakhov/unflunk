@@ -113,7 +113,6 @@ Workspace.prototype.init = function() {
     Preview.Update();
 
     GraphPreview.Init();
-    //GraphPreview.Update();
 };
 
 // drag and drop common method

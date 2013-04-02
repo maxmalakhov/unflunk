@@ -578,7 +578,7 @@ Worksheet.prototype.initGfx = function(){
                     worksheet.textPoint = pt;
                     dijit.byId('graphDialog').show();
                     dijit.byId('GraphInput').focus();
-                    GraphPreview.Update(worksheet.lineColor);
+                    GraphPreview.Update();
                 }
                 //worksheet.points = [];
                 if(geom){

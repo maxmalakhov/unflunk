@@ -151,7 +151,7 @@ var workspace; // window scope
 </div>
 
 <div id="graphDialog" dojoType="dijit.Dialog" title="Type in some graph relation"  style="display: none; height: 520px; width: 520px">
-    <div id="graphBox" class="dijitDialogPaneContentArea">
+    <div class="dijitDialogPaneContentArea">
     <textarea id="GraphInput" data-dojo-type="dijit.form.Textarea" name="wbGraph" rows="10" cols="100" style="width:100%;"
         >y=x^2 + x - 2</textarea><br>
     <div id="GraphPreview" style="border:1px solid; padding: 3px; height: 400px; width:500px !important; margin-top:5px;"></div>
@@ -161,6 +161,8 @@ var workspace; // window scope
     <button dojoType="dijit.form.Button" id="okGraphBtn">OK</button>&nbsp;&nbsp;&nbsp;<button dojoType="dijit.form.Button" id="cancelGraphBtn">Cancel</button>
     </div>
 </div>
+
+<div id="graphBox" style="height: 520px; width: 520px;"></div>
 
 <div id="movieDialog" dojoType="dijit.Dialog" title="Move slider to see drawing steps."  style="display: none">
     <div id="movieWhiteboardContainer" style="border: 2px blue solid; background-color: white;"></div><br>

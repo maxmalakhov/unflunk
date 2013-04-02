@@ -51,7 +51,7 @@ var GraphPreview = {
     //    a pause in the typing).
     //  The callback function is set up below, after the Preview object is set up.
     //
-    Update: function (color) {
+    Update: function () {
         if (this.timeout) {
             clearTimeout(this.timeout);
         }
@@ -130,7 +130,7 @@ var GraphPreview = {
         brd.create('functiongraph', [function(x) {
             try {
                 var formula = humanFunction.replace(/[xX]/g,'('+x+')');
-                console.debug('Formula: '+formula);
+                //console.debug('Formula: '+formula);
                 return processor.parse(formula);
             } catch(e) {
                 //console.error(e);
@@ -139,18 +139,18 @@ var GraphPreview = {
             }
         }],{ strokeColor: '#ff0000' });
 
-        brd.create('text',[-4.5,18,
-            function() {
-                return '\\[f(x) = {' + humanFunction + '}\\]';
-            }]);
+//        brd.create('text',[-4.5,18,
+//            function() {
+//                return '\\[f(x) = {' + humanFunction + '}\\]';
+//            }]);
 
         //setTimeout(function() {
             var pathNode = dojo.query('path',box)[0];
             var pathAttr = dojo.attr(pathNode,'d');
             console.debug('Path: "'+pathAttr+'"');
-            //callback(pathAttr);
+            callback(pathAttr);
         return pathAttr;
-        //}, 500);
+        //}, 3000);
     },
 
     //
