@@ -31,8 +31,8 @@
         <button id="equationToolBtn_${worksheetId}" dojoType="dijit.form.Button" class="equationToolBtn"><img border="0" src="/images/edit-mathematics.png"></button>
         <div dojoType="dijit.Tooltip" connectId="equationToolBtn_${worksheetId}" position="above" showDelay="0">Equation Input</div>
 
-        <button id="curveToolBtn_${worksheetId}" dojoType="dijit.form.Button" class="curveToolBtn"><img border="0" src="/images/chart_curve.png"></button>
-        <div dojoType="dijit.Tooltip" connectId="curveToolBtn_${worksheetId}" position="above" showDelay="0">Graph Curve</div>
+        <button id="graphToolBtn_${worksheetId}" dojoType="dijit.form.Button" class="graphToolBtn"><img border="0" src="/images/chart_curve.png"></button>
+        <div dojoType="dijit.Tooltip" connectId="graphToolBtn_${worksheetId}" position="above" showDelay="0">Graph Input</div>
 
         <button id="moveToolBtn_${worksheetId}" dojoType="dijit.form.Button" class="moveToolBtn"><img border="0" src="/images/move.png"></button>
         <div dojoType="dijit.Tooltip" connectId="moveToolBtn_${worksheetId}" position="above" showDelay="0">Move a shape</div>

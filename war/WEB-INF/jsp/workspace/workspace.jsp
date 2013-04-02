@@ -77,8 +77,9 @@ var workspace; // window scope
 <%-- JSXGraph, http://jsxgraph.uni-bayreuth.de --%>
 <link rel="stylesheet" type="text/css" href="http://jsxgraph.uni-bayreuth.de/distrib/jsxgraph.css" />
 <script type="text/javascript" src="http://jsxgraph.uni-bayreuth.de/distrib/jsxgraphcore.js"></script>
-<script type="text/javascript" src="/js/workspace/curve.js"></script>
+<script type="text/javascript" src="/js/workspace/graph-preview.js"></script>
 <script type="text/javascript" src="/js/workspace/function.js"></script>
+<script type="text/javascript" src="/js/workspace/math-processor.js"></script>
 
 <style>
 #header{
@@ -149,15 +150,15 @@ var workspace; // window scope
     <button dojoType="dijit.form.Button" id="okEquationBtn">OK</button>&nbsp;&nbsp;&nbsp;<button dojoType="dijit.form.Button" id="cancelEquationBtn">Cancel</button>
 </div>
 
-<div id="curveDialog" dojoType="dijit.Dialog" title="Type in some graph relation"  style="display: none; height: 520px; width: 520px">
-    <div class="dijitDialogPaneContentArea">
-    <textarea id="GraphInput" data-dojo-type="dijit.form.Textarea" name="wbCurve" rows="10" cols="100" style="width:100%;"
+<div id="graphDialog" dojoType="dijit.Dialog" title="Type in some graph relation"  style="display: none; height: 520px; width: 520px">
+    <div id="graphBox" class="dijitDialogPaneContentArea">
+    <textarea id="GraphInput" data-dojo-type="dijit.form.Textarea" name="wbGraph" rows="10" cols="100" style="width:100%;"
         >y=x^2 + x - 2</textarea><br>
-    <div id="GraphPreview" style="border:1px solid; padding: 3px; height: 400px; width:500px !important; margin-top:5px"></div>
-    <div id="GraphBuffer" style="border:1px solid; padding: 3px; height: 400px; width:500px !important; margin-top:5px; visibility:hidden; position:absolute; top:0; left: 0"></div>
+    <div id="GraphPreview" style="border:1px solid; padding: 3px; height: 400px; width:500px !important; margin-top:5px;"></div>
+    <div id="GraphBuffer" style="border:1px solid; padding: 3px; height: 400px; width:500px !important; margin-top:5px; visibility:hidden; position:absolute;"></div>
     </div>
     <div class="dijitDialogPaneActionBar">
-    <button dojoType="dijit.form.Button" id="okCurveBtn">OK</button>&nbsp;&nbsp;&nbsp;<button dojoType="dijit.form.Button" id="cancelCurveBtn">Cancel</button>
+    <button dojoType="dijit.form.Button" id="okGraphBtn">OK</button>&nbsp;&nbsp;&nbsp;<button dojoType="dijit.form.Button" id="cancelGraphBtn">Cancel</button>
     </div>
 </div>
 

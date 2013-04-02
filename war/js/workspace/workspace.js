@@ -105,15 +105,15 @@ Workspace.prototype.init = function() {
     dojo.connect(dijit.byId('wbEquation'),'onkeyup',function() {
         Preview.Update();
     });
-    dojo.connect(dijit.byId('wbCurve'),'onkeyup',function() {
-        CurvePreview.Update();
+    dojo.connect(dijit.byId('wbGraph'),'onkeyup',function() {
+        GraphPreview.Update();
     });
 
     Preview.Init();
     Preview.Update();
 
-    CurvePreview.Init();
-    CurvePreview.Update();
+    GraphPreview.Init();
+    //GraphPreview.Update();
 };
 
 // drag and drop common method
