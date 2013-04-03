@@ -13,9 +13,6 @@
         <button id="lineToolBtn_${worksheetId}" dojoType="dijit.form.Button" class="lineToolBtn"><img border="0" src="/images/line.png"></button>
         <div dojoType="dijit.Tooltip" connectId="lineToolBtn_${worksheetId}" position="above" showDelay="0">Straight Line</div>
 
-        <button id="triangleToolBtn_${worksheetId}" dojoType="dijit.form.Button" class="triangleToolBtn"><img border="0" src="/images/ruler-triangle.png"></button>
-        <div dojoType="dijit.Tooltip" connectId="triangleToolBtn_${worksheetId}" position="above" showDelay="0">Triangle</div>
-
         <button id="rectToolBtn_${worksheetId}" dojoType="dijit.form.Button" class="rectToolBtn"><img border="0" src="/images/rect.png"></button>
         <div dojoType="dijit.Tooltip" connectId="rectToolBtn_${worksheetId}" position="above" showDelay="0">Rectangle</div>
 
@@ -31,12 +28,6 @@
         <button id="textToolBtn_${worksheetId}" dojoType="dijit.form.Button" class="textToolBtn"><img border="0" src="/images/text.png"></button>
         <div dojoType="dijit.Tooltip" connectId="textToolBtn_${worksheetId}" position="above" showDelay="0">Draw Text</div>
 
-        <button id="equationToolBtn_${worksheetId}" dojoType="dijit.form.Button" class="equationToolBtn"><img border="0" src="/images/edit-mathematics.png"></button>
-        <div dojoType="dijit.Tooltip" connectId="equationToolBtn_${worksheetId}" position="above" showDelay="0">Equation Input</div>
-
-        <button id="graphToolBtn_${worksheetId}" dojoType="dijit.form.Button" class="graphToolBtn"><img border="0" src="/images/chart_curve.png"></button>
-        <div dojoType="dijit.Tooltip" connectId="graphToolBtn_${worksheetId}" position="above" showDelay="0">Graph Input</div>
-
         <button id="moveToolBtn_${worksheetId}" dojoType="dijit.form.Button" class="moveToolBtn"><img border="0" src="/images/move.png"></button>
         <div dojoType="dijit.Tooltip" connectId="moveToolBtn_${worksheetId}" position="above" showDelay="0">Move a shape</div>
 
@@ -48,6 +39,23 @@
 
         <button id="deleteToolBtn_${worksheetId}" dojoType="dijit.form.Button" class="deleteToolBtn"><img border="0" src="/images/delete.png"></button>
         <div dojoType="dijit.Tooltip" connectId="deleteToolBtn_${worksheetId}" position="above" showDelay="0">Delete a shape</div>
+
+        <br>
+
+        <button id="triangleToolBtn_${worksheetId}" dojoType="dijit.form.Button" class="triangleToolBtn"><img border="0" src="/images/icon_triangle2.png"></button>
+        <div dojoType="dijit.Tooltip" connectId="triangleToolBtn_${worksheetId}" position="above" showDelay="0">Triangle</div>
+
+        <button id="quadrangleToolBtn_${worksheetId}" dojoType="dijit.form.Button" class="quadrangleToolBtn"><img border="0" src="/images/icon-rectangle.png"></button>
+        <div dojoType="dijit.Tooltip" connectId="quadrangleToolBtn_${worksheetId}" position="above" showDelay="0">Quadrangle</div>
+
+        <button id="circleToolBtn_${worksheetId}" dojoType="dijit.form.Button" class="circleToolBtn"><img border="0" src="/images/icon-elipse.png"></button>
+        <div dojoType="dijit.Tooltip" connectId="circleToolBtn_${worksheetId}" position="above" showDelay="0">Circle</div>
+
+        <button id="equationToolBtn_${worksheetId}" dojoType="dijit.form.Button" class="equationToolBtn"><img border="0" src="/images/edit-mathematics.png"></button>
+        <div dojoType="dijit.Tooltip" connectId="equationToolBtn_${worksheetId}" position="above" showDelay="0">Equation Input</div>
+
+        <button id="graphToolBtn_${worksheetId}" dojoType="dijit.form.Button" class="graphToolBtn"><img border="0" src="/images/chart_curve.png"></button>
+        <div dojoType="dijit.Tooltip" connectId="graphToolBtn_${worksheetId}" position="above" showDelay="0">Graph Input</div>
 
         <br>
 

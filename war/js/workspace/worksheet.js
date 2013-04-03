@@ -1,17 +1,19 @@
 var tools = [{name: 'line', showLineColor: true, showLineThickness: true}
             ,{name: 'pen', showLineColor: true, showLineThickness: true}
-            ,{name: 'triangle', showLineColor: true, showLineThickness: true}
             ,{name: 'rect', showLineColor: true, showLineThickness: true}
             ,{name: 'ellipse', showLineColor: true, showLineThickness: true}
             ,{name: 'filledRect', showFillColor: true, showLineColor: true, showLineThickness: true}
             ,{name: 'filledEllipse', showFillColor: true, showLineColor: true, showLineThickness: true}
             ,{name: 'text', showLineColor: true, showFontSize: true}
-            ,{name: 'equation', showLineColor: true}
-            ,{name: 'graph', showLineColor: true, showLineThickness: true}
             ,{name: 'delete'}
             ,{name: 'move'}
             ,{name: 'moveUp'}
             ,{name: 'moveDown'}
+            ,{name: 'triangle', showLineColor: true, showLineThickness: true}
+            ,{name: 'quadrangle', showLineColor: true, showLineThickness: true}
+            ,{name: 'circle', showLineColor: true, showLineThickness: true}
+            ,{name: 'equation', showLineColor: true}
+            ,{name: 'graph', showLineColor: true, showLineThickness: true}
             ];
 
 // multiple instances
@@ -138,17 +140,170 @@ Worksheet.prototype.drawFromJSON = function(geom,drawing,strong) {
         var stroke = {color: geom.lineColor, width: geom.lineStroke};
         if(geom.shapeType === 'rect'){
             shape = drawing.createRect({x: geom.xPts[0], y: geom.yPts[0], width: (geom.xPts[1] - geom.xPts[0]), height: (geom.yPts[1] - geom.yPts[0]) });
+        } else if(geom.shapeType === 'image'){
+            var imgData = geom.dataStr || ((geom.data) ? geom.data.value : null);
+            if(imgData && strong){
+                window.URL = window.URL || window.webkitURL;
+
+                var href2 = "/images/save.png";
+
+                // TODO: It's work fine
+                try {
+                    var img = new Image();
+                    img.type = "image/svg+xml";
+                    img.addEventListener("load", function(){
+                        shape = drawing.createImage({
+                            x:xSize[0],
+                            y:ySize[0],
+                            width: xSize[1],
+                            height: ySize[1],
+                            src: href2
+                        });
+                        //window.URL.revokeObjectURL(href);
+                    });
+                    img.src = href2;
+                } catch(ex) {
+                    console.error(ex);
+                    console.trace();
+                }
+            }
+        } else if(geom.shapeType === 'line'){
+            shape = drawing.createLine({x1: geom.xPts[0], y1: geom.yPts[0], x2: geom.xPts[1], y2: geom.yPts[1]});
+            stroke.cap = 'round';
+        } else if(geom.shapeType === 'text'){
+            shape = drawing.createText({ x:geom.xPts[0], y:geom.yPts[0] + geom.lineStroke, text:geom.text});
+            shape.setFont({ size:(geom.lineStroke + "pt"), weight:"normal", family:"Arial" });
+            shape.setFill(geom.lineColor);
+            var width = shape.getTextWidth(geom.text);
+            shape.wbbb = {
+                x1: geom.xPts[0],
+                y1: geom.yPts[0],
+                x2: (geom.xPts[0] + width),
+                y2: geom.yPts[0] + geom.lineStroke
+            };
+        } else if(geom.shapeType === 'ellipse'){
+            shape = drawing.createEllipse({cx: ((geom.xPts[1] - geom.xPts[0])/2) + geom.xPts[0],
+                cy: ((geom.yPts[1] - geom.yPts[0])/2) + geom.yPts[0],
+                rx: (geom.xPts[1] - geom.xPts[0])/2,
+                ry: (geom.yPts[1] - geom.yPts[0])/2 });
+        } else if(geom.shapeType === 'pen'){
+            if(geom.xPts){
+                if(geom.xPts.length > 1){
+                    //console.log("num pen points drawing:",geom.xPts.length);
+                    shape = drawing.createGroup();
+                    for(var i = 0; i < (geom.xPts.length - 1); i++){
+                        var lineShape = drawing.createLine({x1: geom.xPts[i], y1: geom.yPts[i], x2: geom.xPts[i + 1], y2: geom.yPts[i + 1]});
+                        stroke.cap = 'round';
+                        lineShape.setStroke(stroke);
+                        shape.add(lineShape);
+                    }
+                }
+            }
+        } else if(geom.shapeType === 'clear'){
+            drawing.clear();
+        } else if(geom.shapeType === 'delete'){
+            removeShape(geom,drawing);
+        } else if(geom.shapeType === 'move'){
+            moveShape(geom,drawing);
+        } else if(geom.shapeType === 'moveUp'){
+            moveShapeUp(geom,drawing);
+        } else if(geom.shapeType === 'moveDown'){
+            moveShapeDown(geom,drawing);
+        } else if(geom.shapeType === 'select'){
+            shape = drawing.createRect({x: geom.xPts[0] - 3, y: geom.yPts[0] - 3, width: (geom.xPts[1] - geom.xPts[0] + 6), height: (geom.yPts[1] - geom.yPts[0] + 6) });
+            shape.setStroke({color: new dojo.Color([0,0,255,0.75]), width: 2});
+            shape.setFill(new dojo.Color([0,0,255,0.25]));
+
+            return shape;
+        } else if(geom.shapeType === 'deleteOverlay'){
+            shape = drawing.createRect({x: geom.xPts[0] - 3, y: geom.yPts[0] - 3, width: (geom.xPts[1] - geom.xPts[0] + 6), height: (geom.yPts[1] - geom.yPts[0] + 6) });
+            shape.setStroke({color: new dojo.Color([255,0,0,0.75]), width: 2});
+            shape.setFill(new dojo.Color([255,0,0,0.25]));
+
+            line = drawing.createLine({x1: geom.xPts[0] - 3, y1: geom.yPts[0] - 3, x2: geom.xPts[1] + 3, y2: geom.yPts[1] + 3});
+            line.setStroke({color: "#FF0000", width: 2});
+
+            line = drawing.createLine({x1: geom.xPts[1] + 3, y1: geom.yPts[0] - 3, x2: geom.xPts[0] - 3, y2: geom.yPts[1] + 3});
+            line.setStroke({color: "#FF0000", width: 2});
+
+            return shape;
+        } else if(geom.shapeType === 'moveOverlay'){
+            shape = drawing.createRect({x: geom.xPts[0] - 3, y: geom.yPts[0] - 3, width: (geom.xPts[1] - geom.xPts[0] + 6), height: (geom.yPts[1] - geom.yPts[0] + 6) });
+            shape.setStroke({color: new dojo.Color([0,0,255,0.75]), width: 2});
+            shape.setFill(new dojo.Color([0,0,255,0.25]));
+
+            return shape;
+        } else if(geom.shapeType === 'moveUpOverlay'){
+            shape = drawing.createRect({x: geom.xPts[0] - 3, y: geom.yPts[0] - 3, width: (geom.xPts[1] - geom.xPts[0] + 6), height: (geom.yPts[1] - geom.yPts[0] + 6) });
+            //shape.setStroke({color: new dojo.Color([0,0,255,0.75]), width: 2});
+            shape.setFill(new dojo.Color([0,0,255,0.15]));
+
+            line = drawing.createLine({x1: geom.xPts[0] - 5, y1: geom.yPts[0] + ((geom.yPts[1] - geom.yPts[0]) / 2), x2: geom.xPts[1] + 3, y2: geom.yPts[0] + ((geom.yPts[1] - geom.yPts[0]) / 2)});
+            line.setStroke({color: "#0000FF", width: 2});
+
+            line = drawing.createLine({x1: geom.xPts[0] - 5, y1: geom.yPts[0] + ((geom.yPts[1] - geom.yPts[0]) / 2), x2: geom.xPts[0] + ((geom.xPts[1] - geom.xPts[0]) / 2), y2: geom.yPts[0] -5});
+            line.setStroke({color: "#0000FF", width: 2});
+
+            line = drawing.createLine({x1: geom.xPts[0] + ((geom.xPts[1] - geom.xPts[0]) / 2), y1: geom.yPts[0] -5, x2: geom.xPts[1] + 5, y2: geom.yPts[0] + ((geom.yPts[1] - geom.yPts[0]) / 2)});
+            line.setStroke({color: "#0000FF", width: 2});
+
+            return shape;
+        } else if(geom.shapeType === 'moveDownOverlay'){
+            shape = drawing.createRect({x: geom.xPts[0] - 3, y: geom.yPts[0] - 3, width: (geom.xPts[1] - geom.xPts[0] + 6), height: (geom.yPts[1] - geom.yPts[0] + 6) });
+            //shape.setStroke({color: new dojo.Color([0,0,255,0.75]), width: 2});
+            shape.setFill(new dojo.Color([0,0,255,0.15]));
+
+            line = drawing.createLine({x1: geom.xPts[0] - 5, y1: geom.yPts[0] + ((geom.yPts[1] - geom.yPts[0]) / 2), x2: geom.xPts[1] + 3, y2: geom.yPts[0] + ((geom.yPts[1] - geom.yPts[0]) / 2)});
+            line.setStroke({color: "#0000FF", width: 2});
+
+            line = drawing.createLine({x1: geom.xPts[0] - 5, y1: geom.yPts[0] + ((geom.yPts[1] - geom.yPts[0]) / 2), x2: geom.xPts[0] + ((geom.xPts[1] - geom.xPts[0]) / 2), y2: geom.yPts[1] + 5});
+            line.setStroke({color: "#0000FF", width: 2});
+
+            line = drawing.createLine({x1: geom.xPts[0] + ((geom.xPts[1] - geom.xPts[0]) / 2), y1: geom.yPts[1] + 5, x2: geom.xPts[1] + 5, y2: geom.yPts[0] + ((geom.yPts[1] - geom.yPts[0]) / 2)});
+            line.setStroke({color: "#0000FF", width: 2});
+
+            return shape;
         }
+        // new code
         else if (geom.shapeType === 'triangle') {
-            console.debug('Draw triangle: x='+geom.xPts[0]+','+geom.xPts[1]+', y='+geom.yPts[0]+','+geom.yPts[1]);
+            //console.debug('Draw triangle: x='+geom.xPts[0]+','+geom.xPts[1]+', y='+geom.yPts[0]+','+geom.yPts[1]);
+            var scaling = 2;
+            var distance = Math.sqrt((Math.pow(geom.xPts[1] - geom.xPts[0],2)) + (Math.pow(geom.yPts[0] - geom.yPts[1],2)));
+            var horizontalCathetus = distance / scaling;//geom.yPts[1]-geom.yPts[0];
+            var verticalCathetus = (horizontalCathetus*4)/3;
+
             shape = drawing.createPolyline([
                 {x: geom.xPts[0], y: geom.yPts[1]},
-                {x: geom.xPts[0], y: (geom.yPts[0]-(geom.yPts[1]-geom.yPts[0]))},
-                {x: (geom.xPts[0]+(geom.yPts[1]-geom.yPts[0])), y: geom.yPts[1]}, // x: x0 + (geom.yPts[1]-geom.yPts[0]) || (geom.xPts[1]-geom.xPts[0])
+                {x: geom.xPts[0], y: (geom.yPts[1]-verticalCathetus)},
+                {x: (geom.xPts[0]+horizontalCathetus), y: geom.yPts[1]},
                 {x: geom.xPts[0], y: geom.yPts[1]}
             ]);
-        }
-        else if (geom.shapeType === 'equation' && geom.data) {
+        } else if (geom.shapeType === 'quadrangle') {
+            console.debug('Draw quadrangle: x='+geom.xPts[0]+','+geom.xPts[1]+', y='+geom.yPts[0]+','+geom.yPts[1]);
+            var scaling = 2;
+            var distance = Math.sqrt((Math.pow(geom.xPts[1] - geom.xPts[0],2)) + (Math.pow(geom.yPts[0] - geom.yPts[1],2)));
+            var edgeLength = distance/scaling;
+
+            shape = drawing.createPolyline([
+                {x: geom.xPts[0], y: geom.yPts[1]},
+                {x: geom.xPts[0], y: (geom.yPts[1]-edgeLength)},
+                {x: (geom.xPts[0]+edgeLength), y: (geom.yPts[1]-edgeLength)},
+                {x: (geom.xPts[0]+edgeLength), y: geom.yPts[1]},
+                {x: geom.xPts[0], y: geom.yPts[1]}
+            ]);
+        } else if (geom.shapeType === 'circle') {
+            console.debug('Draw circle: x='+geom.xPts[0]+','+geom.xPts[1]+', y='+geom.yPts[0]+','+geom.yPts[1]);
+            var scaling = 2;
+            var distance = Math.sqrt((Math.pow(geom.xPts[1] - geom.xPts[0],2)) + (Math.pow(geom.yPts[0] - geom.yPts[1],2)));
+            var diameter = distance/scaling;
+
+            shape = drawing.createEllipse({
+                cx: ((geom.xPts[1] - geom.xPts[0])/2) + geom.xPts[0],
+                cy: ((geom.yPts[1] - geom.yPts[0])/2) + geom.yPts[0],
+                rx: (diameter)/2,
+                ry: (diameter)/2 });
+
+        } else if (geom.shapeType === 'equation' && geom.data) {
             var data = dojox.html.entities.decode(geom.data.value || geom.data);
             window.URL = window.URL || window.webkitURL;
 
@@ -231,9 +386,7 @@ Worksheet.prototype.drawFromJSON = function(geom,drawing,strong) {
                     }
                 }]
             );
-        }
-
-        else if(geom.shapeType === 'graph' && geom.data){
+        } else if(geom.shapeType === 'graph' && geom.data){
             var data = dojox.html.entities.decode(geom.data.value || geom.data);
             var scaling = 2;
 
@@ -252,135 +405,6 @@ Worksheet.prototype.drawFromJSON = function(geom,drawing,strong) {
             });
         }
 
-        else if(geom.shapeType === 'image'){
-            var imgData = geom.dataStr || ((geom.data) ? geom.data.value : null);
-            if(imgData && strong){
-                window.URL = window.URL || window.webkitURL;
-
-                var href2 = "/images/save.png";
-
-                // TODO: It's work fine
-                try {
-                    var img = new Image();
-                    img.type = "image/svg+xml";
-                    img.addEventListener("load", function(){
-                        shape = drawing.createImage({
-                            x:xSize[0],
-                            y:ySize[0],
-                            width: xSize[1],
-                            height: ySize[1],
-                            src: href2
-                        });
-                        //window.URL.revokeObjectURL(href);
-                    });
-                    img.src = href2;
-                } catch(ex) {
-                    console.error(ex);
-                    console.trace();
-                }
-            }
-        }
-        else if(geom.shapeType === 'line'){
-            shape = drawing.createLine({x1: geom.xPts[0], y1: geom.yPts[0], x2: geom.xPts[1], y2: geom.yPts[1]});
-            stroke.cap = 'round';
-        }
-        else if(geom.shapeType === 'text'){
-            shape = drawing.createText({ x:geom.xPts[0], y:geom.yPts[0] + geom.lineStroke, text:geom.text});
-            shape.setFont({ size:(geom.lineStroke + "pt"), weight:"normal", family:"Arial" });
-            shape.setFill(geom.lineColor);
-            var width = shape.getTextWidth(geom.text);
-            shape.wbbb = {
-                x1: geom.xPts[0],
-                y1: geom.yPts[0],
-                x2: (geom.xPts[0] + width),
-                y2: geom.yPts[0] + geom.lineStroke
-            };
-        }
-        else if(geom.shapeType === 'ellipse'){
-            shape = drawing.createEllipse({cx: ((geom.xPts[1] - geom.xPts[0])/2) + geom.xPts[0],
-                cy: ((geom.yPts[1] - geom.yPts[0])/2) + geom.yPts[0],
-                rx: (geom.xPts[1] - geom.xPts[0])/2,
-                ry: (geom.yPts[1] - geom.yPts[0])/2 });
-        }
-        else if(geom.shapeType === 'pen'){
-            if(geom.xPts){
-                if(geom.xPts.length > 1){
-                    //console.log("num pen points drawing:",geom.xPts.length);
-                    shape = drawing.createGroup();
-                    for(var i = 0; i < (geom.xPts.length - 1); i++){
-                        var lineShape = drawing.createLine({x1: geom.xPts[i], y1: geom.yPts[i], x2: geom.xPts[i + 1], y2: geom.yPts[i + 1]});
-                        stroke.cap = 'round';
-                        lineShape.setStroke(stroke);
-                        shape.add(lineShape);
-                    }
-                }
-            }
-        }else if(geom.shapeType === 'clear'){
-            drawing.clear();
-        }else if(geom.shapeType === 'delete'){
-            removeShape(geom,drawing);
-        }else if(geom.shapeType === 'move'){
-            moveShape(geom,drawing);
-        }else if(geom.shapeType === 'moveUp'){
-            moveShapeUp(geom,drawing);
-        }else if(geom.shapeType === 'moveDown'){
-            moveShapeDown(geom,drawing);
-        }
-        else if(geom.shapeType === 'select'){
-            shape = drawing.createRect({x: geom.xPts[0] - 3, y: geom.yPts[0] - 3, width: (geom.xPts[1] - geom.xPts[0] + 6), height: (geom.yPts[1] - geom.yPts[0] + 6) });
-            shape.setStroke({color: new dojo.Color([0,0,255,0.75]), width: 2});
-            shape.setFill(new dojo.Color([0,0,255,0.25]));
-
-            return shape;
-        }else if(geom.shapeType === 'deleteOverlay'){
-            shape = drawing.createRect({x: geom.xPts[0] - 3, y: geom.yPts[0] - 3, width: (geom.xPts[1] - geom.xPts[0] + 6), height: (geom.yPts[1] - geom.yPts[0] + 6) });
-            shape.setStroke({color: new dojo.Color([255,0,0,0.75]), width: 2});
-            shape.setFill(new dojo.Color([255,0,0,0.25]));
-
-            line = drawing.createLine({x1: geom.xPts[0] - 3, y1: geom.yPts[0] - 3, x2: geom.xPts[1] + 3, y2: geom.yPts[1] + 3});
-            line.setStroke({color: "#FF0000", width: 2});
-
-            line = drawing.createLine({x1: geom.xPts[1] + 3, y1: geom.yPts[0] - 3, x2: geom.xPts[0] - 3, y2: geom.yPts[1] + 3});
-            line.setStroke({color: "#FF0000", width: 2});
-
-            return shape;
-        }else if(geom.shapeType === 'moveOverlay'){
-            shape = drawing.createRect({x: geom.xPts[0] - 3, y: geom.yPts[0] - 3, width: (geom.xPts[1] - geom.xPts[0] + 6), height: (geom.yPts[1] - geom.yPts[0] + 6) });
-            shape.setStroke({color: new dojo.Color([0,0,255,0.75]), width: 2});
-            shape.setFill(new dojo.Color([0,0,255,0.25]));
-
-            return shape;
-        }else if(geom.shapeType === 'moveUpOverlay'){
-            shape = drawing.createRect({x: geom.xPts[0] - 3, y: geom.yPts[0] - 3, width: (geom.xPts[1] - geom.xPts[0] + 6), height: (geom.yPts[1] - geom.yPts[0] + 6) });
-            //shape.setStroke({color: new dojo.Color([0,0,255,0.75]), width: 2});
-            shape.setFill(new dojo.Color([0,0,255,0.15]));
-
-            line = drawing.createLine({x1: geom.xPts[0] - 5, y1: geom.yPts[0] + ((geom.yPts[1] - geom.yPts[0]) / 2), x2: geom.xPts[1] + 3, y2: geom.yPts[0] + ((geom.yPts[1] - geom.yPts[0]) / 2)});
-            line.setStroke({color: "#0000FF", width: 2});
-
-            line = drawing.createLine({x1: geom.xPts[0] - 5, y1: geom.yPts[0] + ((geom.yPts[1] - geom.yPts[0]) / 2), x2: geom.xPts[0] + ((geom.xPts[1] - geom.xPts[0]) / 2), y2: geom.yPts[0] -5});
-            line.setStroke({color: "#0000FF", width: 2});
-
-            line = drawing.createLine({x1: geom.xPts[0] + ((geom.xPts[1] - geom.xPts[0]) / 2), y1: geom.yPts[0] -5, x2: geom.xPts[1] + 5, y2: geom.yPts[0] + ((geom.yPts[1] - geom.yPts[0]) / 2)});
-            line.setStroke({color: "#0000FF", width: 2});
-
-            return shape;
-        }else if(geom.shapeType === 'moveDownOverlay'){
-            shape = drawing.createRect({x: geom.xPts[0] - 3, y: geom.yPts[0] - 3, width: (geom.xPts[1] - geom.xPts[0] + 6), height: (geom.yPts[1] - geom.yPts[0] + 6) });
-            //shape.setStroke({color: new dojo.Color([0,0,255,0.75]), width: 2});
-            shape.setFill(new dojo.Color([0,0,255,0.15]));
-
-            line = drawing.createLine({x1: geom.xPts[0] - 5, y1: geom.yPts[0] + ((geom.yPts[1] - geom.yPts[0]) / 2), x2: geom.xPts[1] + 3, y2: geom.yPts[0] + ((geom.yPts[1] - geom.yPts[0]) / 2)});
-            line.setStroke({color: "#0000FF", width: 2});
-
-            line = drawing.createLine({x1: geom.xPts[0] - 5, y1: geom.yPts[0] + ((geom.yPts[1] - geom.yPts[0]) / 2), x2: geom.xPts[0] + ((geom.xPts[1] - geom.xPts[0]) / 2), y2: geom.yPts[1] + 5});
-            line.setStroke({color: "#0000FF", width: 2});
-
-            line = drawing.createLine({x1: geom.xPts[0] + ((geom.xPts[1] - geom.xPts[0]) / 2), y1: geom.yPts[1] + 5, x2: geom.xPts[1] + 5, y2: geom.yPts[0] + ((geom.yPts[1] - geom.yPts[0]) / 2)});
-            line.setStroke({color: "#0000FF", width: 2});
-
-            return shape;
-        }
         if(shape){
             shape.cRand = geom.cRand;
             shape.cTime = geom.cTime;
@@ -449,9 +473,6 @@ Worksheet.prototype.initGfx = function(){
                 if(worksheet.tool === 'rect'){
                     geom  = createRectJSON(bounds,false);
                     worksheet.drawFromJSON(geom,worksheet.overlayDrawing);
-                }else if(worksheet.tool === 'triangle'){
-                    geom  = createTriangleJSON(bounds,false);
-                    worksheet.drawFromJSON(geom,worksheet.overlayDrawing);
                 }else if(worksheet.tool === 'filledRect'){
                     geom  = createRectJSON(bounds,true);
                     worksheet.drawFromJSON(geom,worksheet.overlayDrawing);
@@ -474,6 +495,15 @@ Worksheet.prototype.initGfx = function(){
 
                         worksheet.drawFromJSON(geom2,worksheet.overlayDrawing);
                     }
+                }else if(worksheet.tool === 'triangle'){
+                    geom  = createTriangleJSON(bounds,false);
+                    worksheet.drawFromJSON(geom,worksheet.overlayDrawing);
+                }else if(worksheet.tool === 'quadrangle'){
+                    geom  = createQuadrangleJSON(bounds,false);
+                    worksheet.drawFromJSON(geom,worksheet.overlayDrawing);
+                }else if(worksheet.tool === 'circle'){
+                    geom  = createCircleJSON(bounds,false);
+                    worksheet.drawFromJSON(geom,worksheet.overlayDrawing);
                 }
             }
         } else {
@@ -541,9 +571,6 @@ Worksheet.prototype.initGfx = function(){
                 }else if(worksheet.tool === 'filledRect'){
                     geom  = createRectJSON(bounds,true);
                     worksheet.drawFromJSON(geom,worksheet.drawing);
-                }else if(worksheet.tool === 'triangle'){
-                    geom  = createTriangleJSON(bounds,false);
-                    worksheet.drawFromJSON(geom,worksheet.drawing);
                 }else if(worksheet.tool === 'ellipse'){
                     geom  = createEllipseJSON(bounds,false);
                     worksheet.drawFromJSON(geom,worksheet.drawing);
@@ -590,6 +617,15 @@ Worksheet.prototype.initGfx = function(){
                     worksheet.textPoint = pt;
                     dijit.byId('textDialog').show();
                     dijit.byId('wbText').focus();
+                }else if(worksheet.tool === 'triangle'){
+                    geom  = createTriangleJSON(bounds,false);
+                    worksheet.drawFromJSON(geom,worksheet.drawing);
+                }else if(worksheet.tool === 'quadrangle'){
+                    geom  = createQuadrangleJSON(bounds,false);
+                    worksheet.drawFromJSON(geom,worksheet.drawing);
+                }else if(worksheet.tool === 'circle'){
+                    geom  = createCircleJSON(bounds,false);
+                    worksheet.drawFromJSON(geom,worksheet.drawing);
                 }else if(worksheet.tool === 'equation'){
                     worksheet.textPoint = pt;
                     dijit.byId('equationDialog').show();
@@ -637,6 +673,38 @@ Worksheet.prototype.initGfx = function(){
             yPts: [bounds.y1,bounds.y2]
         };
         geom.shapeType = 'triangle';
+        geom.filled = filled;
+        if(filled){
+            geom.fillColor = worksheet.fillColor;
+        }
+        geom.lineColor = worksheet.lineColor;
+        geom.lineStroke = worksheet.lineStroke;
+
+        return worksheet.addTimeRand(geom);
+    };
+    var createQuadrangleJSON = function(bounds,filled){
+        bounds = normalizeBounds(bounds);
+        var geom = {
+            xPts: [bounds.x1,bounds.x2],
+            yPts: [bounds.y1,bounds.y2]
+        };
+        geom.shapeType = 'quadrangle';
+        geom.filled = filled;
+        if(filled){
+            geom.fillColor = worksheet.fillColor;
+        }
+        geom.lineColor = worksheet.lineColor;
+        geom.lineStroke = worksheet.lineStroke;
+
+        return worksheet.addTimeRand(geom);
+    };
+    var createCircleJSON = function(bounds,filled){
+        bounds = normalizeBounds(bounds);
+        var geom = {
+            xPts: [bounds.x1,bounds.x2],
+            yPts: [bounds.y1,bounds.y2]
+        };
+        geom.shapeType = 'circle';
         geom.filled = filled;
         if(filled){
             geom.fillColor = worksheet.fillColor;
