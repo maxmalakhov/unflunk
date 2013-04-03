@@ -144,13 +144,10 @@ var GraphPreview = {
 //                return '\\[f(x) = {' + humanFunction + '}\\]';
 //            }]);
 
-        //setTimeout(function() {
-            var pathNode = dojo.query('path',box)[0];
-            var pathAttr = dojo.attr(pathNode,'d');
-            console.debug('Path: "'+pathAttr+'"');
-            callback(pathAttr);
-        return pathAttr;
-        //}, 3000);
+        var pathNode = dojo.query('path',box)[0];
+        var pathAttr = dojo.attr(pathNode,'d');
+        //console.debug('Path: "'+pathAttr+'"');
+        callback(pathAttr);
     },
 
     //

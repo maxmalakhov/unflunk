@@ -13,6 +13,9 @@
         <button id="lineToolBtn_${worksheetId}" dojoType="dijit.form.Button" class="lineToolBtn"><img border="0" src="/images/line.png"></button>
         <div dojoType="dijit.Tooltip" connectId="lineToolBtn_${worksheetId}" position="above" showDelay="0">Straight Line</div>
 
+        <button id="triangleToolBtn_${worksheetId}" dojoType="dijit.form.Button" class="triangleToolBtn"><img border="0" src="/images/ruler-triangle.png"></button>
+        <div dojoType="dijit.Tooltip" connectId="triangleToolBtn_${worksheetId}" position="above" showDelay="0">Triangle</div>
+
         <button id="rectToolBtn_${worksheetId}" dojoType="dijit.form.Button" class="rectToolBtn"><img border="0" src="/images/rect.png"></button>
         <div dojoType="dijit.Tooltip" connectId="rectToolBtn_${worksheetId}" position="above" showDelay="0">Rectangle</div>
 

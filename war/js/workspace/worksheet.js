@@ -1,5 +1,6 @@
 var tools = [{name: 'line', showLineColor: true, showLineThickness: true}
             ,{name: 'pen', showLineColor: true, showLineThickness: true}
+            ,{name: 'triangle', showLineColor: true, showLineThickness: true}
             ,{name: 'rect', showLineColor: true, showLineThickness: true}
             ,{name: 'ellipse', showLineColor: true, showLineThickness: true}
             ,{name: 'filledRect', showFillColor: true, showLineColor: true, showLineThickness: true}
@@ -138,6 +139,15 @@ Worksheet.prototype.drawFromJSON = function(geom,drawing,strong) {
         if(geom.shapeType === 'rect'){
             shape = drawing.createRect({x: geom.xPts[0], y: geom.yPts[0], width: (geom.xPts[1] - geom.xPts[0]), height: (geom.yPts[1] - geom.yPts[0]) });
         }
+        else if (geom.shapeType === 'triangle') {
+            console.debug('Draw triangle: x='+geom.xPts[0]+','+geom.xPts[1]+', y='+geom.yPts[0]+','+geom.yPts[1]);
+            shape = drawing.createPolyline([
+                {x: geom.xPts[0], y: geom.yPts[1]},
+                {x: geom.xPts[0], y: (geom.yPts[0]-(geom.yPts[1]-geom.yPts[0]))},
+                {x: (geom.xPts[0]+(geom.yPts[1]-geom.yPts[0])), y: geom.yPts[1]}, // x: x0 + (geom.yPts[1]-geom.yPts[0]) || (geom.xPts[1]-geom.xPts[0])
+                {x: geom.xPts[0], y: geom.yPts[1]}
+            ]);
+        }
         else if (geom.shapeType === 'equation' && geom.data) {
             var data = dojox.html.entities.decode(geom.data.value || geom.data);
             window.URL = window.URL || window.webkitURL;
@@ -225,17 +235,21 @@ Worksheet.prototype.drawFromJSON = function(geom,drawing,strong) {
 
         else if(geom.shapeType === 'graph' && geom.data){
             var data = dojox.html.entities.decode(geom.data.value || geom.data);
+            var scaling = 2;
 
-            var path = GraphPreview.RenderGraph(data, function(path) {
+            GraphPreview.RenderGraph(data, function(path) {
+                stroke = {
+                    cap:"butt",
+                    join:"round",
+                    width: geom.lineStroke/scaling,
+                    color: geom.lineColor
+                };
 
                 shape = drawing.createPath(path);
-                shape.applyTransform(dojox.gfx.matrix.scale(0.5,0.5));
+                shape.applyTransform(dojox.gfx.matrix.scale(1/scaling,1/scaling));
                 shape.applyTransform({dx: geom.xPts[0], dy: geom.yPts[0]});
+                shape.setStroke(stroke);
             });
-
-            shape = drawing.createPath(path);
-            shape.applyTransform(dojox.gfx.matrix.scale(0.5,0.5));
-            shape.applyTransform({dx: geom.xPts[0], dy: geom.yPts[0]});
         }
 
         else if(geom.shapeType === 'image'){
@@ -435,6 +449,9 @@ Worksheet.prototype.initGfx = function(){
                 if(worksheet.tool === 'rect'){
                     geom  = createRectJSON(bounds,false);
                     worksheet.drawFromJSON(geom,worksheet.overlayDrawing);
+                }else if(worksheet.tool === 'triangle'){
+                    geom  = createTriangleJSON(bounds,false);
+                    worksheet.drawFromJSON(geom,worksheet.overlayDrawing);
                 }else if(worksheet.tool === 'filledRect'){
                     geom  = createRectJSON(bounds,true);
                     worksheet.drawFromJSON(geom,worksheet.overlayDrawing);
@@ -524,6 +541,9 @@ Worksheet.prototype.initGfx = function(){
                 }else if(worksheet.tool === 'filledRect'){
                     geom  = createRectJSON(bounds,true);
                     worksheet.drawFromJSON(geom,worksheet.drawing);
+                }else if(worksheet.tool === 'triangle'){
+                    geom  = createTriangleJSON(bounds,false);
+                    worksheet.drawFromJSON(geom,worksheet.drawing);
                 }else if(worksheet.tool === 'ellipse'){
                     geom  = createEllipseJSON(bounds,false);
                     worksheet.drawFromJSON(geom,worksheet.drawing);
@@ -601,6 +621,22 @@ Worksheet.prototype.initGfx = function(){
                 yPts: [bounds.y1,bounds.y2]
         };
         geom.shapeType = 'rect';
+        geom.filled = filled;
+        if(filled){
+            geom.fillColor = worksheet.fillColor;
+        }
+        geom.lineColor = worksheet.lineColor;
+        geom.lineStroke = worksheet.lineStroke;
+
+        return worksheet.addTimeRand(geom);
+    };
+    var createTriangleJSON = function(bounds,filled){
+        bounds = normalizeBounds(bounds);
+        var geom = {
+            xPts: [bounds.x1,bounds.x2],
+            yPts: [bounds.y1,bounds.y2]
+        };
+        geom.shapeType = 'triangle';
         geom.filled = filled;
         if(filled){
             geom.fillColor = worksheet.fillColor;
