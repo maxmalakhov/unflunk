@@ -61,8 +61,8 @@ public class WBGeometry  implements Serializable
     
     @Persistent
     protected long cRand;
-    
-    
+
+
     
     @Persistent
     protected String text;

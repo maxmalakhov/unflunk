@@ -66,12 +66,25 @@ Worksheet.prototype.drawFromJSON = function(geom,drawing,strong) {
     var moveShape = function(geom, drawing){
         var shape = getShapeFromGeom(geom,drawing);
         if(shape){
+            var scale = (geom.scale) ? geom.scale : 1;
+            geom.xPts[0] *= scale;
+            geom.yPts[0] *= scale;
             shape.applyTransform({dx: geom.xPts[0], dy: geom.yPts[0]});
             if(shape.wbbb){
-                shape.wbbb.x1 += geom.xPts[0];
-                shape.wbbb.x2 += geom.xPts[0];
-                shape.wbbb.y1 += geom.yPts[0];
-                shape.wbbb.y2 += geom.yPts[0];
+                var shapeBounding = shape.getTransformedBoundingBox();
+                if(shapeBounding) {
+                    shape.wbbb = {
+                        x1: shapeBounding[0].x,
+                        y1: shapeBounding[0].y,
+                        x2: shapeBounding[2].x,
+                        y2: shapeBounding[2].y
+                    };
+                } else {
+                    shape.wbbb.x1 += geom.xPts[0];
+                    shape.wbbb.x2 += geom.xPts[0];
+                    shape.wbbb.y1 += geom.yPts[0];
+                    shape.wbbb.y2 += geom.yPts[0];
+                }
             }
         }
     };
@@ -267,9 +280,9 @@ Worksheet.prototype.drawFromJSON = function(geom,drawing,strong) {
         // new code
         else if (geom.shapeType === 'triangle') {
             //console.debug('Draw triangle: x='+geom.xPts[0]+','+geom.xPts[1]+', y='+geom.yPts[0]+','+geom.yPts[1]);
-            var scaling = 2;
+            var scale = 2;
             var distance = Math.sqrt((Math.pow(geom.xPts[1] - geom.xPts[0],2)) + (Math.pow(geom.yPts[0] - geom.yPts[1],2)));
-            var horizontalCathetus = distance / scaling;//geom.yPts[1]-geom.yPts[0];
+            var horizontalCathetus = distance / scale;//geom.yPts[1]-geom.yPts[0];
             var verticalCathetus = (horizontalCathetus*4)/3;
 
             shape = drawing.createPolyline([
@@ -279,10 +292,10 @@ Worksheet.prototype.drawFromJSON = function(geom,drawing,strong) {
                 {x: geom.xPts[0], y: geom.yPts[1]}
             ]);
         } else if (geom.shapeType === 'quadrangle') {
-            console.debug('Draw quadrangle: x='+geom.xPts[0]+','+geom.xPts[1]+', y='+geom.yPts[0]+','+geom.yPts[1]);
-            var scaling = 2;
+            //console.debug('Draw quadrangle: x='+geom.xPts[0]+','+geom.xPts[1]+', y='+geom.yPts[0]+','+geom.yPts[1]);
+            var scale = 2;
             var distance = Math.sqrt((Math.pow(geom.xPts[1] - geom.xPts[0],2)) + (Math.pow(geom.yPts[0] - geom.yPts[1],2)));
-            var edgeLength = distance/scaling;
+            var edgeLength = distance/scale;
 
             shape = drawing.createPolyline([
                 {x: geom.xPts[0], y: geom.yPts[1]},
@@ -292,10 +305,10 @@ Worksheet.prototype.drawFromJSON = function(geom,drawing,strong) {
                 {x: geom.xPts[0], y: geom.yPts[1]}
             ]);
         } else if (geom.shapeType === 'circle') {
-            console.debug('Draw circle: x='+geom.xPts[0]+','+geom.xPts[1]+', y='+geom.yPts[0]+','+geom.yPts[1]);
-            var scaling = 2;
+            //console.debug('Draw circle: x='+geom.xPts[0]+','+geom.xPts[1]+', y='+geom.yPts[0]+','+geom.yPts[1]);
+            var scale = 2;
             var distance = Math.sqrt((Math.pow(geom.xPts[1] - geom.xPts[0],2)) + (Math.pow(geom.yPts[0] - geom.yPts[1],2)));
-            var diameter = distance/scaling;
+            var diameter = distance/scale;
 
             shape = drawing.createEllipse({
                 cx: ((geom.xPts[1] - geom.xPts[0])/2) + geom.xPts[0],
@@ -388,28 +401,38 @@ Worksheet.prototype.drawFromJSON = function(geom,drawing,strong) {
             );
         } else if(geom.shapeType === 'graph' && geom.data){
             var data = dojox.html.entities.decode(geom.data.value || geom.data);
-            var scaling = 2;
+            var scale = 3;
+            var location = { x: geom.xPts[0]*scale, y: geom.yPts[0]*scale };
+            var path = GraphPreview.RenderGraph(data);
 
-            GraphPreview.RenderGraph(data, function(path) {
-                stroke = {
-                    cap:"butt",
-                    join:"round",
-                    width: geom.lineStroke/scaling,
-                    color: geom.lineColor
-                };
+            stroke = {
+                cap:"butt",
+                join:"round",
+                width: geom.lineStroke/(scale/2),
+                color: geom.lineColor
+            };
 
-                shape = drawing.createPath(path);
-                shape.applyTransform(dojox.gfx.matrix.scale(1/scaling,1/scaling));
-                shape.applyTransform({dx: geom.xPts[0], dy: geom.yPts[0]});
-                shape.setStroke(stroke);
-            });
+            shape = drawing.createPath(path);
+            shape.applyTransform(dojox.gfx.matrix.scale(1/scale,1/scale));
+            shape.applyTransform({ dx: location.x, dy: location.y });
+            shape.scale = scale;
         }
 
         if(shape){
             shape.cRand = geom.cRand;
             shape.cTime = geom.cTime;
             if(!shape.wbbb){
-                shape.wbbb = getBoundingBox(geom);
+                var shapeBounding = shape.getTransformedBoundingBox();
+                if(shapeBounding) {
+                    shape.wbbb = {
+                        x1: shapeBounding[0].x,
+                        y1: shapeBounding[0].y,
+                        x2: shapeBounding[2].x,
+                        y2: shapeBounding[2].y
+                    };
+                } else {
+                    shape.wbbb = getBoundingBox(geom);
+                }
             }
             shape.fromUser = geom.fromUser;
 
@@ -424,6 +447,9 @@ Worksheet.prototype.drawFromJSON = function(geom,drawing,strong) {
     }
 };
 Worksheet.prototype.sendMessage = function(message){
+    //if(message.geometry.scale) {
+        delete message.geometry.scale;
+    //}
     this.room.sendMessage(dojo.mixin(message, { worksheetId: this.id }));
 };
 Worksheet.prototype.initGfx = function(){
@@ -757,6 +783,7 @@ Worksheet.prototype.initGfx = function(){
                 yPts: [ptDelta.y]
         };
         geom.shapeType = 'move';
+        geom.scale = shape.scale;
         geom.cTime = shape.cTime;
         geom.cRand = shape.cRand;
         geom.fromUser = shape.fromUser;

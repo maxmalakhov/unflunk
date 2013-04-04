@@ -108,7 +108,7 @@ var GraphPreview = {
         that.PreviewDone();
     },
 
-    RenderGraph: function(humanFunction, callback) {
+    RenderGraph: function(humanFunction) {
         console.debug('Function: '+humanFunction);
 
         var processor = new MathProcessor();
@@ -145,9 +145,14 @@ var GraphPreview = {
 //            }]);
 
         var pathNode = dojo.query('path',box)[0];
-        var pathAttr = dojo.attr(pathNode,'d');
-        //console.debug('Path: "'+pathAttr+'"');
-        callback(pathAttr);
+        var pathRaw = dojo.attr(pathNode,'d');
+        console.debug('Raw Path: "'+pathRaw+'"');
+
+        var pathCropped = this.CropPath(pathRaw);
+
+        console.debug('Cropped Path: "'+pathCropped);
+
+        return pathCropped;
     },
 
     //
@@ -172,6 +177,32 @@ var GraphPreview = {
         console.debug('Function:'+humanFunction);
 
         return humanFunction;
+    },
+
+    CropPath: function(rawPath) {
+        var croppedPath;
+        var slippedPath = rawPath.split('L');
+        if(slippedPath.length > 2) {
+            var highLimit = 700;
+            var lowLimit = -100;
+            var first = true;
+            for(var i = 1; i < slippedPath.length; i++) {
+                x = slippedPath[i].split(' ')[1];
+                y = slippedPath[i].split(' ')[2];
+                if (x > lowLimit && x < highLimit &&
+                    y > lowLimit && y < highLimit) {
+
+                    if(first) {
+                        croppedPath = 'M '+x+' '+y;
+                        first = false;
+                    }
+                    croppedPath = croppedPath + ' L ' + slippedPath[i];
+                }
+            }
+        } else {
+            croppedPath = rawPath;
+        }
+        return croppedPath;
     }
 };
 
