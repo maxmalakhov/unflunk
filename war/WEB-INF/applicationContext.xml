@@ -12,7 +12,15 @@
        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd
        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
 
-
+	<context:property-placeholder location="classpath:unflunk.properties"/>
+    <context:component-scan base-package="com.azprogrammer.qgf.auth" annotation-config="true" scoped-proxy="targetClass"/>
+    
+	<bean id="credentialStore" class="com.google.api.client.extensions.appengine.auth.oauth2.AppEngineCredentialStore"/>
+	<bean id="jsonFactory" class="com.google.api.client.json.jackson.JacksonFactory"/>
+	<bean id="transport" class="com.google.api.client.http.javanet.NetHttpTransport"/>
+	
+	<bean id="scopes" class="com.azprogrammer.qgf.auth.Scopes"/>
+	
     <bean id="transactionManager" class="org.springframework.orm.jdo.JdoTransactionManager">
         <property name="persistenceManagerFactory" ref="persistenceManagerFactory" />
     </bean>

@@ -4,6 +4,7 @@
 .project
 .metadata
 .mymetadata
+.springBeans
 
 # IntelliJ Idea project files
 .idea

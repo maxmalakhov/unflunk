@@ -216,8 +216,8 @@ public class RoomController {
                     //trim any text geom > 100 chars
                     if(message.getGeometry() != null){
                         WBGeometry geom = message.getGeometry();
-                        if((geom.getText() != null) && (geom.getText().length() > 100)  ) {
-                            geom.setText(geom.getText().substring (0, 99));
+                        if((geom.getText() != null) && (geom.getText().length() > 200)  ) {
+                            geom.setText(geom.getText().substring (0, 199));
                         }
                         if("image".equals(geom.getShapeType()) && geom.getDataStr() != null) {
                             //validate image data

@@ -15,7 +15,23 @@
     </properties>
 
     <dependencies>
-
+        <!--  Google APIs -->
+	<dependency>
+        	<groupId>com.google.apis</groupId>
+        	<artifactId>google-api-services-drive</artifactId>
+        	<version>v2-rev61-1.13.2-beta</version>
+      	</dependency>
+      	<dependency>
+	        <groupId>com.google.apis</groupId>
+    	    <artifactId>google-api-services-oauth2</artifactId>
+        	<version>v2-rev30-1.13.2-beta</version>
+      	</dependency>
+	  	<dependency>
+	        <groupId>com.google.api-client</groupId>
+        	<artifactId>google-api-client-appengine</artifactId>
+        	<version>1.14.1-beta</version>
+      	</dependency>
+      
         <!-- Google App Engine -->
         <dependency>
             <groupId>com.google.appengine</groupId>
@@ -355,4 +371,11 @@
             </build>
         </profile>
     </profiles>
+    
+    <repositories>
+        <repository>
+            <id>google-api-services</id>
+            <url>http://google-api-client-libraries.appspot.com/mavenrepo</url>
+        </repository>
+    </repositories>
 </project>
