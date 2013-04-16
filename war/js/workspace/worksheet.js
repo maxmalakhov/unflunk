@@ -326,7 +326,7 @@ Worksheet.prototype.drawFromJSON = function(geom,drawing,strong) {
             window.URL = window.URL || window.webkitURL;
 
             var div = dojo.create("div", {
-                innerHTML: data,
+                innerHTML: ('$'+data+'$'),
                 //xmlns: "http://www.w3.org/1999/xhtml", // !!! hack for Chrome
                 style: "border: 1px dashed; width: 100%; height: 100%;"
             });

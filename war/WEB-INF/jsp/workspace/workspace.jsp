@@ -153,7 +153,7 @@ var workspace; // window scope
 
 <div id="equationDialog" dojoType="dijit.Dialog" title="Type in some equation in LaTeX"  style="display: none;">
     <textarea id="MathInput" data-dojo-type="dijit.form.SimpleTextarea" name="wbEquation" rows="10" cols="100"
-        >$\left( \sum_{k=1}^n a_k b_k \right)^2 \leq \left( \sum_{k=1}^n a_k^2 \right) \left( \sum_{k=1}^n b_k^2 \right)$</textarea><br>
+        >\left( \sum_{k=1}^n a_k b_k \right)^2 \leq \left( \sum_{k=1}^n a_k^2 \right) \left( \sum_{k=1}^n b_k^2 \right)</textarea><br>
     <div id="MathPreview" style="border:1px solid; padding: 3px; width:95%; margin-top:5px"></div>
     <div id="MathBuffer" style="border:1px solid; padding: 3px; width:95%; margin-top:5px; visibility:hidden; position:absolute; top:0; left: 0"></div>
     <button dojoType="dijit.form.Button" id="okEquationBtn">OK</button>&nbsp;&nbsp;&nbsp;<button dojoType="dijit.form.Button" id="cancelEquationBtn">Cancel</button>

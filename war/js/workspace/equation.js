@@ -59,7 +59,7 @@ var Preview = {
     CreatePreview: function () {
         Preview.timeout = null;
         if (this.mjRunning) return;
-        var text = document.getElementById("MathInput").value;
+        var text = '$'+document.getElementById("MathInput").value+'$';
         if (text === this.oldtext) return;
         this.buffer.innerHTML = this.oldtext = text;
         this.mjRunning = true;
