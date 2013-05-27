@@ -54,15 +54,24 @@ var workspace; // window scope
     dojo.require("dijit.form.Textarea");
 </script>
 
+<script src="/js/libs/pdf.js"></script>
+<script src="/js/libs/compatibility.js"></script>
+<script src="/js/libs/jsxgraphsrc.js"></script>
+
 <%--<script src="/js/azp/WBCommon.js"></script>--%>
 <script src="/js/workspace/worksheet.js"></script>
 <script src="/js/workspace/room.js"></script>
 <script src="/js/workspace/workspace.js"></script>
+<script src="/js/workspace/board.js"></script>
+<script src="/js/workspace/documents.js"></script>
+
+<script src="/js/workspace/shapes/triangle.js"></script>
 
 <!-- Call specific libs and styles -->
 <script src="/js/azp/adapter.js"></script>
 <script src="/js/workspace/call.js"></script>
 <link rel="stylesheet" href="/css/call.css">
+<link rel="stylesheet" href="/css/jsxgraph.css">
 
 <%-- MathJax, http://www.mathjax.org --%>
 <%--HTMLorMML TeX-AMS-MML_HTMLorMML--%>
@@ -76,7 +85,7 @@ var workspace; // window scope
 
 <%-- JSXGraph, http://jsxgraph.uni-bayreuth.de --%>
 <link rel="stylesheet" type="text/css" href="http://jsxgraph.uni-bayreuth.de/distrib/jsxgraph.css" />
-<script type="text/javascript" src="http://jsxgraph.uni-bayreuth.de/distrib/jsxgraphcore.js"></script>
+<!-- <script type="text/javascript" src="http://jsxgraph.uni-bayreuth.de/distrib/jsxgraphcore.js"></script> -->
 <script type="text/javascript" src="/js/workspace/graph-preview.js"></script>
 <script type="text/javascript" src="/js/workspace/function.js"></script>
 <script type="text/javascript" src="/js/workspace/math-processor.js"></script>

@@ -1,4 +1,4 @@
-dojo.addOnLoad(function() {
+var getDocs = function() {
 	dojo.xhrPost({
        url: '/doc',
        load: function(resp){
@@ -57,4 +57,4 @@ dojo.addOnLoad(function() {
        },
        preventCache: true
     });
-});
+}

@@ -1,9 +1,9 @@
 <%--<div dojoType="dijit.layout.ContentPane" style="padding:0; height: 800px;" closable="true" id="${worksheetId}">--%>
 <!-- Draw Area -->
     draw:
-    <div>
-        <div class="whiteboardContainer" style="border: 2px blue solid; background-color: white;"></div>
-        <div class="whiteboardOverlayContainer"  style="border: 2px black solid; z-index : 1;"></div>
+    <div style="position: relative">
+        <div class="whiteboardContainer" id="whiteboardContainer_${worksheetId}" style="border: 2px blue solid; background-color: white; z-index: 1; background: transparent"></div>
+        <div class="whiteboardOverlayContainer" id="whiteboardOverlayContainer_${worksheetId}" style="border: 2px black solid; background: transparent"></div>
     </div>
     <form onsubmit="return false" dojoType="dijit.form.Form" class="toolForm">
 

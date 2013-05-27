@@ -60,6 +60,9 @@
                     </tr></table>
             </div>
         </div>
+        <div id="documentArea" style="width: 100%; height: 50%" dojoType="dijit.layout.BorderContainer" liveSplitters="true">
+		    <div id="documents" style="overflow: auto; width: 37em;" region="center" dojoType="dijit.layout.ContentPane" splitter="true"></div>
+	    </div>
     </div>
 </div>
 

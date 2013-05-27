@@ -115,6 +115,16 @@ Whiteboard.prototype.createRect = function(params) {
 	return this._createElement(rectangle);
 }
 
+Whiteboard.prototype.createPolyline = function(points) {
+	var points = new Array();
+	for ( var i = 0; i < points.length; i++ ) {
+		var point = this._board.create('point', [points[i].x, points[i].y]);
+		points.push(point);
+	}
+	var polyline = this._board.create('polygon', points, { hasInnerPoints : true });
+	return this._createElement(polyline);
+}
+
 Whiteboard.prototype.getUsrCoordsOfMouse = function(evt) {
 	return this._board.getUsrCoordsOfMouse(evt);
 }
@@ -133,6 +143,10 @@ Whiteboard.prototype._createElement = function(element) {
 	};
 	element.moveToFront = function() { /* remove and recreate */ }
 	element.moveToBack = function() { /* ??? */ }
+	element.getTransformedBoundingBox = function() {
+		var bounds = this.bounds();
+		return [ { x: bounds[0], y: bounds[1] }, { x: 0, y: 0 }, { x: bounds[2], y: bounds[3] } ];
+	}
 	
 	this.children.push(element);
 	return element;
