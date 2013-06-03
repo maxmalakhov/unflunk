@@ -86,7 +86,7 @@ var workspace; // window scope
 <%-- JSXGraph, http://jsxgraph.uni-bayreuth.de --%>
 <link rel="stylesheet" type="text/css" href="http://jsxgraph.uni-bayreuth.de/distrib/jsxgraph.css" />
 <!-- <script type="text/javascript" src="http://jsxgraph.uni-bayreuth.de/distrib/jsxgraphcore.js"></script> -->
-<script type="text/javascript" src="/js/workspace/graph-preview.js"></script>
+<script type="text/javascript" src="/js/workspace/graph.js"></script>
 <script type="text/javascript" src="/js/workspace/function.js"></script>
 <script type="text/javascript" src="/js/workspace/math-processor.js"></script>
 
@@ -133,7 +133,7 @@ var workspace; // window scope
         <div data-dojo-type="dijit.form.Button" id="mainmenu.exit"
              data-dojo-props="iconClass:'dijitEditorIcon dijitEditorIconRedo'">Exit</div>
         <div data-dojo-type="dijit.ToolbarSeparator"></div>
-        <input id="value1Box" dojoType="dijit.form.TextBox" readonly="readonly" value="Current user: ${userName}"/>
+        <input id="value1Box" dojoType="dijit.form.TextBox" readonly="readonly" width="300px" value="Current user: ${userName}"/>
     </div>
 </div>
 <div id="rooms" region="center" dojoType="dijit.layout.TabContainer">

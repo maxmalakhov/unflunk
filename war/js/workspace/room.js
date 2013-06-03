@@ -20,8 +20,8 @@ function Room(id, token, messages, worksheets) {
     };
 
     this.newWorksheet = function(worksheetId, show) {
-        console.debug("newWorksheet()");
         var room = this;
+        console.debug("newWorksheet() "+"/room/"+room.id+"/worksheet/"+worksheetId);
         var worksheetTabs = room.getWidget('worksheets');
         var worksheetTab = new dijit.layout.ContentPane({
             id: worksheetId,
@@ -136,7 +136,7 @@ Room.prototype.sendMessage = function(message){
     var clearChatUI = function(){
         try{
             //room.getNode('chatText').setAttribute('disabled',false);
-            room.getWidget('chatText').setValue('');
+            room.getWidget('chatText').set('value','');
             //room.getNode('chatBtn').setAttribute('disabled',false);
             room.getNode('chatWaitMessage').innerHTML = '';
         }catch(e){

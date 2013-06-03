@@ -79,6 +79,7 @@ var GraphPreview = {
         that.preview.innerHTML = '';
         that.mjRunning = true;
 
+        JXG.Options.renderer = 'svg';
         JXG.Options.text.useMathJax = true;
         var brd = JXG.JSXGraph.initBoard(that.preview.id, {
             boundingbox:[-10,20,10,-5],
@@ -114,10 +115,12 @@ var GraphPreview = {
         var processor = new MathProcessor();
 
         var box = dojo.clone(this.buffer);
+        //var box = this.buffer;
         dojo.attr(box,'id',this.buffer.id+(++this.bufferCount));
         dojo.place(box, dojo.byId('graphBox'));
         box.innerHTML = '';
 
+        JXG.Options.renderer = 'svg';
         JXG.Options.text.useMathJax = true;
         var brd = JXG.JSXGraph.initBoard(box.id, {
             boundingbox:[-10,20,10,-5],
@@ -148,9 +151,11 @@ var GraphPreview = {
         var pathRaw = dojo.attr(pathNode,'d');
         console.debug('Raw Path: "'+pathRaw+'"');
 
-        var pathCropped = this.CropPath(pathRaw);
+        //var pathCropped = this.CropPath(pathRaw);
+        var pathCropped = this.PathToPoints(pathRaw);
+        console.dir(pathCropped);
 
-        console.debug('Cropped Path: "'+pathCropped);
+        //console.debug('Cropped Path: "'+pathCropped);
 
         return pathCropped;
     },
@@ -186,6 +191,7 @@ var GraphPreview = {
             var highLimit = 700;
             var lowLimit = -100;
             var first = true;
+            var x, y;
             for(var i = 1; i < slippedPath.length; i++) {
                 x = slippedPath[i].split(' ')[1];
                 y = slippedPath[i].split(' ')[2];
@@ -203,6 +209,62 @@ var GraphPreview = {
             croppedPath = rawPath;
         }
         return croppedPath;
+    },
+
+    PathToPoints: function(rawPath) {
+        var Points = function(){
+            var xValues = [], yValues = [],
+                minX = 0, minY = 0, maxX = 0, maxY = 0;
+            this.add = function(x,y) {
+                x = parseFloat(x);
+                y = parseFloat(y);
+
+                xValues.push(x);
+                yValues.push(y);
+
+                if (xValues.length === 1 &&
+                    xValues.length === 1) {
+
+                    minX = maxX = x;
+                    minY = maxY = y;
+                } else {
+                    if(x < minX) { minX=x; }
+                    if(x > maxX) { maxX=x; }
+                    if(y < minY) { minY=y; }
+                    if(y > maxY) { maxY=y; }
+                }
+            },
+            this.get = function() {
+                return {
+                    xValues: xValues,
+                    yValues: yValues,
+                    center: {
+                        x: (maxX + minX)/2,
+                        y: (maxY + minY)/2
+                    }
+                };
+            };
+        };
+        var points = new Points();
+        var slippedPath = rawPath.split('L');
+        if(slippedPath.length > 2) {
+            var highLimit = 700;
+            var lowLimit = -100;
+            var x, y;
+            for(var i = 1; i < slippedPath.length; i++) {
+                x = slippedPath[i].split(' ')[1];
+                y = slippedPath[i].split(' ')[2];
+                if (x > lowLimit && x < highLimit &&
+                    y > lowLimit && y < highLimit) {
+
+                    points.add(x,y);
+                }
+            }
+        } else {
+            points.add(slippedPath[0].split(' ')[2],slippedPath[0].split(' ')[3]);
+            points.add(slippedPath[1].split(' ')[1],slippedPath[1].split(' ')[2]);
+        }
+        return points.get();
     }
 };
 

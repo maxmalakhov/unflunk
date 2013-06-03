@@ -29,11 +29,11 @@
  
   <!-- All JavaScript at the bottom, except for Modernizr which enables HTML5 elements & feature detects -->
   <script src="/js/libs/modernizr2.js"></script>
- <script TYPE="text/javascript" src="http://ajax.googleapis.com/ajax/libs/dojo/1.6.1/dojo/dojo.xd.js.uncompressed.js " data-dojo-config="isDebug: true, parseOnLoad: true, baseUrl: '/js/', modulePaths:{azp:'azp', workspace:'workspace'}, gfxRenderer:'canvas,svg,vml,silverlight',defaultDuration:1"></script>
+ <script TYPE="text/javascript" src="http://ajax.googleapis.com/ajax/libs/dojo/1.9.0/dojo/dojo.js" djConfig="isDebug: true, parseOnLoad: true, baseUrl: '/js/', modulePaths:{azp:'azp', workspace:'workspace'}, gfxRenderer:'canvas,svg,vml,silverlight',defaultDuration:1"></script>
 
 <style type="text/css">
-        @import "http://ajax.googleapis.com/ajax/libs/dojo/1.6/dijit/themes/claro/claro.css"; 
-        @import "http://ajax.googleapis.com/ajax/libs/dojo/1.6/dojox/widget/ColorPicker/ColorPicker.css";  
+        @import "http://ajax.googleapis.com/ajax/libs/dojo/1.9.0/dijit/themes/claro/claro.css";
+        @import "http://ajax.googleapis.com/ajax/libs/dojo/1.9.0/dojox/widget/ColorPicker/ColorPicker.css";
                    
 </style>
 </head>

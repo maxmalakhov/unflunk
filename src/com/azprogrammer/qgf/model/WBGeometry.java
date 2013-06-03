@@ -1,7 +1,6 @@
 package com.azprogrammer.qgf.model;
 
 import java.io.Serializable;
-import java.util.Map;
 
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.NotPersistent;
@@ -11,13 +10,7 @@ import javax.jdo.annotations.PrimaryKey;
 
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.Text;
-import com.google.appengine.repackaged.com.google.api.client.json.Json;
-import com.google.appengine.repackaged.org.codehaus.jackson.JsonNode;
-import com.google.appengine.repackaged.org.codehaus.jackson.annotate.JsonAnySetter;
 import com.google.appengine.repackaged.org.codehaus.jackson.annotate.JsonIgnore;
-import com.google.appengine.repackaged.org.codehaus.jackson.annotate.JsonProperty;
-import com.google.appengine.repackaged.org.codehaus.jackson.annotate.JsonRawValue;
-import net.sf.json.JSON;
 
 
 /**
@@ -51,10 +44,10 @@ public class WBGeometry  implements Serializable
     protected boolean filled = false;
     
     @Persistent
-    protected int[] xPts;
+    protected float[] xPts;
     
     @Persistent
-    protected int[] yPts;
+    protected float[] yPts;
     
     @Persistent
     protected long cTime;
@@ -204,7 +197,7 @@ public class WBGeometry  implements Serializable
     /**
      * @return the xPts
      */
-    public int[] getxPts ()
+    public float[] getxPts()
     {
         return xPts;
     }
@@ -212,7 +205,7 @@ public class WBGeometry  implements Serializable
     /**
      * @param xPts the xPts to set
      */
-    public void setxPts (int[] xPts)
+    public void setxPts (float[] xPts)
     {
         this.xPts = xPts;
     }
@@ -220,7 +213,7 @@ public class WBGeometry  implements Serializable
     /**
      * @return the yPts
      */
-    public int[] getyPts ()
+    public float[] getyPts()
     {
         return yPts;
     }
@@ -228,7 +221,7 @@ public class WBGeometry  implements Serializable
     /**
      * @param yPts the yPts to set
      */
-    public void setyPts (int[] yPts)
+    public void setyPts (float[] yPts)
     {
         this.yPts = yPts;
     }

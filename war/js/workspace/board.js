@@ -1,5 +1,6 @@
 function Whiteboard(name, params) {
 	JXG.Options.renderer = 'canvas';
+    JXG.Options.text.useMathJax = true;
 	
 	this._name = name;
 	
@@ -22,6 +23,52 @@ Whiteboard.prototype.clear = function() {
 	JXG.JSXGraph.freeBoard(this._board);
 	this._board = JXG.JSXGraph.initBoard(this._name, this._params);
 }
+
+Whiteboard.prototype.createEquation = function(params) {
+    var data = '$'+dojox.html.entities.decode(params.data.value || params.data)+'$';
+    var equation = this._board.create('text', [params.x, params.y, function () { return data; }]);
+    return this._createElement(equation);
+}
+
+Whiteboard.prototype.createGraph = function(params) {
+    var board = this._board;
+    var data = dojox.html.entities.decode(params.data.value || params.data);
+    var points = GraphPreview.RenderGraph(data);
+    var factor = { x: 0.065, y: 0.1, degrees: 180, xOffset: 3/2, yOffset: 3/2 };
+    if (points.xValues.length === 2 ) {
+        factor.degrees = 90;
+        factor.xOffset = 3/2;
+        factor.yOffset = 3;
+    }
+    var graph = board.create('curve', [points.xValues, points.yValues], { handDrawing : false });
+    var rotationCenter = board.create('point', [factor.x*points.center.x,factor.y*points.center.y], {style:6, name:''});
+    var rotator = board.create('transform', [factor.degrees*Math.PI/180.0,rotationCenter], {type:'rotate'});
+    var scaller = board.create('transform', [factor.x,factor.y], {type:'scale'});
+    var mover = board.create('transform', [params.x/factor.xOffset,params.y/factor.yOffset], {type:'translate'});
+    // normalize a graph
+    scaller.bindTo(graph);
+    rotator.bindTo(graph);
+    mover.bindTo(graph);
+
+    board.removeObject(rotationCenter);
+
+    board.update();
+
+//    var graph = this._board.create('functiongraph', [function(x) {
+//        try {
+//            var formula = data.replace(/[xX]/g,'('+x+')');
+//            //console.debug('Formula:'+formula);
+//            return GraphPreview.mathProcessor.parse(formula);
+//        } catch(e) {
+//            //console.error(e);
+//            // TODO: Display the error message
+//            return 0;
+//        }
+//    }],{ strokeColor: '#ff0000' });
+
+    return this._createElement(graph);
+}
+
 
 Whiteboard.prototype.createImage = function(params) {
 	var image = this._board.create('image', [params.src, [params.x, params.y], [params.width, params.height]]);
@@ -75,10 +122,10 @@ Whiteboard.prototype.createPdf = function(params) {
 }
 
 Whiteboard.prototype.createLine = function(params) {
-	var line = this._board.create('curve', [[params.x1, params.y1], [params.x2, params.y2]], { handDrawing : true });
+   var line = this._board.create('curve', [[params.x1, params.x2], [params.y1, params.y2]], { handDrawing : false });
 	return this._createElement(line);
 }
- 
+
 Whiteboard.prototype.createText = function(params) {
 	var text = this._board.create('text', [params.x, params.y, params.text]);
 	return this._createElement(text);

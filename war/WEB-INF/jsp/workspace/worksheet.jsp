@@ -75,40 +75,40 @@
                 <button dojoType="dijit.form.Button" class="fillColorPaletteCancelBtn  ${worksheetId}">Cancel</button>
             </div>
         </div>
-        <select name="select" dojoType="dijit.form.Select" class="lineStrokeSelect">
-            <option value="1">Line Thicknes:  1</option>
-            <option value="2">Line Thicknes:  2</option>
-            <option value="3" selected="selected">Line Thicknes:  3</option>
-            <option value="4">Line Thicknes:  4</option>
-            <option value="5">Line Thicknes:  5</option>
-            <option value="6">Line Thicknes:  6</option>
-            <option value="7">Line Thicknes:  7</option>
-            <option value="8">Line Thicknes:  8</option>
-            <option value="9">Line Thicknes:  9</option>
-            <option value="10">Line Thicknes: 10</option>
-            <option value="15">Line Thicknes: 15</option>
-            <option value="20">Line Thicknes: 20</option>
-            <option value="30">Line Thicknes: 30</option>
-            <option value="50">Line Thicknes: 50</option>
-            <option value="75">Line Thicknes: 75</option>
-            <option value="100">Line Thicknes:100</option>
-        </select>
-        <select name="select" dojoType="dijit.form.Select" class="fontSizeSelect">
-            <option value="5">Font:  5pt</option>
-            <option value="6">Font:  6pt</option>
-            <option value="7">Font:  7pt</option>
-            <option value="8">Font:  8pt</option>
-            <option value="9">Font:  9pt</option>
-            <option value="10">Font: 10pt</option>
-            <option value="12" selected="selected">Font: 12pt</option>
-            <option value="14">Font: 14pt</option>
-            <option value="16">Font: 16pt</option>
-            <option value="20">Font: 20pt</option>
-            <option value="24">Font: 24pt</option>
-            <option value="32">Font: 32pt</option>
-            <option value="48">Font: 48pt</option>
-            <option value="64">Font: 64pt</option>
-        </select>
+        <%--<select dojoType="dijit.form.Select" class="lineStrokeSelect">--%>
+            <%--<option value="1">Line Thicknes:  1</option>--%>
+            <%--<option value="2">Line Thicknes:  2</option>--%>
+            <%--<option value="3" selected="selected">Line Thicknes:  3</option>--%>
+            <%--<option value="4">Line Thicknes:  4</option>--%>
+            <%--<option value="5">Line Thicknes:  5</option>--%>
+            <%--<option value="6">Line Thicknes:  6</option>--%>
+            <%--<option value="7">Line Thicknes:  7</option>--%>
+            <%--<option value="8">Line Thicknes:  8</option>--%>
+            <%--<option value="9">Line Thicknes:  9</option>--%>
+            <%--<option value="10">Line Thicknes: 10</option>--%>
+            <%--<option value="15">Line Thicknes: 15</option>--%>
+            <%--<option value="20">Line Thicknes: 20</option>--%>
+            <%--<option value="30">Line Thicknes: 30</option>--%>
+            <%--<option value="50">Line Thicknes: 50</option>--%>
+            <%--<option value="75">Line Thicknes: 75</option>--%>
+            <%--<option value="100">Line Thicknes:100</option>--%>
+        <%--</select>--%>
+        <%--<select dojoType="dijit.form.Select" class="fontSizeSelect">--%>
+            <%--<option value="5">Font:  5pt</option>--%>
+            <%--<option value="6">Font:  6pt</option>--%>
+            <%--<option value="7">Font:  7pt</option>--%>
+            <%--<option value="8">Font:  8pt</option>--%>
+            <%--<option value="9">Font:  9pt</option>--%>
+            <%--<option value="10">Font: 10pt</option>--%>
+            <%--<option value="12" selected="selected">Font: 12pt</option>--%>
+            <%--<option value="14">Font: 14pt</option>--%>
+            <%--<option value="16">Font: 16pt</option>--%>
+            <%--<option value="20">Font: 20pt</option>--%>
+            <%--<option value="24">Font: 24pt</option>--%>
+            <%--<option value="32">Font: 32pt</option>--%>
+            <%--<option value="48">Font: 48pt</option>--%>
+            <%--<option value="64">Font: 64pt</option>--%>
+        <%--</select>--%>
 
         <button id="exportImgBtn_${worksheetId}" dojoType="dijit.form.Button" class="exportImgBtn"><img src="/images/export-icon.png"></button>
         <div dojoType="dijit.Tooltip" connectId="exportImgBtn_${worksheetId}" position="below" showDelay="0">Export the drawing surface.</div>

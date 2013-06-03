@@ -208,6 +208,8 @@ Worksheet.prototype.drawFromJSON = function(geom,drawing,strong) {
                 if(geom.xPts.length > 1){
                     //console.log("num pen points drawing:",geom.xPts.length);
                     //shape = drawing.createGroup();
+//                    console.debug("Points");
+//                    console.dir(geom.xPts);
                     for(var i = 0; i < (geom.xPts.length - 1); i++){
                         var lineShape = drawing.createLine({x1: geom.xPts[i], y1: geom.yPts[i], x2: geom.xPts[i + 1], y2: geom.yPts[i + 1]});
                         //stroke.cap = 'round';
@@ -322,105 +324,112 @@ Worksheet.prototype.drawFromJSON = function(geom,drawing,strong) {
                 ry: (diameter)/2 });
 
         } else if (geom.shapeType === 'equation' && geom.data) {
-            var data = dojox.html.entities.decode(geom.data.value || geom.data);
-            window.URL = window.URL || window.webkitURL;
+            shape = drawing.createEquation({x: geom.xPts[0], y: geom.yPts[0], data: geom.data});
 
-            var div = dojo.create("div", {
-                innerHTML: ('$'+data+'$'),
-                //xmlns: "http://www.w3.org/1999/xhtml", // !!! hack for Chrome
-                style: "border: 1px dashed; width: 100%; height: 100%;"
-            });
-
-            MathJax.Hub.Queue(
-                ["Typeset",MathJax.Hub,div],
-                [function() { // call after rendering
-
-                    var xSize = geom.xPts;
-                    var ySize = geom.yPts;
-                    xSize[1]=(xSize[1])?(xSize[1]+60):500;
-                    ySize[1]=(ySize[1])?(ySize[1]+8):100;
-
-                    //var nobr = dojo.query("nobr",div)[0];
-                    //svg.xmlns="http://www.w3.org/2000/svg";
-                    //var svg_xml = (new XMLSerializer).serializeToString(svg);
-
-                    var svg_xml = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"'+
-                        ' color="'+geom.lineColor+'" width="'+xSize[1]+'" height="'+ySize[1]+'">'+
-                        '<foreignObject width="100%" height="100%">'+
-                        '<body xmlns="http://www.w3.org/1999/xhtml">'+
-                        (new XMLSerializer).serializeToString(div)+
-                        '</body>'+
-                        '</foreignObject>'+
-                        '</svg>';
-
-                    var blob = new Blob([svg_xml], {type: "image/svg+xml"});
-                    var href = window.URL.createObjectURL(blob);
-//                    var href = "data:image/svg+xml;base64,"+btoa(svg_xml); // svg_xml, mysvg
-//                    var href = "data:image/svg+xml,"+svg_xml; // svg_xml, mysvg
-
-                    // TODO: It's work fine
-                    try {
-                        //href = "data:image/svg+xml;base64,"+btoa(svg_xml); // svg_xml, mysvg
-
-                        // http://en.wikipedia.org/wiki/SVG#Native_support
-                        // https://developer.mozilla.org/en/DOM/window.btoa
-//                        var ctx = dojo.query('canvas',worksheet.getNode("whiteboardContainer"))[0].getContext('2d');
-//                        var img1 = new Image();
-//                        img1.onload = function() {
-//                            // after this, Canvas’ origin-clean is DIRTY
-//                            ctx.drawImage(this, xSize[0], ySize[0]);
-//                            console.log("");
-//                        };
-//                        img1.src = href;
-
-                        var img = new Image();
-                        img.type = "image/svg+xml";
-                        img.addEventListener("load", function(){
-
-                            var shape = drawing.createImage({
-                                x:xSize[0],
-                                y:ySize[0],
-                                width: xSize[1],
-                                height: ySize[1],
-                                src: href
-                            });
-                            window.URL.revokeObjectURL(href);
-                            if(shape){
-                                shape.cRand = geom.cRand;
-                                shape.cTime = geom.cTime;
-                                shape.wbbb = {
-                                    x1: xSize[0],
-                                    y1: ySize[0],
-                                    x2: xSize[0]+xSize[1],
-                                    y2: ySize[0]+ySize[1]
-                                };
-                                shape.fromUser = geom.fromUser;
-                            }
-                        });
-                        img.src = href;
-                    } catch(ex) {
-                        console.error(ex);
-                        console.trace();
-                    }
-                }]
-            );
+//            var data = dojox.html.entities.decode(geom.data.value || geom.data);
+//            window.URL = window.URL || window.webkitURL;
+//
+//            var div = dojo.create("div", {
+//                innerHTML: ('$'+data+'$'),
+//                //xmlns: "http://www.w3.org/1999/xhtml", // !!! hack for Chrome
+//                style: "border: 1px dashed; width: 100%; height: 100%;"
+//            });
+//
+//            MathJax.Hub.Queue(
+//                ["Typeset",MathJax.Hub,div],
+//                [function() { // call after rendering
+//
+//                    var xSize = geom.xPts;
+//                    var ySize = geom.yPts;
+//                    xSize[1]=(xSize[1])?(xSize[1]+60):500;
+//                    ySize[1]=(ySize[1])?(ySize[1]+8):100;
+//
+//                    //var nobr = dojo.query("nobr",div)[0];
+//                    //svg.xmlns="http://www.w3.org/2000/svg";
+//                    //var svg_xml = (new XMLSerializer).serializeToString(svg);
+//
+//                    var svg_xml = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"'+
+//                        ' color="'+geom.lineColor+'" width="'+xSize[1]+'" height="'+ySize[1]+'">'+
+//                        '<foreignObject width="100%" height="100%">'+
+//                        '<body xmlns="http://www.w3.org/1999/xhtml">'+
+//                        (new XMLSerializer).serializeToString(div)+
+//                        '</body>'+
+//                        '</foreignObject>'+
+//                        '</svg>';
+//
+//                    var blob = new Blob([svg_xml], {type: "image/svg+xml"});
+//                    var href = window.URL.createObjectURL(blob);
+////                    var href = "data:image/svg+xml;base64,"+btoa(svg_xml); // svg_xml, mysvg
+////                    var href = "data:image/svg+xml,"+svg_xml; // svg_xml, mysvg
+//
+//                    // TODO: It's work fine
+//                    try {
+//                        //href = "data:image/svg+xml;base64,"+btoa(svg_xml); // svg_xml, mysvg
+//
+//                        // http://en.wikipedia.org/wiki/SVG#Native_support
+//                        // https://developer.mozilla.org/en/DOM/window.btoa
+////                        var ctx = dojo.query('canvas',worksheet.getNode("whiteboardContainer"))[0].getContext('2d');
+////                        var img1 = new Image();
+////                        img1.onload = function() {
+////                            // after this, Canvas’ origin-clean is DIRTY
+////                            ctx.drawImage(this, xSize[0], ySize[0]);
+////                            console.log("");
+////                        };
+////                        img1.src = href;
+//
+//                        var img = new Image();
+//                        img.type = "image/svg+xml";
+//                        img.addEventListener("load", function(){
+//
+//                            var shape = drawing.createImage({
+//                                x:xSize[0],
+//                                y:ySize[0],
+//                                width: xSize[1],
+//                                height: ySize[1],
+//                                src: href
+//                            });
+//                            window.URL.revokeObjectURL(href);
+//                            if(shape){
+//                                shape.cRand = geom.cRand;
+//                                shape.cTime = geom.cTime;
+//                                shape.wbbb = {
+//                                    x1: xSize[0],
+//                                    y1: ySize[0],
+//                                    x2: xSize[0]+xSize[1],
+//                                    y2: ySize[0]+ySize[1]
+//                                };
+//                                shape.fromUser = geom.fromUser;
+//                            }
+//                        });
+//                        img.src = href;
+//                    } catch(ex) {
+//                        console.error(ex);
+//                        console.trace();
+//                    }
+//                }]
+//            );
         } else if(geom.shapeType === 'graph' && geom.data){
-            var data = dojox.html.entities.decode(geom.data.value || geom.data);
-            var scale = 3;
-            var location = { x: geom.xPts[0]*scale, y: geom.yPts[0]*scale };
-            var path = GraphPreview.RenderGraph(data);
-
+//            var data = dojox.html.entities.decode(geom.data.value || geom.data);
+//            var points = GraphPreview.RenderGraph(data);
+            shape = drawing.createGraph({x: geom.xPts[0], y: geom.yPts[0], data: geom.data});
+//            shape.setStroke({
+//                color: geom.lineColor,
+//                width: geom.lineStroke/(1/2)}
+//            );
+//            var data = dojox.html.entities.decode(geom.data.value || geom.data);
+//            var scale = 3;
+//            var location = { x: geom.xPts[0]*scale, y: geom.yPts[0]*scale };
+//            var path = GraphPreview.RenderGraph(data);
+//
             stroke = {
-                cap:"butt",
-                join:"round",
-                width: geom.lineStroke/(scale/2),
+                width: geom.lineStroke/4,
                 color: geom.lineColor
             };
-
-            shape = drawing.createPath(path);
-            shape.applyTransform(dojox.gfx.matrix.scale(1/scale,1/scale));
-            shape.applyTransform({ dx: location.x, dy: location.y });
-            shape.scale = scale;
+//
+//            shape = drawing.createPath(path);
+//            shape.applyTransform(dojox.gfx.matrix.scale(1/scale,1/scale));
+//            shape.applyTransform({ dx: location.x, dy: location.y });
+//            shape.scale = scale;
         }
 
         if(shape){
@@ -461,10 +470,12 @@ Worksheet.prototype.initGfx = function(){
     var worksheet = this;
     // private methods
     var getGfxMouse = function(evt){
-        var coordsM = dojo.coords(worksheet.container);
-        var coords = new JXG.Coords(JXG.COORDS_BY_SCREEN, [Math.round(evt.clientX - coordsM.x), Math.round(evt.clientY - coordsM.y)], worksheet.drawing._board); 
-  	    return coords ? { x : coords.usrCoords[1], y : coords.usrCoords[2] } : null;
-        //return {x: Math.round(evt.clientX - coordsM.x), y: Math.round(evt.clientY - coordsM.y)};
+        var coordsM = dojo.position(worksheet.container);//dojo.coords(worksheet.container);
+        //TODO: SXGraph
+        var coords = new JXG.Coords(JXG.COORDS_BY_SCREEN, [Math.round(evt.clientX - coordsM.x), Math.round(evt.clientY - coordsM.y)], worksheet.drawing._board);
+  	    //console.dir(coords);
+        return coords ? { x : coords.usrCoords[1], y : coords.usrCoords[2] } : null;
+//        return {x: Math.round(evt.clientX - coordsM.x), y: Math.round(evt.clientY - coordsM.y)};
     };
     var doGfxMouseDown = function(evt) {
         var pt = getGfxMouse(evt);
@@ -575,13 +586,13 @@ Worksheet.prototype.initGfx = function(){
     };
     var pointInDrawing = function(pt){
     	//TODO:  Look at the JSXGraph bounding box to decide.
-        return pt;
+//        return pt;
         
-        /*if((pt.x > -2) && (pt.x < (worksheet.width + 2)) && (pt.y > -2) && (pt.y < (worksheet.height + 2))){
+        if((pt.x > -2) && (pt.x < (worksheet.width + 2)) && (pt.y > -2) && (pt.y < (worksheet.height + 2))){
             return true;
         }else{
             return false;
-        }*/
+        }
     };
     var doGfxMouseUp = function(evt) {
         var pt = getGfxMouse(evt);
@@ -965,16 +976,22 @@ Worksheet.prototype.initGfx = function(){
     worksheet.overlayContainer = worksheet.getNode("whiteboardOverlayContainer");
     worksheet.overlayContainer.style.width = worksheet.width + 'px';
     worksheet.overlayContainer.style.height = worksheet.height + 'px';
-    
-    worksheet.drawing = new Whiteboard("whiteboardContainer_" + worksheet.id);//dojox.gfx.createSurface(worksheet.container, worksheet.width, worksheet.height);
-    worksheet.overlayDrawing = new Whiteboard("whiteboardOverlayContainer_" + worksheet.id, { hideNavigation : true });//dojox.gfx.createSurface(worksheet.overlayContainer, worksheet.width, worksheet.height);
+    // TODO: SXGraph
+    worksheet.drawing = new Whiteboard("whiteboardContainer_" + worksheet.id);
+//    worksheet.drawing = dojox.gfx.createSurface(worksheet.container, worksheet.width, worksheet.height);
+
+    worksheet.overlayDrawing = new Whiteboard("whiteboardOverlayContainer_" + worksheet.id, { hideNavigation : true });
+//    worksheet.overlayDrawing = dojox.gfx.createSurface(worksheet.overlayContainer, worksheet.width, worksheet.height);
+    worksheet.overlayContainer.style.position = 'absolute';
+    worksheet.overlayContainer.style.zIndex = 1;
 
     //for playback
     worksheet.movieContainer = dojo.byId("movieWhiteboardContainer");
     worksheet.movieContainer.style.width = worksheet.width + 'px';
     worksheet.movieContainer.style.height = worksheet.height + 'px';
 
-    worksheet.movieDrawing = new Whiteboard("movieWhiteboardContainer");//dojox.gfx.createSurface(worksheet.movieContainer, worksheet.width, worksheet.height);
+//    worksheet.movieDrawing = new Whiteboard("movieWhiteboardContainer");
+    worksheet.movieDrawing = dojox.gfx.createSurface(worksheet.movieContainer, worksheet.width, worksheet.height);
 
     //draw any saved objects
     dojo.forEach(worksheet.room.messageList, function(message){
@@ -986,13 +1003,7 @@ Worksheet.prototype.initGfx = function(){
         }
     });
 
-    
-
-
-    //worksheet.overlayContainer.style.position = 'absolute';
-    //worksheet.overlayContainer.style.zIndex = 1;
-
-    var c = dojo.coords(worksheet.container);
+    var c = dojo.getMarginBox(worksheet.container); //dojo.coords(worksheet.container);
     console.dir(c);
     dojo.style(worksheet.overlayContainer,"top", (c.t + 'px'));
     dojo.style(worksheet.overlayContainer,"left", (c.l + 'px'));
@@ -1040,8 +1051,8 @@ Worksheet.prototype.init = function(){
     var selectTool = function(toolName) {
         hide("lineColorDisplay");
         hide("fillColorDisplay");
-        hide("lineStrokeSelect");
-        hide("fontSizeSelect");
+//        hide("lineStrokeSelect");
+//        hide("fontSizeSelect");
 
         var tool = null;
         dojo.forEach(tools,function(aTool){
@@ -1063,12 +1074,12 @@ Worksheet.prototype.init = function(){
         if(tool.showFillColor){
             show("fillColorDisplay");
         }
-        if(tool.showLineThickness){
-            show("lineStrokeSelect");
-        }
-        if(tool.showFontSize){
-            show("fontSizeSelect");
-        }
+//        if(tool.showLineThickness){
+//            show("lineStrokeSelect");
+//        }
+//        if(tool.showFontSize){
+//            show("fontSizeSelect");
+//        }
     };
     var showMovie = function(){
         try{
@@ -1086,7 +1097,7 @@ Worksheet.prototype.init = function(){
             mSlider.setAttribute('maximum',worksheet.room.geomMessageList.length);
             mSlider.setAttribute('discreteValues',worksheet.room.geomMessageList.length);
 
-            mSlider.setValue(0);
+            mSlider.set('value',0);
         }catch(e){
             console.info("canvas not supported",e);
         }
@@ -1102,7 +1113,7 @@ Worksheet.prototype.init = function(){
         }
     };
     var doCancelAddText = function(){
-        dijit.byId('wbText').setValue('');
+        dijit.byId('wbText').set('value','');
         dijit.byId('textDialog').hide();
         //worksheet.overlayDrawing.clear();
         worksheet.textPoint = null;
@@ -1119,7 +1130,7 @@ Worksheet.prototype.init = function(){
         //worksheet.overlayDrawing.clear();
     };
     var doCancelEquationInput = function(){
-        //dijit.byId('MathInput').setValue('');
+        //dijit.byId('MathInput').set('value','');
         dijit.byId('equationDialog').hide();
         worksheet.overlayDrawing.clear();
         worksheet.textPoint = null;
@@ -1137,7 +1148,7 @@ Worksheet.prototype.init = function(){
         worksheet.overlayDrawing.clear();
     };
     var doCancelGraphInput = function(){
-        //dijit.byId('MathInput').setValue('');
+        //dijit.byId('MathInput').set('value','');
         dijit.byId('graphDialog').hide();
         worksheet.overlayDrawing.clear();
         worksheet.textPoint = null;
@@ -1249,12 +1260,12 @@ Worksheet.prototype.init = function(){
     dojo.connect(worksheet.getWidget('showMovieBtn'),'onClick',showMovie);
     dojo.connect(dijit.byId('movieSlider'),'onChange',incrementMovie);
     
-    dojo.connect(worksheet.getWidget('lineStrokeSelect'),'onChange',function(){
-        worksheet.lineStroke = Math.floor(1.0 * worksheet.getWidget('lineStrokeSelect').getValue());
-    });
-    dojo.connect(worksheet.getNode('fontSizeSelect'),'onChange',function(){
-        worksheet.fontSize = Math.floor(1.0 * worksheet.getWidget('fontSizeSelect').getValue());
-    });
+//    dojo.connect(worksheet.getWidget('lineStrokeSelect'),'onChange',function(){
+//        worksheet.lineStroke = Math.floor(1.0 * worksheet.getWidget('lineStrokeSelect').getValue());
+//    });
+//    dojo.connect(worksheet.getNode('fontSizeSelect'),'onChange',function(){
+//        worksheet.fontSize = Math.floor(1.0 * worksheet.getWidget('fontSizeSelect').getValue());
+//    });
     dojo.connect(worksheet.getDialogWidget('clearDrawingNoBtn'),'onClick',function(){
         dijit.popup.close(worksheet.getWidget("clearDrawingDialog"));
     });
@@ -1288,11 +1299,11 @@ Worksheet.prototype.init = function(){
     });
     dojo.connect(worksheet.getWidget("textDialog"), 'onClose', function(evt) {
         //worksheet.overlayDrawing.clear();
-        worksheet.getWidget("wbText").setValue('');
+        worksheet.getWidget("wbText").set('value','');
     });
     dojo.connect(worksheet.getWidget("textDialog"), 'onHide', function(evt) {
         //worksheet.overlayDrawing.clear();
-        worksheet.getWidget("wbText").setValue('');
+        worksheet.getWidget("wbText").set('value','');
     });
     dojo.connect(dijit.byId("okTextBtn"), 'onClick', function(evt) {
         doAddText();

@@ -29,7 +29,15 @@
  
   <!-- All JavaScript at the bottom, except for Modernizr which enables HTML5 elements & feature detects -->
   <script src="js/libs/modernizr-1.6.min.js"></script>
-  <script TYPE="text/javascript" src="http://ajax.googleapis.com/ajax/libs/dojo/1.6/dojo/dojo.xd.js" djConfig="parseOnLoad: true, baseUrl: '/js/', modulePaths:{azp:'azp'}, gfxRenderer:'canvas,svg,vml,silverlight'"></script>
+  <script TYPE="text/javascript" src="http://ajax.googleapis.com/ajax/libs/dojo/1.6/dojo/dojo.xd.js"
+          djConfig="
+            parseOnLoad: true,
+            isDebug: true,
+            baseUrl: '/js/',
+            modulePaths: {azp:'azp'},
+            gfxRenderer: 'canvas,svg,vml,silverlight'"
+          >
+  </script>
 
 
 <style type="text/css">
