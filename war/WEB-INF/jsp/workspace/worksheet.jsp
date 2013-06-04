@@ -57,6 +57,9 @@
         <button id="graphToolBtn_${worksheetId}" dojoType="dijit.form.Button" class="graphToolBtn"><img border="0" src="/images/chart_curve.png"></button>
         <div dojoType="dijit.Tooltip" connectId="graphToolBtn_${worksheetId}" position="above" showDelay="0">Graph Input</div>
 
+        <button id="visionobjectsToolBtn_${worksheetId}" dojoType="dijit.form.Button" class="visionobjectsToolBtn"><img border="0" src="/images/visionobjects.png" height="16" width="16"></button>
+        <div dojoType="dijit.Tooltip" connectId="visionobjectsToolBtn_${worksheetId}" position="above" showDelay="0">Vision Objects</div>
+
         <br>
 
         <div class="lineColorDisplay" style="background-color: #FFFFFF; border-color: black; border-width: 1px;" dojoType="dijit.form.DropDownButton">

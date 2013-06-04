@@ -14,6 +14,7 @@ var tools = [{name: 'line', showLineColor: true, showLineThickness: true}
             ,{name: 'circle', showLineColor: true, showLineThickness: true}
             ,{name: 'equation', showLineColor: true}
             ,{name: 'graph', showLineColor: true, showLineThickness: true}
+            ,{name: 'visionobjects', showLineColor: true, showLineThickness: true}
             ];
 
 // multiple instances
@@ -682,6 +683,10 @@ Worksheet.prototype.initGfx = function(){
                     dijit.byId('graphDialog').show();
                     dijit.byId('GraphInput').focus();
                     GraphPreview.Update();
+                }else if(worksheet.tool === 'visionobjects'){
+                    worksheet.textPoint = pt;
+                    dijit.byId('visionobjectsDialog').show();
+                    voInit();
                 }
                 //worksheet.points = [];
                 if(geom){

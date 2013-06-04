@@ -173,6 +173,25 @@ var workspace; // window scope
 
 <div id="graphBox" style="height: 520px; width: 520px;"></div>
 
+<div id="visionobjectsDialog" dojoType="dijit.Dialog" title="Type in some graph relation"  style="display: none; height: 520px; width: 520px">
+    <div class="dijitDialogPaneContentArea">
+        <img id="clear" src="/images/clear.png" />
+        <img id="undo" src="/images/undo_disabled.png" />
+        <img id="redo" src="/images/redo_disabled.png" /><br/>
+        <canvas id="voCanvas" style="width:500px; height: 400px; border: 1px solid black; background-color: #FFFFBF;"> </canvas>
+        <br/>
+        <img id="loading" src="/images/loading.gif" />
+        <p id="result"></p>
+
+        <script type="application/javascript" src="/js/workspace/jquery-1.7.2.js"></script>
+        <script type="application/javascript" src="/js/workspace/paintShapes.js"></script>
+        <script type="application/javascript" src="/js/workspace/myScriptMethods.js"></script>
+    </div>
+    <div class="dijitDialogPaneActionBar">
+        <button dojoType="dijit.form.Button" id="okVisionobjectsBtn">OK</button>&nbsp;&nbsp;&nbsp;<button dojoType="dijit.form.Button" id="cancelVisionobjectsBtn">Cancel</button>
+    </div>
+</div>
+
 <div id="movieDialog" dojoType="dijit.Dialog" title="Move slider to see drawing steps."  style="display: none">
     <div id="movieWhiteboardContainer" style="border: 2px blue solid; background-color: white;"></div><br>
     <div id="movieSlider" dojoType="dijit.form.HorizontalSlider" value="0"
