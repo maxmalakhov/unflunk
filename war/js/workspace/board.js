@@ -8,11 +8,20 @@ function Whiteboard(name, params) {
 	params.axis = params.axis || false;
 	params.showCopyright = params.showCopyright || false;
 	params.boundingbox = params.boundingbox || [0, 70, 70, 0];
+    params.keepaspectratio = params.keepaspectratio || true;
 	params.showNavigation = !(params.hideNavigation || false);
 	
 	this._params = params;
 	this._board = JXG.JSXGraph.initBoard(this._name, params);
 	this.children = new Array();
+}
+
+Whiteboard.prototype.initEvents = function(events) {
+    if(events) {
+        for(var i= 0; i < events.length; i++) {
+            this._board.on(events[i].name, events[i].func);
+        }
+    }
 }
 
 Whiteboard.prototype.showNavigation = function(show) {
@@ -37,8 +46,6 @@ Whiteboard.prototype.createGraph = function(params) {
     var factor = { x: 0.065, y: 0.1, degrees: 180, xOffset: 3/2, yOffset: 3/2 };
     if (points.xValues.length === 2 ) {
         factor.degrees = 90;
-        factor.xOffset = 3/2;
-        factor.yOffset = 3;
     }
     var graph = board.create('curve', [points.xValues, points.yValues], { handDrawing : false });
     var rotationCenter = board.create('point', [factor.x*points.center.x,factor.y*points.center.y], {style:6, name:''});
@@ -122,7 +129,9 @@ Whiteboard.prototype.createPdf = function(params) {
 }
 
 Whiteboard.prototype.createLine = function(params) {
-   var line = this._board.create('curve', [[params.x1, params.x2], [params.y1, params.y2]], { handDrawing : false });
+    var stroke = params.stroke || {};
+    stroke.handDrawing = false;
+    var line = this._board.create('curve', [[params.x1, params.x2], [params.y1, params.y2]], stroke);
 	return this._createElement(line);
 }
 

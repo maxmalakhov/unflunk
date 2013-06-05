@@ -423,7 +423,7 @@ Worksheet.prototype.drawFromJSON = function(geom,drawing,strong) {
 //            var path = GraphPreview.RenderGraph(data);
 //
             stroke = {
-                width: geom.lineStroke/4,
+                width: geom.lineStroke*0.25,
                 color: geom.lineColor
             };
 //
@@ -493,6 +493,7 @@ Worksheet.prototype.initGfx = function(){
         var pt = getGfxMouse(evt);
         var geom = false;
         var shape = false;
+        var board = worksheet.overlayDrawing;
 
         if(worksheet.mouseDown){
             if((worksheet.tool === 'pen') && pointInDrawing(pt) && !worksheet.selectedShape ){
@@ -507,82 +508,69 @@ Worksheet.prototype.initGfx = function(){
                                 x2: worksheet.points[worksheet.points.length - 1].x,
                                 y2: worksheet.points[worksheet.points.length - 1].y }
                         );
-                        worksheet.drawFromJSON(geom,worksheet.overlayDrawing);
                     }
                 }
             }else{
                 var bounds = {x1:worksheet.mouseDownPt.x, y1:worksheet.mouseDownPt.y, x2: pt.x, y2: pt.y};
                 if(worksheet.tool !== 'pen'){
-                    worksheet.overlayDrawing.clear();
+                    board.clear();
                 }
                 if(worksheet.tool === 'rect' && !worksheet.selectedShape ){
                     geom  = createRectJSON(bounds,false);
-                    worksheet.drawFromJSON(geom,worksheet.overlayDrawing);
                 }else if(worksheet.tool === 'filledRect' && !worksheet.selectedShape ){
                     geom  = createRectJSON(bounds,true);
-                    worksheet.drawFromJSON(geom,worksheet.overlayDrawing);
                 }else if(worksheet.tool === 'ellipse' && !worksheet.selectedShape ){
                     geom  = createEllipseJSON(bounds,false);
-                    worksheet.drawFromJSON(geom,worksheet.overlayDrawing);
                 }else if(worksheet.tool === 'filledEllipse' && !worksheet.selectedShape ){
                     geom  = createEllipseJSON(bounds,true);
-                    worksheet.drawFromJSON(geom,worksheet.overlayDrawing);
                 }else if(worksheet.tool === 'line' && !worksheet.selectedShape ){
                     geom  = createLineJSON(bounds);
-                    worksheet.drawFromJSON(geom,worksheet.overlayDrawing);
                 }else if(worksheet.tool === 'move'){
                     if(worksheet.selectedShape && worksheet.mouseDownPt){
                         geom = createMoveOverlayJSON(worksheet.selectedShape.wbbb);
-                        worksheet.drawFromJSON(geom,worksheet.overlayDrawing);
+
                         var offBB = createOffsetBB(worksheet.selectedShape.wbbb,worksheet.mouseDownPt,pt);
                         //console.dir(offBB);
                         var geom2 = createMoveOverlayJSON(offBB);
 
-                        worksheet.drawFromJSON(geom2,worksheet.overlayDrawing);
+                        worksheet.drawFromJSON(geom2,board);
                     }
                 }else if(worksheet.tool === 'triangle' && !worksheet.selectedShape ){
                     geom  = createTriangleJSON(bounds,false);
-                    worksheet.drawFromJSON(geom,worksheet.overlayDrawing);
                 }else if(worksheet.tool === 'quadrangle' && !worksheet.selectedShape ){
                     geom  = createQuadrangleJSON(bounds,false);
-                    worksheet.drawFromJSON(geom,worksheet.overlayDrawing);
                 }else if(worksheet.tool === 'circle' && !worksheet.selectedShape ){
                     geom  = createCircleJSON(bounds,false);
-                    worksheet.drawFromJSON(geom,worksheet.overlayDrawing);
                 }
             }
         } else {
             if(worksheet.tool === 'move'){
-                //worksheet.overlayDrawing.clear();
                 shape = getHoveredShape(worksheet.drawing,pt);
                 if(shape){
                     geom = createMoveOverlayJSON(shape.wbbb);
-                    worksheet.drawFromJSON(geom,worksheet.overlayDrawing);
                 }
             }
         }
         //mouse up or down doesn't matter for the select and delete tools
         if(worksheet.tool === 'delete'){
-            //worksheet.overlayDrawing.clear();
             shape = getHoveredShape(worksheet.drawing,pt);
             if(shape){
                 geom = createDeleteOverlayJSON(shape.wbbb);
-                worksheet.drawFromJSON(geom,worksheet.overlayDrawing);
             }
         }else if(worksheet.tool === 'moveUp'){
-            //worksheet.overlayDrawing.clear();
             shape = getHoveredShape(worksheet.drawing,pt);
             if(shape){
                 geom = createMoveUpOverlayJSON(shape.wbbb);
-                worksheet.drawFromJSON(geom,worksheet.overlayDrawing);
             }
         }else if(worksheet.tool === 'moveDown'){
-            //worksheet.overlayDrawing.clear();
             shape = getHoveredShape(worksheet.drawing,pt);
             if(shape){
                 geom = createMoveDownOverlayJSON(shape.wbbb);
-                worksheet.drawFromJSON(geom,worksheet.overlayDrawing);
             }
+        }
+        // draw geom
+        if(geom) {
+            worksheet.drawFromJSON(geom,board);
         }
     };
     var pointInDrawing = function(pt){
@@ -599,6 +587,9 @@ Worksheet.prototype.initGfx = function(){
         var pt = getGfxMouse(evt);
         worksheet.mouseDown = false;
         //console.dir(pt);
+        var geom = false;
+        var shape = false;
+        var board = worksheet.drawing;
 
         //always clear the overlay
         //worksheet.overlayDrawing.clear();
@@ -610,56 +601,39 @@ Worksheet.prototype.initGfx = function(){
 
                 var bounds = {x1:worksheet.mouseDownPt.x, y1:worksheet.mouseDownPt.y, x2: pt.x, y2: pt.y};
                 //worksheet.mouseDownPt = null;
-
-                var geom = null;
-                var shape = false;
                 if(worksheet.tool === 'rect'){
                     geom  = createRectJSON(bounds,false);
-                    worksheet.drawFromJSON(geom,worksheet.drawing);
                 }else if(worksheet.tool === 'filledRect'){
                     geom  = createRectJSON(bounds,true);
-                    worksheet.drawFromJSON(geom,worksheet.drawing);
                 }else if(worksheet.tool === 'ellipse'){
                     geom  = createEllipseJSON(bounds,false);
-                    worksheet.drawFromJSON(geom,worksheet.drawing);
                 }else if(worksheet.tool === 'filledEllipse'){
                     geom  = createEllipseJSON(bounds,true);
-                    worksheet.drawFromJSON(geom,worksheet.drawing);
                 }else if(worksheet.tool === 'line'){
                     geom  = createLineJSON(bounds);
-                    worksheet.drawFromJSON(geom,worksheet.drawing);
                 }else if(worksheet.tool === 'pen'){
                     geom = createPenJSON(worksheet.points);
-                    worksheet.drawFromJSON(geom,worksheet.drawing);
                     console.log("num pen points sending:",geom.xPts.length);
                 }else if(worksheet.tool === 'delete'){
                     shape = getHoveredShape(worksheet.drawing,pt);
                     if(shape){
                         geom = createDeleteJSON(shape);
-                        worksheet.drawFromJSON(geom,worksheet.drawing);
                     }
                 }else if(worksheet.tool === 'move'){
                     //console.log(worksheet.selectedShape,worksheet.mouseDownPt,bounds);
-                    if(worksheet.selectedShape && worksheet.mouseDownPt)
-                    {
+                    if(worksheet.selectedShape && worksheet.mouseDownPt) {
                         var ptDelta = {x: (pt.x - worksheet.mouseDownPt.x),y: (pt.y - worksheet.mouseDownPt.y)};
-
                         geom = createMoveJSON(worksheet.selectedShape, ptDelta);
-
-                        worksheet.drawFromJSON(geom,worksheet.drawing);
-                        //console.dir(geom);
                     }
                 }else if(worksheet.tool === 'moveUp'){
                     shape = getHoveredShape(worksheet.drawing,pt);
                     if(shape){
                         geom = createMoveUpJSON(shape);
-                        worksheet.drawFromJSON(geom,worksheet.drawing);
                     }
                 }else if(worksheet.tool === 'moveDown'){
                     shape = getHoveredShape(worksheet.drawing,pt);
                     if(shape){
                         geom = createMoveDownJSON(shape);
-                        worksheet.drawFromJSON(geom,worksheet.drawing);
                     }
                 }else if(worksheet.tool === 'text'){
                     worksheet.textPoint = pt;
@@ -667,13 +641,10 @@ Worksheet.prototype.initGfx = function(){
                     dijit.byId('wbText').focus();
                 }else if(worksheet.tool === 'triangle'){
                     geom  = createTriangleJSON(bounds,false);
-                    worksheet.drawFromJSON(geom,worksheet.drawing);
                 }else if(worksheet.tool === 'quadrangle'){
                     geom  = createQuadrangleJSON(bounds,false);
-                    worksheet.drawFromJSON(geom,worksheet.drawing);
                 }else if(worksheet.tool === 'circle'){
                     geom  = createCircleJSON(bounds,false);
-                    worksheet.drawFromJSON(geom,worksheet.drawing);
                 }else if(worksheet.tool === 'equation'){
                     worksheet.textPoint = pt;
                     dijit.byId('equationDialog').show();
@@ -686,7 +657,7 @@ Worksheet.prototype.initGfx = function(){
                 }else if(worksheet.tool === 'visionobjects'){
                     worksheet.textPoint = pt;
                     dijit.byId('visionobjectsDialog').show();
-                    voInit();
+                    visionObjects.init();
                 }
                 //worksheet.points = [];
                 if(geom){
@@ -696,6 +667,11 @@ Worksheet.prototype.initGfx = function(){
                 worksheet.mouseDownPt = null;
                 console.log("mouse released outside of drawing area");
             }
+        }
+
+        // draw geom
+        if(geom) {
+             worksheet.drawFromJSON(geom,board); //TODO Disable when Single board
         }
         //clear everything
         worksheet.mouseDownPt = null;
@@ -981,14 +957,14 @@ Worksheet.prototype.initGfx = function(){
     worksheet.overlayContainer = worksheet.getNode("whiteboardOverlayContainer");
     worksheet.overlayContainer.style.width = worksheet.width + 'px';
     worksheet.overlayContainer.style.height = worksheet.height + 'px';
-    // TODO: SXGraph
-    worksheet.drawing = new Whiteboard("whiteboardContainer_" + worksheet.id);
-//    worksheet.drawing = dojox.gfx.createSurface(worksheet.container, worksheet.width, worksheet.height);
-
-    worksheet.overlayDrawing = new Whiteboard("whiteboardOverlayContainer_" + worksheet.id, { hideNavigation : true });
-//    worksheet.overlayDrawing = dojox.gfx.createSurface(worksheet.overlayContainer, worksheet.width, worksheet.height);
     worksheet.overlayContainer.style.position = 'absolute';
     worksheet.overlayContainer.style.zIndex = 1;
+    // TODO: SXGraph
+    worksheet.drawing = new Whiteboard("whiteboardContainer_" + worksheet.id, {boundingbox:[0,100,100,0]});
+//    worksheet.drawing = dojox.gfx.createSurface(worksheet.container, worksheet.width, worksheet.height);
+
+    worksheet.overlayDrawing = new Whiteboard("whiteboardOverlayContainer_" + worksheet.id,  {boundingbox:[0,100,100,0], axis:true, hideNavigation : true });
+//    worksheet.overlayDrawing = dojox.gfx.createSurface(worksheet.overlayContainer, worksheet.width, worksheet.height);
 
     //for playback
     worksheet.movieContainer = dojo.byId("movieWhiteboardContainer");
@@ -1021,7 +997,7 @@ Worksheet.prototype.initGfx = function(){
 
     if(Modernizr.draganddrop){
         console.log('supports drag and drop!');
-        var dndc = new DNDFileController(worksheet.getNode('whiteboardOverlayContainer'));
+        //var dndc = new DNDFileController(worksheet.getNode('whiteboardOverlayContainer'));
     }
 };
 Worksheet.prototype.init = function(){
@@ -1120,7 +1096,6 @@ Worksheet.prototype.init = function(){
     var doCancelAddText = function(){
         dijit.byId('wbText').set('value','');
         dijit.byId('textDialog').hide();
-        //worksheet.overlayDrawing.clear();
         worksheet.textPoint = null;
     };
     var doAddText = function(){
@@ -1132,12 +1107,10 @@ Worksheet.prototype.init = function(){
             worksheet.textPoint = null;
             worksheet.sendMessage({geometry:geom});
         }
-        //worksheet.overlayDrawing.clear();
     };
     var doCancelEquationInput = function(){
         //dijit.byId('MathInput').set('value','');
         dijit.byId('equationDialog').hide();
-        worksheet.overlayDrawing.clear();
         worksheet.textPoint = null;
     };
     var doEquationInput = function(){
@@ -1150,12 +1123,10 @@ Worksheet.prototype.init = function(){
             worksheet.sendMessage({geometry:geom});
             dijit.byId('equationDialog').hide();
         }
-        worksheet.overlayDrawing.clear();
     };
     var doCancelGraphInput = function(){
-        //dijit.byId('MathInput').set('value','');
         dijit.byId('graphDialog').hide();
-        worksheet.overlayDrawing.clear();
+        //worksheet.overlayDrawing.clear();
         worksheet.textPoint = null;
     };
     var doGraphInput = function(){
@@ -1168,7 +1139,25 @@ Worksheet.prototype.init = function(){
             worksheet.sendMessage({geometry:geom});
             dijit.byId('graphDialog').hide();
         }
-        worksheet.overlayDrawing.clear();
+    };
+    var doCancelVisionObjectInput = function(){
+        dijit.byId('visionobjectsDialog').hide();
+        worksheet.textPoint = null;
+        visionObjects.clear();
+    };
+    var doVisionObjectInput = function(){
+        dijit.byId('visionobjectsDialog').hide();
+        var shapes = visionObjects.getShapes();
+        var i
+        for(i=0; i < shapes.length; i++) {
+            console.dir(shapes[i]);
+            var geom = createVOPenJSON(worksheet.textPoint, shapes[i]);
+
+            worksheet.drawFromJSON(geom,worksheet.drawing, true);
+            worksheet.sendMessage({geometry:geom});
+        }
+        worksheet.textPoint = null;
+        visionObjects.clear();
     };
 
     var doIncrementalText = function(){
@@ -1238,7 +1227,25 @@ Worksheet.prototype.init = function(){
 
         return worksheet.addTimeRand(geom);
     };
-    
+    var createVOPenJSON = function(pt,shape){
+        var xPts= [], yPts = [];
+//        var offset = {
+//            x: ((shape.max.x-shape.min.x+pt.x > 100)?100-shape.max.x-shape.min.x:pt.x),
+//            y: ((shape.max.y-shape.min.y+pt.y > 100)?100-shape.max.y-shape.min.y:pt.y)
+//        };
+        for(var i=0; i < shape.xPts.length && i < shape.yPts.length; i++) {
+            xPts.push(shape.xPts[i]+pt.x-shape.min.x);
+            yPts.push(shape.yPts[i]+pt.y-shape.min.y);
+        }
+        var geom = {shapeType: 'pen',
+            fillColor: worksheet.fillColor,
+            lineColor: worksheet.lineColor,
+            lineStroke: worksheet.lineStroke,
+            xPts: xPts,
+            yPts: yPts
+        };
+        return worksheet.addTimeRand(geom);
+    };
 
     // method body
     // binding events
@@ -1324,6 +1331,12 @@ Worksheet.prototype.init = function(){
     });
     dojo.connect(dijit.byId("cancelGraphBtn"), 'onClick', function(evt) {
         doCancelGraphInput();
+    });
+    dojo.connect(dijit.byId("cancelVisionobjectsBtn"), 'onClick', function(evt) {
+        doCancelVisionObjectInput();
+    });
+    dojo.connect(dijit.byId("okVisionobjectsBtn"), 'onClick', function(evt) {
+        doVisionObjectInput();
     });
 
     try{

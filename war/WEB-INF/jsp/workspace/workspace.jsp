@@ -175,16 +175,12 @@ var workspace; // window scope
 
 <div id="visionobjectsDialog" dojoType="dijit.Dialog" title="Type in some graph relation"  style="display: none; height: 520px; width: 520px">
     <div class="dijitDialogPaneContentArea">
-        <img id="clear" src="/images/clear.png" />
-        <img id="undo" src="/images/undo_disabled.png" />
-        <img id="redo" src="/images/redo_disabled.png" /><br/>
-        <canvas id="voCanvas" style="width:500px; height: 400px; border: 1px solid black; background-color: #FFFFBF;"> </canvas>
+        <div id="voCanvas" style="margin-left: 30px; height: 430px; width: 430px; border: 1px solid black; background-color: #FFFFBF;"></div>
         <br/>
         <img id="loading" src="/images/loading.gif" />
         <p id="result"></p>
 
         <script type="application/javascript" src="/js/workspace/jquery-1.7.2.js"></script>
-        <script type="application/javascript" src="/js/workspace/paintShapes.js"></script>
         <script type="application/javascript" src="/js/workspace/myScriptMethods.js"></script>
     </div>
     <div class="dijitDialogPaneActionBar">
