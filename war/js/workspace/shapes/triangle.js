@@ -1,4 +1,5 @@
 	function Triangle(board, p1, p2, p3) {
+        var points = [];
 		this._p1 = p1 || [50.0, 50.0];
 		this._p2 = p2 || [200.0, 50.0];
 		this._p3 = p3 || [200.0, 250.0];
@@ -8,21 +9,24 @@
 		this._p1 = board.create('point', this._p1,
 				  { name : function() {
 					  return JXG.Math.Geometry.trueAngle(triangle._p2, triangle._p1, triangle._p3).toFixed(2) + "&deg;";
-				  } 
+				  },size:0.5
 			  });
 		this._p2 = board.create('point', this._p2,
 				  { name : function() {
 					  return JXG.Math.Geometry.trueAngle(triangle._p3, triangle._p2, triangle._p1).toFixed(2) + "&deg;";
-				  } 
+                  },size:0.5
 			  });
 		this._p3 = board.create('point', this._p3,
 				    { name : function() {
 					  	return JXG.Math.Geometry.trueAngle(triangle._p1, triangle._p3, triangle._p2).toFixed(2) + "&deg;";
-				    }
+                    },size:0.5
 				});
-	 
 
 		this._polygon = board.create('polygon', [this._p1, this._p2, this._p3], { hasInnerPoints : true });
+        points.push(this._p1);
+        points.push(this._p2);
+        points.push(this._p3);
+        this._polygon.points = points;
 		
 		this._midpoint1 = board.create('midpoint', [this._p1, this._p2],
 				  { size: 0, name : function() { 
@@ -43,6 +47,8 @@
 		this.addSnapEvent(this._p1, this._p2, this._p3);
 		this.addSnapEvent(this._p3, this._p1, this._p2);
 		this.addSnapEvent(this._p2, this._p3, this._p1);
+
+        return this._polygon;
 	}
 	
 

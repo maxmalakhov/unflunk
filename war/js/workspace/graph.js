@@ -7,7 +7,7 @@
  */
 
 var GraphPreview = {
-    delay: 150,        // delay after keystroke before updating
+    sleep: 150,        // delay after keystroke before updating
 
     preview: null,     // filled in by Init below
     buffer: null,      // filled in by Init below
@@ -55,7 +55,7 @@ var GraphPreview = {
         if (this.timeout) {
             clearTimeout(this.timeout);
         }
-        this.timeout = setTimeout(this.CreatePreview(this),this.delay);
+        this.timeout = setTimeout(this.CreatePreview(this),this.sleep);
     },
 
     //

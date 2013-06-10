@@ -2,10 +2,13 @@
 <!-- Draw Area -->
     draw:
     <div style="position: relative">
-        <div class="whiteboardContainer" id="whiteboardContainer_${worksheetId}" style="border: 2px blue solid; background-color: white; z-index: 1; background: transparent"></div>
-        <div class="whiteboardOverlayContainer" id="whiteboardOverlayContainer_${worksheetId}" style="border: 2px black solid; background: transparent"></div>
+        <div class="whiteboardContainer" id="whiteboardContainer_${worksheetId}" style="border: 1px #B5BCC7 solid; background-color: white; z-index: 1; background: transparent"></div>
+        <%--<div class="whiteboardOverlayContainer" id="whiteboardOverlayContainer_${worksheetId}" style="border: 1px indianred solid; background: transparent"></div>--%>
     </div>
     <form onsubmit="return false" dojoType="dijit.form.Form" class="toolForm">
+
+        <button id="handToolBtn_${worksheetId}" dojoType="dijit.form.Button" class="handToolBtn"><img border="0" src="/images/hand-point.png"></button>
+        <div dojoType="dijit.Tooltip" connectId="handToolBtn_${worksheetId}" position="above" showDelay="0">Hand</div>
 
         <button id="penToolBtn_${worksheetId}" dojoType="dijit.form.Button" class="penToolBtn"><img border="0" src="/images/pencil.png"></button>
         <div dojoType="dijit.Tooltip" connectId="penToolBtn_${worksheetId}" position="above" showDelay="0">Pencil<br>(freehand drawing)</div>

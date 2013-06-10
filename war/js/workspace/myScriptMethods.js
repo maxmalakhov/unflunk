@@ -80,7 +80,7 @@ var visionObjects = new function() {
         };
         this.move = function(pts) {
             if (drawing) {
-                board.createLine({
+                board.createPenLine({
                     x1:lastX, y1:lastY,
                     x2:pts.x, y2:pts.y,
                     stroke: { strokeColor:'blue', strokeWidth:2 }

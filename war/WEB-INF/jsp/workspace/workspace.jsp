@@ -56,7 +56,7 @@ var workspace; // window scope
 
 <script src="/js/libs/pdf.js"></script>
 <script src="/js/libs/compatibility.js"></script>
-<script src="/js/libs/jsxgraphsrc.js"></script>
+<%--<script src="/js/libs/jsxgraphsrc.js"></script>--%>
 
 <%--<script src="/js/azp/WBCommon.js"></script>--%>
 <script src="/js/workspace/worksheet.js"></script>
@@ -85,7 +85,8 @@ var workspace; // window scope
 
 <%-- JSXGraph, http://jsxgraph.uni-bayreuth.de --%>
 <link rel="stylesheet" type="text/css" href="http://jsxgraph.uni-bayreuth.de/distrib/jsxgraph.css" />
-<!-- <script type="text/javascript" src="http://jsxgraph.uni-bayreuth.de/distrib/jsxgraphcore.js"></script> -->
+<%--<script type="text/javascript" src="http://jsxgraph.uni-bayreuth.de/distrib/jsxgraphcore.js"></script>--%>
+<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/jsxgraph/0.96/jsxgraphcore.js"></script>
 <script type="text/javascript" src="/js/workspace/graph.js"></script>
 <script type="text/javascript" src="/js/workspace/function.js"></script>
 <script type="text/javascript" src="/js/workspace/math-processor.js"></script>
