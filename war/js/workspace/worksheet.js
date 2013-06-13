@@ -508,14 +508,7 @@ Worksheet.prototype.initGfx = function(){
         }
     };
     var pointInDrawing = function(pt){
-        //TODO:  Look at the JSXGraph bounding box to decide.
-//        return pt;
-        
-        if((pt.x > -2) && (pt.x < (worksheet.width + 2)) && (pt.y > -2) && (pt.y < (worksheet.height + 2))){
-            return true;
-        }else{
-            return false;
-        }
+        return pt;
     };
     var doGfxMouseUp = function(evt) {
         if (worksheet.tool === 'hand') {
