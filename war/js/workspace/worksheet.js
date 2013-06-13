@@ -195,13 +195,6 @@ Worksheet.prototype.drawFromJSON = function(geom,drawing,strong) {
             shape = drawing.createText({ x:geom.xPts[0], y:geom.yPts[0] + geom.lineStroke, text:geom.text});
             shape.setFont({ size:(geom.lineStroke + "pt"), weight:"normal", family:"Arial" });
             shape.setFill(geom.lineColor);
-            var width = shape.getTextWidth(geom.text);
-            shape.wbbb = {
-                x1: geom.xPts[0],
-                y1: geom.yPts[0],
-                x2: (geom.xPts[0] + width),
-                y2: geom.yPts[0] + geom.lineStroke
-            };
         } else if(geom.shapeType === 'ellipse'){
             shape = drawing.createEllipse({cx: ((geom.xPts[1] - geom.xPts[0])/2) + geom.xPts[0],
                 cy: ((geom.yPts[1] - geom.yPts[0])/2) + geom.yPts[0],
