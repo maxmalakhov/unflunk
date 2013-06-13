@@ -29,8 +29,10 @@ Whiteboard.prototype.showNavigation = function(show) {
 };
 
 Whiteboard.prototype.clear = function() {
+    var viewBox = this._board.getBoundingBox();
     JXG.JSXGraph.freeBoard(this._board);
     this._board = JXG.JSXGraph.initBoard(this._name, this._params);
+    this._board.setBoundingBox(viewBox);
 };
 
 Whiteboard.prototype.remove = function(shape) {
