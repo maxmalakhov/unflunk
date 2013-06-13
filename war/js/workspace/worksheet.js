@@ -36,7 +36,7 @@ function Worksheet(id, room) {
     this.tool = 'pen';
     this.points = [];
     this.mouseDown = false;
-    this.shape = false;
+    this.overlayShape = false;
 
 }
 // Entity methods
@@ -184,21 +184,12 @@ Worksheet.prototype.drawFromJSON = function(geom,drawing,strong) {
                     console.trace();
                 }
             }
-        } else if(geom.shapeType == 'pdf'){
+        } else if(geom.shapeType === 'pdf'){
             shape = drawing.createPdf({src:geom.text, x:geom.xPts[0], y:geom.yPts[0]});
-        } else if ( geom.shapeType == 'video' ) {
+        } else if ( geom.shapeType === 'video' ) {
             shape = drawing.createVideo({src:geom.text, x:geom.xPts[0], y:geom.yPts[0]});
         } else if(geom.shapeType === 'line') {
-            shape = drawing.createLine(geom.xPts, geom.yPts,
-                function(newXPts,newYPts) {
-                    console.debug("send a message by the moving and resizing");
-                    var newGeom = dojo.clone(geom);
-                    newGeom.shapeType = 'update';
-                    newGeom.xPts = newXPts;
-                    newGeom.yPts = newYPts;
-                    worksheet.sendMessage({geometry:newGeom});
-                }
-            );
+            shape = drawing.createLine(geom.xPts, geom.yPts);
             stroke.cap = 'round';
         } else if(geom.shapeType === 'text'){
             shape = drawing.createText({ x:geom.xPts[0], y:geom.yPts[0] + geom.lineStroke, text:geom.text});
@@ -221,8 +212,6 @@ Worksheet.prototype.drawFromJSON = function(geom,drawing,strong) {
                 if(geom.xPts.length > 1){
                     //console.log("num pen points drawing:",geom.xPts.length);
                     //shape = drawing.createGroup();
-//                    console.debug("Points");
-//                    console.dir(geom.xPts);
                     for(var i = 0; i < (geom.xPts.length - 1); i++){
                         var lineShape = drawing.createPenLine({x1: geom.xPts[i], y1: geom.yPts[i], x2: geom.xPts[i + 1], y2: geom.yPts[i + 1]});
                         //stroke.cap = 'round';
@@ -335,89 +324,6 @@ Worksheet.prototype.drawFromJSON = function(geom,drawing,strong) {
 
         } else if (geom.shapeType === 'equation' && geom.data) {
             shape = drawing.createEquation({x: geom.xPts[0], y: geom.yPts[0], data: geom.data});
-
-//            var data = dojox.html.entities.decode(geom.data.value || geom.data);
-//            window.URL = window.URL || window.webkitURL;
-//
-//            var div = dojo.create("div", {
-//                innerHTML: ('$'+data+'$'),
-//                //xmlns: "http://www.w3.org/1999/xhtml", // !!! hack for Chrome
-//                style: "border: 1px dashed; width: 100%; height: 100%;"
-//            });
-//
-//            MathJax.Hub.Queue(
-//                ["Typeset",MathJax.Hub,div],
-//                [function() { // call after rendering
-//
-//                    var xSize = geom.xPts;
-//                    var ySize = geom.yPts;
-//                    xSize[1]=(xSize[1])?(xSize[1]+60):500;
-//                    ySize[1]=(ySize[1])?(ySize[1]+8):100;
-//
-//                    //var nobr = dojo.query("nobr",div)[0];
-//                    //svg.xmlns="http://www.w3.org/2000/svg";
-//                    //var svg_xml = (new XMLSerializer).serializeToString(svg);
-//
-//                    var svg_xml = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"'+
-//                        ' color="'+geom.lineColor+'" width="'+xSize[1]+'" height="'+ySize[1]+'">'+
-//                        '<foreignObject width="100%" height="100%">'+
-//                        '<body xmlns="http://www.w3.org/1999/xhtml">'+
-//                        (new XMLSerializer).serializeToString(div)+
-//                        '</body>'+
-//                        '</foreignObject>'+
-//                        '</svg>';
-//
-//                    var blob = new Blob([svg_xml], {type: "image/svg+xml"});
-//                    var href = window.URL.createObjectURL(blob);
-////                    var href = "data:image/svg+xml;base64,"+btoa(svg_xml); // svg_xml, mysvg
-////                    var href = "data:image/svg+xml,"+svg_xml; // svg_xml, mysvg
-//
-//                    // TODO: It's work fine
-//                    try {
-//                        //href = "data:image/svg+xml;base64,"+btoa(svg_xml); // svg_xml, mysvg
-//
-//                        // http://en.wikipedia.org/wiki/SVG#Native_support
-//                        // https://developer.mozilla.org/en/DOM/window.btoa
-////                        var ctx = dojo.query('canvas',worksheet.getNode("whiteboardContainer"))[0].getContext('2d');
-////                        var img1 = new Image();
-////                        img1.onload = function() {
-////                            // after this, Canvas’ origin-clean is DIRTY
-////                            ctx.drawImage(this, xSize[0], ySize[0]);
-////                            console.log("");
-////                        };
-////                        img1.src = href;
-//
-//                        var img = new Image();
-//                        img.type = "image/svg+xml";
-//                        img.addEventListener("load", function(){
-//
-//                            var shape = drawing.createImage({
-//                                x:xSize[0],
-//                                y:ySize[0],
-//                                width: xSize[1],
-//                                height: ySize[1],
-//                                src: href
-//                            });
-//                            window.URL.revokeObjectURL(href);
-//                            if(shape){
-//                                shape.cRand = geom.cRand;
-//                                shape.cTime = geom.cTime;
-//                                shape.wbbb = {
-//                                    x1: xSize[0],
-//                                    y1: ySize[0],
-//                                    x2: xSize[0]+xSize[1],
-//                                    y2: ySize[0]+ySize[1]
-//                                };
-//                                shape.fromUser = geom.fromUser;
-//                            }
-//                        });
-//                        img.src = href;
-//                    } catch(ex) {
-//                        console.error(ex);
-//                        console.trace();
-//                    }
-//                }]
-//            );
         } else if(geom.shapeType === 'graph' && geom.data){
 //            var data = dojox.html.entities.decode(geom.data.value || geom.data);
 //            var points = GraphPreview.RenderGraph(data);
@@ -507,6 +413,7 @@ Worksheet.prototype.initGfx = function(){
             worksheet.mouseDownPt = pt;
             worksheet.points = [pt];
             worksheet.mouseDown = true;
+            worksheet.overlayShape = false;
 
             worksheet.selectedShape = getHoveredShape(worksheet.drawing,pt);
         }
@@ -540,8 +447,7 @@ Worksheet.prototype.initGfx = function(){
             }else{
                 var bounds = {x1:worksheet.mouseDownPt.x, y1:worksheet.mouseDownPt.y, x2: pt.x, y2: pt.y};
                 if(worksheet.tool !== 'pen'){
-                    //board.clear();
-                    board.remove(worksheet.shape);
+                    board.remove(worksheet.overlayShape);
                 }
                 if(worksheet.tool === 'rect' && !worksheet.selectedShape ){
                     geom  = createRectJSON(bounds,false);
@@ -596,9 +502,9 @@ Worksheet.prototype.initGfx = function(){
                 geom = createMoveDownOverlayJSON(shape.wbbb);
             }
         }
-        // draw geom
+        // draw overlay geom
         if(geom) {
-            worksheet.shape = worksheet.drawFromJSON(geom,board);
+            worksheet.overlayShape = worksheet.drawFromJSON(geom,board);
         }
     };
     var pointInDrawing = function(pt){
@@ -625,6 +531,7 @@ Worksheet.prototype.initGfx = function(){
 
         //always clear the overlay
         //worksheet.overlayDrawing.clear();
+        board.remove(worksheet.overlayShape);
 
         if(worksheet.mouseDownPt){
             //make sure mouse was released inside of drawing area
@@ -704,7 +611,7 @@ Worksheet.prototype.initGfx = function(){
 
         // draw geom
         if(geom) {
-             worksheet.drawFromJSON(geom,board); //TODO Disable when Single board
+            worksheet.drawFromJSON(geom,board);
         }
         //clear everything
         worksheet.mouseDownPt = null;
@@ -1081,8 +988,10 @@ Worksheet.prototype.init = function(){
     var selectTool = function(toolName) {
         if(worksheet.overlayContainer) {
             if (toolName === 'hand') {
+                worksheet.drawing.drawMode = false;
                 worksheet.overlayContainer.style.cursor="pointer";
             } else {
+                worksheet.drawing.drawMode = true;
                 worksheet.overlayContainer.style.cursor="crosshair";
             }
         }
