@@ -215,6 +215,7 @@ Worksheet.prototype.drawFromJSON = function(geom,drawing,strong) {
             }
         } else if(geom.shapeType === 'clear'){
             drawing.clear();
+            worksheet.initEvent();
         } else if(geom.shapeType === 'delete'){
             removeShape(geom,drawing);
         } else if(geom.shapeType === 'move'){
@@ -892,13 +893,17 @@ Worksheet.prototype.initGfx = function(){
 //    worksheet.overlayContainer.style.cursor="pointer";
 
     // create a drawing board
-    var events = [
-        { name: "down", func: doGfxMouseDown },
-        { name: "move", func: doGfxMouseMove },
-        { name: "up", func: doGfxMouseUp }
-    ];
     worksheet.drawing = new Whiteboard("whiteboardContainer_" + worksheet.id, {boundingbox:[0,100,100,0], axis: true});
-    worksheet.drawing.initEvents(events);
+    //
+    worksheet.initEvent = function () {
+        var events = [
+            { name: "down", func: doGfxMouseDown },
+            { name: "move", func: doGfxMouseMove },
+            { name: "up", func: doGfxMouseUp }
+        ];
+        worksheet.drawing.initEvents(events);
+    };
+    worksheet.initEvent();
 
 
 //    worksheet.overlayDrawing = new Whiteboard("whiteboardOverlayContainer_" + worksheet.id,  {boundingbox:[0,100,100,0], axis:true, hideNavigation : true });
