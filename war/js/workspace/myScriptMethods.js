@@ -129,13 +129,11 @@ var visionObjects = new function() {
                         if(primitive.type === "line") {
                             shape.xPts.push(primitive.firstPoint.x);
                             shape.yPts.push(primitive.firstPoint.y);
-                            board.createLine({
-                                x1: primitive.firstPoint.x,
-                                y1: primitive.firstPoint.y,
-                                x2: primitive.lastPoint.x,
-                                y2: primitive.lastPoint.y,
-                                stroke: { strokeColor:'red', strokeWidth:2 }
-                            });
+                            var geom = board.createLine(
+                                [ primitive.firstPoint.x, primitive.lastPoint.x],
+                                [ primitive.firstPoint.y, primitive.lastPoint.y ]
+                            );
+                            geom.setStroke({ color:'red', width:2 });
                         } else if(primitive.type === "ellipse") {
 //                            center: Object
 //                            x: 372.919
