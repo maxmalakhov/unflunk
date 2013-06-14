@@ -1,6 +1,5 @@
 <%--<div dojoType="dijit.layout.ContentPane" style="padding:0; height: 800px;" closable="true" id="${worksheetId}">--%>
 <!-- Draw Area -->
-    draw:
     <div style="position: relative">
         <div class="whiteboardContainer" id="whiteboardContainer_${worksheetId}" style="border: 1px #B5BCC7 solid; background-color: white; z-index: 1; background: transparent"></div>
         <%--<div class="whiteboardOverlayContainer" id="whiteboardOverlayContainer_${worksheetId}" style="border: 1px indianred solid; background: transparent"></div>--%>
@@ -14,36 +13,10 @@
         <div dojoType="dijit.Tooltip" connectId="penToolBtn_${worksheetId}" position="above" showDelay="0">Pencil<br>(freehand drawing)</div>
 
         <button id="lineToolBtn_${worksheetId}" dojoType="dijit.form.Button" class="lineToolBtn"><img border="0" src="/images/line.png"></button>
-        <div dojoType="dijit.Tooltip" connectId="lineToolBtn_${worksheetId}" position="above" showDelay="0">Straight Line</div>
-
-        <button id="rectToolBtn_${worksheetId}" dojoType="dijit.form.Button" class="rectToolBtn"><img border="0" src="/images/rect.png"></button>
-        <div dojoType="dijit.Tooltip" connectId="rectToolBtn_${worksheetId}" position="above" showDelay="0">Rectangle</div>
-
-        <button id="filledRectToolBtn_${worksheetId}" dojoType="dijit.form.Button" class="filledRectToolBtn"><img border="0" src="/images/filledRect.png"></button>
-        <div dojoType="dijit.Tooltip" connectId="filledRectToolBtn_${worksheetId}" position="above" showDelay="0">Filled Rectangle</div>
-
-        <button id="ellipseToolBtn_${worksheetId}"dojoType="dijit.form.Button" class="ellipseToolBtn"><img border="0" src="/images/ellipse.png"></button>
-        <div dojoType="dijit.Tooltip" connectId="ellipseToolBtn_${worksheetId}" position="above" showDelay="0">Ellipse</div>
-
-        <button id="filledEllipseToolBtn_${worksheetId}" dojoType="dijit.form.Button" class="filledEllipseToolBtn"><img border="0" src="/images/filledEllipse.png"></button>
-        <div dojoType="dijit.Tooltip" connectId="filledEllipseToolBtn_${worksheetId}" position="above" showDelay="0">Filled Ellipse</div>
+        <div dojoType="dijit.Tooltip" connectId="lineToolBtn_${worksheetId}" position="above" showDelay="0">Line</div>
 
         <button id="textToolBtn_${worksheetId}" dojoType="dijit.form.Button" class="textToolBtn"><img border="0" src="/images/text.png"></button>
         <div dojoType="dijit.Tooltip" connectId="textToolBtn_${worksheetId}" position="above" showDelay="0">Draw Text</div>
-
-        <button id="moveToolBtn_${worksheetId}" dojoType="dijit.form.Button" class="moveToolBtn"><img border="0" src="/images/move.png"></button>
-        <div dojoType="dijit.Tooltip" connectId="moveToolBtn_${worksheetId}" position="above" showDelay="0">Move a shape</div>
-
-        <button id="moveUpToolBtn_${worksheetId}"  dojoType="dijit.form.Button" class="moveUpToolBtn"><img border="0" src="/images/moveUp.png"></button>
-        <div dojoType="dijit.Tooltip" connectId="moveUpToolBtn_${worksheetId}" position="above" showDelay="0">Pull a shape forward</div>
-
-        <button id="moveDownToolBtn_${worksheetId}" dojoType="dijit.form.Button" class="moveDownToolBtn"><img border="0" src="/images/moveDown.png"></button>
-        <div dojoType="dijit.Tooltip" connectId="moveDownToolBtn_${worksheetId}" position="above" showDelay="0">Push a shape back</div>
-
-        <button id="deleteToolBtn_${worksheetId}" dojoType="dijit.form.Button" class="deleteToolBtn"><img border="0" src="/images/delete.png"></button>
-        <div dojoType="dijit.Tooltip" connectId="deleteToolBtn_${worksheetId}" position="above" showDelay="0">Delete a shape</div>
-
-        <br>
 
         <button id="triangleToolBtn_${worksheetId}" dojoType="dijit.form.Button" class="triangleToolBtn"><img border="0" src="/images/icon_triangle2.png"></button>
         <div dojoType="dijit.Tooltip" connectId="triangleToolBtn_${worksheetId}" position="above" showDelay="0">Triangle</div>
@@ -63,6 +36,47 @@
         <button id="visionobjectsToolBtn_${worksheetId}" dojoType="dijit.form.Button" class="visionobjectsToolBtn"><img border="0" src="/images/visionobjects.png" height="16" width="16"></button>
         <div dojoType="dijit.Tooltip" connectId="visionobjectsToolBtn_${worksheetId}" position="above" showDelay="0">Vision Objects</div>
 
+        <%--<button id="rectToolBtn_${worksheetId}" dojoType="dijit.form.Button" class="rectToolBtn"><img border="0" src="/images/rect.png"></button>--%>
+        <%--<div dojoType="dijit.Tooltip" connectId="rectToolBtn_${worksheetId}" position="above" showDelay="0">Rectangle</div>--%>
+
+        <%--<button id="filledRectToolBtn_${worksheetId}" dojoType="dijit.form.Button" class="filledRectToolBtn"><img border="0" src="/images/filledRect.png"></button>--%>
+        <%--<div dojoType="dijit.Tooltip" connectId="filledRectToolBtn_${worksheetId}" position="above" showDelay="0">Filled Rectangle</div>--%>
+
+        <%--<button id="ellipseToolBtn_${worksheetId}"dojoType="dijit.form.Button" class="ellipseToolBtn"><img border="0" src="/images/ellipse.png"></button>--%>
+        <%--<div dojoType="dijit.Tooltip" connectId="ellipseToolBtn_${worksheetId}" position="above" showDelay="0">Ellipse</div>--%>
+
+        <%--<button id="filledEllipseToolBtn_${worksheetId}" dojoType="dijit.form.Button" class="filledEllipseToolBtn"><img border="0" src="/images/filledEllipse.png"></button>--%>
+        <%--<div dojoType="dijit.Tooltip" connectId="filledEllipseToolBtn_${worksheetId}" position="above" showDelay="0">Filled Ellipse</div>--%>
+
+        <%--<button id="moveToolBtn_${worksheetId}" dojoType="dijit.form.Button" class="moveToolBtn"><img border="0" src="/images/move.png"></button>--%>
+        <%--<div dojoType="dijit.Tooltip" connectId="moveToolBtn_${worksheetId}" position="above" showDelay="0">Move a shape</div>--%>
+
+        <%--<button id="moveUpToolBtn_${worksheetId}"  dojoType="dijit.form.Button" class="moveUpToolBtn"><img border="0" src="/images/moveUp.png"></button>--%>
+        <%--<div dojoType="dijit.Tooltip" connectId="moveUpToolBtn_${worksheetId}" position="above" showDelay="0">Pull a shape forward</div>--%>
+
+        <%--<button id="moveDownToolBtn_${worksheetId}" dojoType="dijit.form.Button" class="moveDownToolBtn"><img border="0" src="/images/moveDown.png"></button>--%>
+        <%--<div dojoType="dijit.Tooltip" connectId="moveDownToolBtn_${worksheetId}" position="above" showDelay="0">Push a shape back</div>--%>
+
+        <%--<button id="deleteToolBtn_${worksheetId}" dojoType="dijit.form.Button" class="deleteToolBtn"><img border="0" src="/images/delete.png"></button>--%>
+        <%--<div dojoType="dijit.Tooltip" connectId="deleteToolBtn_${worksheetId}" position="above" showDelay="0">Delete a shape</div>--%>
+
+        <%--<br>--%>
+
+        <button id="exportImgBtn_${worksheetId}" dojoType="dijit.form.Button" class="exportImgBtn"><img src="/images/export-icon.png"></button>
+        <div dojoType="dijit.Tooltip" connectId="exportImgBtn_${worksheetId}" position="below" showDelay="0">Export the drawing surface.</div>
+
+        <button id="showMovieBtn_${worksheetId}" dojoType="dijit.form.Button" class="showMovieBtn"><img src="/images/movie-icon.png"></button>
+        <div dojoType="dijit.Tooltip" connectId="showMovieBtn_${worksheetId}" position="below" showDelay="0">View all steps that made this drawing.</div>
+
+        <div class="clearDrawingDisplay" dojoType="dijit.form.DropDownButton">
+            <span class="colorText">clear</span>
+            <div dojoType="dijit.TooltipDialog" class="clearDrawingDialog ${worksheetId}" title="Clear Drawing">
+                Clear Drawing?<br>
+                <button class="clearDrawingYesBtn  ${worksheetId}" dojoType="dijit.form.Button">Yes</button> &nbsp;&nbsp;&nbsp;
+                <button class="clearDrawingNoBtn  ${worksheetId}" dojoType="dijit.form.Button">No</button>
+            </div>
+        </div>
+
         <br>
 
         <div class="lineColorDisplay" style="background-color: #FFFFFF; border-color: black; border-width: 1px;" dojoType="dijit.form.DropDownButton">
@@ -81,54 +95,40 @@
                 <button dojoType="dijit.form.Button" class="fillColorPaletteCancelBtn  ${worksheetId}">Cancel</button>
             </div>
         </div>
-        <%--<select dojoType="dijit.form.Select" class="lineStrokeSelect">--%>
-            <%--<option value="1">Line Thicknes:  1</option>--%>
-            <%--<option value="2">Line Thicknes:  2</option>--%>
-            <%--<option value="3" selected="selected">Line Thicknes:  3</option>--%>
-            <%--<option value="4">Line Thicknes:  4</option>--%>
-            <%--<option value="5">Line Thicknes:  5</option>--%>
-            <%--<option value="6">Line Thicknes:  6</option>--%>
-            <%--<option value="7">Line Thicknes:  7</option>--%>
-            <%--<option value="8">Line Thicknes:  8</option>--%>
-            <%--<option value="9">Line Thicknes:  9</option>--%>
-            <%--<option value="10">Line Thicknes: 10</option>--%>
-            <%--<option value="15">Line Thicknes: 15</option>--%>
-            <%--<option value="20">Line Thicknes: 20</option>--%>
-            <%--<option value="30">Line Thicknes: 30</option>--%>
-            <%--<option value="50">Line Thicknes: 50</option>--%>
-            <%--<option value="75">Line Thicknes: 75</option>--%>
-            <%--<option value="100">Line Thicknes:100</option>--%>
-        <%--</select>--%>
-        <%--<select dojoType="dijit.form.Select" class="fontSizeSelect">--%>
-            <%--<option value="5">Font:  5pt</option>--%>
-            <%--<option value="6">Font:  6pt</option>--%>
-            <%--<option value="7">Font:  7pt</option>--%>
-            <%--<option value="8">Font:  8pt</option>--%>
-            <%--<option value="9">Font:  9pt</option>--%>
-            <%--<option value="10">Font: 10pt</option>--%>
-            <%--<option value="12" selected="selected">Font: 12pt</option>--%>
-            <%--<option value="14">Font: 14pt</option>--%>
-            <%--<option value="16">Font: 16pt</option>--%>
-            <%--<option value="20">Font: 20pt</option>--%>
-            <%--<option value="24">Font: 24pt</option>--%>
-            <%--<option value="32">Font: 32pt</option>--%>
-            <%--<option value="48">Font: 48pt</option>--%>
-            <%--<option value="64">Font: 64pt</option>--%>
-        <%--</select>--%>
+        <select dojoType="dijit.form.Select" class="lineStrokeSelect">
+            <option value="1">Line Thicknes:  1</option>
+            <option value="2">Line Thicknes:  2</option>
+            <option value="3" selected="selected">Line Thicknes:  3</option>
+            <option value="4">Line Thicknes:  4</option>
+            <option value="5">Line Thicknes:  5</option>
+            <option value="6">Line Thicknes:  6</option>
+            <option value="7">Line Thicknes:  7</option>
+            <option value="8">Line Thicknes:  8</option>
+            <option value="9">Line Thicknes:  9</option>
+            <option value="10">Line Thicknes: 10</option>
+            <option value="15">Line Thicknes: 15</option>
+            <option value="20">Line Thicknes: 20</option>
+            <option value="30">Line Thicknes: 30</option>
+            <option value="50">Line Thicknes: 50</option>
+            <option value="75">Line Thicknes: 75</option>
+            <option value="100">Line Thicknes:100</option>
+        </select>
+        <select dojoType="dijit.form.Select" class="fontSizeSelect">
+            <option value="5">Font:  5pt</option>
+            <option value="6">Font:  6pt</option>
+            <option value="7">Font:  7pt</option>
+            <option value="8">Font:  8pt</option>
+            <option value="9">Font:  9pt</option>
+            <option value="10">Font: 10pt</option>
+            <option value="12" selected="selected">Font: 12pt</option>
+            <option value="14">Font: 14pt</option>
+            <option value="16">Font: 16pt</option>
+            <option value="20">Font: 20pt</option>
+            <option value="24">Font: 24pt</option>
+            <option value="32">Font: 32pt</option>
+            <option value="48">Font: 48pt</option>
+            <option value="64">Font: 64pt</option>
+        </select>
 
-        <button id="exportImgBtn_${worksheetId}" dojoType="dijit.form.Button" class="exportImgBtn"><img src="/images/export-icon.png"></button>
-        <div dojoType="dijit.Tooltip" connectId="exportImgBtn_${worksheetId}" position="below" showDelay="0">Export the drawing surface.</div>
-
-        <button id="showMovieBtn_${worksheetId}" dojoType="dijit.form.Button" class="showMovieBtn"><img src="/images/movie-icon.png"></button>
-        <div dojoType="dijit.Tooltip" connectId="showMovieBtn_${worksheetId}" position="below" showDelay="0">View all steps that made this drawing.</div>
-
-        <div class="clearDrawingDisplay" dojoType="dijit.form.DropDownButton">
-            <span class="colorText">clear</span>
-            <div dojoType="dijit.TooltipDialog" class="clearDrawingDialog ${worksheetId}" title="Clear Drawing">
-                Clear Drawing?<br>
-                <button class="clearDrawingYesBtn  ${worksheetId}" dojoType="dijit.form.Button">Yes</button> &nbsp;&nbsp;&nbsp;
-                <button class="clearDrawingNoBtn  ${worksheetId}" dojoType="dijit.form.Button">No</button>
-            </div>
-        </div>
     </form>
 <%--</div>--%>

@@ -1,15 +1,15 @@
 var tools = [{name: 'hand'}
             ,{name: 'line', showLineColor: true, showLineThickness: true}
             ,{name: 'pen', showLineColor: true, showLineThickness: true}
-            ,{name: 'rect', showLineColor: true, showLineThickness: true}
-            ,{name: 'ellipse', showLineColor: true, showLineThickness: true}
-            ,{name: 'filledRect', showFillColor: true, showLineColor: true, showLineThickness: true}
-            ,{name: 'filledEllipse', showFillColor: true, showLineColor: true, showLineThickness: true}
+//            ,{name: 'rect', showLineColor: true, showLineThickness: true}
+//            ,{name: 'ellipse', showLineColor: true, showLineThickness: true}
+//            ,{name: 'filledRect', showFillColor: true, showLineColor: true, showLineThickness: true}
+//            ,{name: 'filledEllipse', showFillColor: true, showLineColor: true, showLineThickness: true}
             ,{name: 'text', showLineColor: true, showFontSize: true}
-            ,{name: 'delete'}
-            ,{name: 'move'}
-            ,{name: 'moveUp'}
-            ,{name: 'moveDown'}
+//            ,{name: 'delete'}
+//            ,{name: 'move'}
+//            ,{name: 'moveUp'}
+//            ,{name: 'moveDown'}
             ,{name: 'triangle', showLineColor: true, showLineThickness: true}
             ,{name: 'quadrangle', showLineColor: true, showLineThickness: true}
             ,{name: 'circle', showLineColor: true, showLineThickness: true}
@@ -988,8 +988,8 @@ Worksheet.prototype.init = function(){
         }
         hide("lineColorDisplay");
         hide("fillColorDisplay");
-//        hide("lineStrokeSelect");
-//        hide("fontSizeSelect");
+        hide("lineStrokeSelect");
+        hide("fontSizeSelect");
 
         var tool = null;
         dojo.forEach(tools,function(aTool){
@@ -999,10 +999,13 @@ Worksheet.prototype.init = function(){
             //dojo.style(this.byClass(aTool.name + 'ToolBtn').domNode,'border','0px');
             //dojo.addClass(dojo.style(this.byClass(aTool.name + 'ToolBtn').domNode, "selected");
             dojo.removeClass(worksheet.getNode(aTool.name + 'ToolBtn'), "selected");
+            dojo.style(dojo.query("span",worksheet.getNode(aTool.name + 'ToolBtn'))[0],"background-color","");
         });
+
 
         //dojo.style(this.byClass(tool.name + 'ToolBtn').domNode,'border','2px solid black');
         dojo.addClass(worksheet.getNode(tool.name + 'ToolBtn'), "selected");
+        dojo.style(dojo.query("span",worksheet.getNode(tool.name + 'ToolBtn'))[0],"background-color","rgb(226, 94, 152)");
         worksheet.tool = tool.name;
 
         if(tool.showLineColor){
@@ -1011,12 +1014,12 @@ Worksheet.prototype.init = function(){
         if(tool.showFillColor){
             show("fillColorDisplay");
         }
-//        if(tool.showLineThickness){
-//            show("lineStrokeSelect");
-//        }
-//        if(tool.showFontSize){
-//            show("fontSizeSelect");
-//        }
+        if(tool.showLineThickness){
+            show("lineStrokeSelect");
+        }
+        if(tool.showFontSize){
+            show("fontSizeSelect");
+        }
     };
     var showMovie = function(){
         try{
@@ -1227,12 +1230,12 @@ Worksheet.prototype.init = function(){
     dojo.connect(worksheet.getWidget('showMovieBtn'),'onClick',showMovie);
     dojo.connect(dijit.byId('movieSlider'),'onChange',incrementMovie);
     
-//    dojo.connect(worksheet.getWidget('lineStrokeSelect'),'onChange',function(){
-//        worksheet.lineStroke = Math.floor(1.0 * worksheet.getWidget('lineStrokeSelect').getValue());
-//    });
-//    dojo.connect(worksheet.getNode('fontSizeSelect'),'onChange',function(){
-//        worksheet.fontSize = Math.floor(1.0 * worksheet.getWidget('fontSizeSelect').getValue());
-//    });
+    dojo.connect(worksheet.getWidget('lineStrokeSelect'),'onChange',function(){
+        worksheet.lineStroke = Math.floor(1.0 * worksheet.getWidget('lineStrokeSelect').getValue());
+    });
+    dojo.connect(worksheet.getNode('fontSizeSelect'),'onChange',function(){
+        worksheet.fontSize = Math.floor(1.0 * worksheet.getWidget('fontSizeSelect').getValue());
+    });
     dojo.connect(worksheet.getDialogWidget('clearDrawingNoBtn'),'onClick',function(){
         dijit.popup.close(worksheet.getWidget("clearDrawingDialog"));
     });

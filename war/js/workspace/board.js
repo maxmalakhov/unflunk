@@ -38,8 +38,8 @@ Whiteboard.prototype.clear = function() {
 Whiteboard.prototype.remove = function(shape) {
     var board = this._board;
     if(shape) {
-        if(shape.points) {
-            dojo.forEach(shape.points, function(point){
+        if(shape.pointList) {
+            dojo.forEach(shape.pointList, function(point){
                 board.removeObject(point);
             });
         }
@@ -151,13 +151,13 @@ Whiteboard.prototype.createLine = function(xPts, yPts) {
     stroke.straightLast = false;
 
     // points of the shape
-    var points = [];
+    var pointList = [];
     // create the points
     for(var i = 0; i < xPts.length && i < yPts.length; i++) {
-        points.push(board.create('point', [xPts[i], yPts[i]], {size:0.5,name:''}));
+        pointList.push(board.create('point', [xPts[i], yPts[i]], {size:0.5,name:''}));
     }
-    var line = board.create('line', points, stroke);
-    line.points = points;
+    var line = board.create('line', pointList, stroke);
+    line.pointList = pointList;
 
     return this._createElement(line);
 };
@@ -177,11 +177,13 @@ Whiteboard.prototype.createText = function(params) {
 
 Whiteboard.prototype.createEllipse = function(params) {
     var c = Math.sqrt(Math.abs(params.rx - params.ry));
-    var f1 = this._board.create('point', params.rx > params.ry ? [params.cx + c, params.cy] : [params.cx, params.cy + c]);
-    var f2 = this._board.create('point', params.rx > params.ry ? [params.cx - c, params.cy] : [params.cx, paramx.cy - c]);
-    var pt = this._board.create('point', [params.cx + params.rx, params.cy]);
+    var f1 = this._board.create('point', params.rx > params.ry ? [params.cx + c, params.cy] : [params.cx, params.cy + c], {size:0.5,name:''});
+
+    //var f2 = this._board.create('point', params.rx > params.ry ? [params.cx - c, params.cy] : [params.cx, params.cy - c], {size:0.5,name:''});
+    var pt = this._board.create('point', [params.cx + params.rx, params.cy], {size:0.5,name:''});
     
-    var ellipse = this._board.create('ellipse', [f1, f2, pt], { hasInnerPoints : true });
+    var ellipse = this._board.create('ellipse', [f1, f1, pt], { hasInnerPoints : false });
+    ellipse.pointList = [f1, pt];
     return this._createElement(ellipse);
 };
 
@@ -201,28 +203,23 @@ Whiteboard.prototype.createTriangle = function(params) {
 };
 
 Whiteboard.prototype.createRect = function(params) {
-    var points = [];
     var p1 = this._board.create('point', [params.x, params.y], {size:0.5,name:''});
     var p2 = this._board.create('point', [params.x + params.width, params.y], {size:0.5,name:''});
     var p3 = this._board.create('point', [params.x + params.width, params.y + params.height], {size:0.5,name:''});
     var p4 = this._board.create('point', [params.x, params.y + params.height], {size:0.5,name:''});
     var rectangle = this._board.create('polygon', [p1, p2, p3, p4], { hasInnerPoints : true });
-    points.push(p1);
-    points.push(p2);
-    points.push(p3);
-    points.push(p4);
-    rectangle.points = points;
+    rectangle.pointList = [p1, p2, p3, p4];
     return this._createElement(rectangle);
 };
 
 Whiteboard.prototype.createPolyline = function(xPts, yPts) {
-    var points = [];
+    var pointList = [];
     for ( var i = 0; i < xPts.length && i < yPts.length; i++ ) {
         var point = this._board.create('point', [xPts[i], yPts[i]],{size:0.5,name:''});
-        points.push(point);
+        pointList.push(point);
     }
-    var polyline = this._board.create('polygon', points, { hasInnerPoints : true });
-    polyline.points = points;
+    var polyline = this._board.create('polygon', pointList, { hasInnerPoints : true });
+    polyline.pointList = pointList;
     return this._createElement(polyline);
 };
 
@@ -259,17 +256,17 @@ Whiteboard.prototype._createElement = function(element) {
         }
     };
     element.moveTo = function(xPts, yPts) {
-        var points = element.isPoint ? [element] : element.points;
-        for(var i = 0; i<xPts.length && i<yPts.length && i<points.length; i++) {
-            points[i].setPosition(JXG.COORDS_BY_USER, [xPts[i],yPts[i]]);
+        var pointList = element.isPoint ? [element] : element.pointList;
+        for(var i = 0; i<xPts.length && i<yPts.length && i<pointList.length; i++) {
+            pointList[i].setPosition(JXG.COORDS_BY_USER, [xPts[i],yPts[i]]);
         }
         board.update();
     };
 
     var callback = function(evt) {
         var newXPts = [], newYPts = [];
-        var points = element.isPoint ? [element] : element.points;
-        dojo.forEach(points, function(point){
+        var pointList = element.isPoint ? [element] : element.pointList;
+        dojo.forEach(pointList, function(point){
             newXPts.push(point.X());
             newYPts.push(point.Y());
         });
@@ -280,7 +277,7 @@ Whiteboard.prototype._createElement = function(element) {
         element.worksheet.sendMessage({geometry:newGeom});
     };
     // add an event to the shape and its points
-    dojo.forEach(element.points, function(point){
+    dojo.forEach(element.pointList, function(point){
         if(point.coords){
             point.on("up", callback);
             point.coords.on('update', function (ou, os) {
