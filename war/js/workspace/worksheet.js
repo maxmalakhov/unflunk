@@ -284,19 +284,7 @@ Worksheet.prototype.drawFromJSON = function(geom,drawing,strong) {
         }
         // new code
         else if (geom.shapeType === 'triangle') {
-            shape = drawing.createTriangle({x1: geom.xPts[0], y1: geom.yPts[0], x2: geom.xPts[1], y2: geom.yPts[1]});
-            //console.debug('Draw triangle: x='+geom.xPts[0]+','+geom.xPts[1]+', y='+geom.yPts[0]+','+geom.yPts[1]);
-            /*var scale = 2;
-            var distance = Math.sqrt((Math.pow(geom.xPts[1] - geom.xPts[0],2)) + (Math.pow(geom.yPts[0] - geom.yPts[1],2)));
-            var horizontalCathetus = distance / scale;//geom.yPts[1]-geom.yPts[0];
-            var verticalCathetus = (horizontalCathetus*4)/3;
-
-            shape = drawing.createPolyline([
-                {x: geom.xPts[0], y: geom.yPts[1]},
-                {x: geom.xPts[0], y: (geom.yPts[1]-verticalCathetus)},
-                {x: (geom.xPts[0]+horizontalCathetus), y: geom.yPts[1]},
-                {x: geom.xPts[0], y: geom.yPts[1]}
-            ]);*/
+            shape = drawing.createTriangle(geom.xPts, geom.yPts);
         } else if (geom.shapeType === 'quadrangle') {
             //console.debug('Draw quadrangle: x='+geom.xPts[0]+','+geom.xPts[1]+', y='+geom.yPts[0]+','+geom.yPts[1]);
             var scale = 2;
@@ -637,8 +625,8 @@ Worksheet.prototype.initGfx = function(){
     var createTriangleJSON = function(bounds,filled){
         bounds = normalizeBounds(bounds);
         var geom = {
-            xPts: [bounds.x1,bounds.x2],
-            yPts: [bounds.y1,bounds.y2]
+            xPts: [bounds.x1,bounds.x2,bounds.x2],
+            yPts: [bounds.y1,bounds.y1, bounds.y2]
         };
         geom.shapeType = 'triangle';
         geom.filled = filled;

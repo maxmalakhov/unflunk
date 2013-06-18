@@ -194,8 +194,8 @@ Whiteboard.prototype.createCurve = function(points, params) {
     return this._createElement(curve);
 };
 
-Whiteboard.prototype.createTriangle = function(params) {
-    var triangle = new Triangle(this._board, [params.x1, params.y1], [params.x2, params.y1], [params.x2, params.y2]);
+Whiteboard.prototype.createTriangle = function(xPts,yPts) {
+    var triangle = new Triangle(this._board, [xPts[0], yPts[0]], [xPts[1], yPts[1]], [xPts[2], yPts[2]]);
     if(triangle.bounds === 'undefined') {
         triangle.bounds = {};
     }

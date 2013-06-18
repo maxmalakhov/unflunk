@@ -34,41 +34,44 @@ function Workspace(id, roomIdList) {
         var workspace = this;
         console.debug('newRoom()');
         var roomTabs = dijit.byId("rooms");
-
-        dojo.xhrPost({
-            url: "/workspace/"+workspace.id+"/room/"+(roomId || ''),
-            load: function(resp){
-                if(resp.error){
-                    console.error(resp.error);
-                } else {
-                    var roomTab = new dijit.layout.ContentPane({
-                        id: resp.roomId,
-                        title: "Room #"+(++workspace.roomCount),
-                        href: "/workspace/"+workspace.id+"/room/"+resp.roomId,
-                        onDownloadEnd: function() {
-                            var room = new Room(resp.roomId, resp.token, resp.messages, resp.worksheets);
-                            if (room.token) {
-                                room.openChannel();
-                                room.init();
-                            }
-                            workspace.addRoom(room);
-                            dijit.byId('applicationArea').resize();
-                        },
-                        selected: true,
-                        closable: true
-                    });
-                    roomTabs.addChild(roomTab);
-                    if(!roomId) {
-                        roomTabs.selectChild(roomTab);
+        try {
+            dojo.xhrPost({
+                url: "/workspace/"+workspace.id+"/room/"+(roomId || ''),
+                load: function(resp){
+                    if(resp.error){
+                        console.error(resp.error);
+                    } else {
+                        var roomTab = new dijit.layout.ContentPane({
+                            id: resp.roomId,
+                            title: "Room #"+(++workspace.roomCount),
+                            href: "/workspace/"+workspace.id+"/room/"+resp.roomId,
+                            onDownloadEnd: function() {
+                                var room = new Room(resp.roomId, resp.token, resp.messages, resp.worksheets);
+                                if (room.token) {
+                                    room.openChannel();
+                                    room.init();
+                                }
+                                workspace.addRoom(room);
+                                dijit.byId('applicationArea').resize();
+                            },
+                            selected: true,
+                            closable: true
+                        });
+                        roomTabs.addChild(roomTab);
+                        if(!roomId) {
+                            roomTabs.selectChild(roomTab);
+                        }
                     }
-                }
-            },
-            error: function(e){
-                console.info("post error",e);
-            },
-            handleAs: "json",
-            preventCache: true
-        });
+                },
+                error: function(e){
+                    console.info("post error",e);
+                },
+                handleAs: "json",
+                preventCache: true
+            });
+        } catch(ex) {
+            console.error(ex);
+        }
     };
     this.exit = function() {
         dojo.xhrPost({

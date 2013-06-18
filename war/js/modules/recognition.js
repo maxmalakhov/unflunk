@@ -48,20 +48,22 @@ var moduleRecognition = new (function() {
                             strokes.minRadius = primitive.minRadius;
                         }
                     }
-                    if (strokes.type === "line" && strokes.xPts.length === 1) {
-                        strokes.xPts.push(primitive.lastPoint.x);
-                        strokes.yPts.push(primitive.lastPoint.y);
+                    if (strokes.type === "line") {
+                        if(strokes.xPts.length === 1) {
+                            strokes.xPts.push(primitive.lastPoint.x);
+                            strokes.yPts.push(primitive.lastPoint.y);
+                        }
+                        var shapeType;
+                        switch(strokes.xPts.length) {
+                            case 2:  shapeType = "line"; break;
+                            case 3:  shapeType = "triangle"; break;
+//                            case 4:  shapeType = "quadrangle"; break;
+                            default: shapeType = "polygon"; break;
+                        }
+                        geom.shapeType = shapeType;
+                        geom.xPts = strokes.xPts;
+                        geom.yPts = strokes.yPts;
                     }
-                    var shapeType;
-                    switch(strokes.xPts.length) {
-                        case 2:  shapeType = "line"; break;
-                        case 3:  shapeType = "triangle"; break;
-//                        case 4:  shapeType = "quadrangle"; break;
-                        default: shapeType = "polygon"; break;
-                    }
-                    geom.shapeType = shapeType;
-                    geom.xPts = strokes.xPts;
-                    geom.yPts = strokes.yPts;
                 }
 //                else if (candidate.type === "notRecognized") {
 //                    for (var j=0;j<segment.inkRanges.length;j++) {
