@@ -50,7 +50,6 @@ Whiteboard.prototype.remove = function(shape) {
 Whiteboard.prototype.createEquation = function(params) {
     var data = '$'+dojox.html.entities.decode(params.data.value || params.data)+'$';
     var equation = this._board.create('text', [params.x, params.y, function () { return data; }]);
-    equation.isPoint = true;
     return this._createElement(equation);
 };
 
@@ -162,16 +161,17 @@ Whiteboard.prototype.createLine = function(xPts, yPts) {
     return this._createElement(line);
 };
 
-Whiteboard.prototype.createPenLine = function(params) {
-    var stroke = params.stroke || {};
-    stroke.handDrawing = false;
-    var line = this._board.create('curve', [[params.x1, params.x2], [params.y1, params.y2]], stroke);
-    return this._createElement(line);
+Whiteboard.prototype.createPenLine = function(xPts, yPts, withPoints) {
+    var stroke = { handDrawing: false };
+    var pointList = [];
+    var penLine = this._board.create('curve', [xPts, yPts], stroke);
+
+    return this._createElement(penLine);
 };
 
 Whiteboard.prototype.createText = function(params) {
     var text = this._board.create('text', [params.x, params.y, params.text]);
-    text.isPoint = true;
+
     return this._createElement(text);
 };
 
@@ -182,7 +182,7 @@ Whiteboard.prototype.createEllipse = function(params) {
     //var f2 = this._board.create('point', params.rx > params.ry ? [params.cx - c, params.cy] : [params.cx, params.cy - c], {size:0.5,name:''});
     var pt = this._board.create('point', [params.cx + params.rx, params.cy], {size:0.5,name:''});
     
-    var ellipse = this._board.create('ellipse', [f1, f1, pt], { hasInnerPoints : false });
+    var ellipse = this._board.create('ellipse', [f1, f1, pt], { hasInnerPoints : true });
     ellipse.pointList = [f1, pt];
     return this._createElement(ellipse);
 };
@@ -231,7 +231,13 @@ Whiteboard.prototype._createElement = function(element) {
     var drawing = this;
     var board = this._board;
     element.setStroke = function(stroke) {
-        this.setProperty({"strokeColor" : stroke.color, "strokeWidth" : stroke.width});
+        if(this.borders) {
+            dojo.forEach(this.borders, function(border){
+                border.setProperty({"strokeColor" : stroke.color, "strokeWidth" : stroke.width});
+            });
+        } else {
+            this.setProperty({"strokeColor" : stroke.color, "strokeWidth" : stroke.width});
+        }
     };
     element.setFill = function(fillColor) {
         this.setProperty({"fillColor" : fillColor});
@@ -256,16 +262,26 @@ Whiteboard.prototype._createElement = function(element) {
         }
     };
     element.moveTo = function(xPts, yPts) {
-        var pointList = element.isPoint ? [element] : element.pointList;
-        for(var i = 0; i<xPts.length && i<yPts.length && i<pointList.length; i++) {
-            pointList[i].setPosition(JXG.COORDS_BY_USER, [xPts[i],yPts[i]]);
+        //var pointList = (element.elType === 'text') ? [element] : element.pointList;
+        if(element.pointList) {
+            for(var i = 0; i<xPts.length && i<yPts.length && i<element.pointList.length; i++) {
+                element.pointList[i].setPosition(JXG.COORDS_BY_USER, [xPts[i],yPts[i]]);
+            }
+        } else {
+            if(element.elType === 'text') {
+//                var offset = board.create('transform', [xPts[0],yPts[0]], {type:'translate'});
+//                offset.bindTo(element);
+                element.coords.usrCoords[1] = xPts[0];
+                element.coords.usrCoords[2] = yPts[0];
+                element.coords.usr2screen();
+            }
         }
         board.update();
     };
 
     var callback = function(evt) {
         var newXPts = [], newYPts = [];
-        var pointList = element.isPoint ? [element] : element.pointList;
+        var pointList = (element.elType === 'text') ? [element] : element.pointList;
         dojo.forEach(pointList, function(point){
             newXPts.push(point.X());
             newYPts.push(point.Y());

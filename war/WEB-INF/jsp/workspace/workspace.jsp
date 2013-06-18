@@ -52,6 +52,8 @@ var workspace; // window scope
     dojo.require("dijit.form.TextBox");
     dojo.require("dijit.form.SimpleTextarea");
     dojo.require("dijit.form.Textarea");
+
+    dojo.require("dojo.request");
 </script>
 
 <script src="/js/libs/pdf.js"></script>
@@ -90,6 +92,7 @@ var workspace; // window scope
 <script type="text/javascript" src="/js/workspace/graph.js"></script>
 <script type="text/javascript" src="/js/workspace/function.js"></script>
 <script type="text/javascript" src="/js/workspace/math-processor.js"></script>
+<script type="text/javascript" src="/js/modules/recognition.js"></script>
 
 <style>
 #header{
@@ -173,21 +176,6 @@ var workspace; // window scope
 </div>
 
 <div id="graphBox" style="height: 520px; width: 520px;"></div>
-
-<div id="visionobjectsDialog" dojoType="dijit.Dialog" title="Type in some graph relation"  style="display: none; height: 520px; width: 520px">
-    <div class="dijitDialogPaneContentArea">
-        <div id="voCanvas" style="margin-left: 30px; height: 430px; width: 430px; border: 1px solid black; background-color: #FFFFBF;"></div>
-        <br/>
-        <img id="loading" src="/images/loading.gif" />
-        <p id="result"></p>
-
-        <script type="application/javascript" src="/js/workspace/jquery-1.7.2.js"></script>
-        <script type="application/javascript" src="/js/workspace/myScriptMethods.js"></script>
-    </div>
-    <div class="dijitDialogPaneActionBar">
-        <button dojoType="dijit.form.Button" id="okVisionobjectsBtn">OK</button>&nbsp;&nbsp;&nbsp;<button dojoType="dijit.form.Button" id="cancelVisionobjectsBtn">Cancel</button>
-    </div>
-</div>
 
 <div id="movieDialog" dojoType="dijit.Dialog" title="Move slider to see drawing steps."  style="display: none">
     <div id="movieWhiteboardContainer" style="border: 2px blue solid; background-color: white;"></div><br>

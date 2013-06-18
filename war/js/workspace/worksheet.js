@@ -37,7 +37,8 @@ function Worksheet(id, room) {
     this.points = [];
     this.mouseDown = false;
     this.overlayShape = false;
-
+    this.process = false;
+    this.penLines = [];
 }
 // Entity methods
 Worksheet.prototype = {
@@ -205,12 +206,14 @@ Worksheet.prototype.drawFromJSON = function(geom,drawing,strong) {
                 if(geom.xPts.length > 1){
                     //console.log("num pen points drawing:",geom.xPts.length);
                     //shape = drawing.createGroup();
-                    for(var i = 0; i < (geom.xPts.length - 1); i++){
-                        var lineShape = drawing.createPenLine({x1: geom.xPts[i], y1: geom.yPts[i], x2: geom.xPts[i + 1], y2: geom.yPts[i + 1]});
-                        //stroke.cap = 'round';
-                        lineShape.setStroke(stroke);
-                        //shape.add(lineShape);
-                    }
+                    shape = drawing.createPenLine(geom.xPts, geom.yPts, !worksheet.process);
+//                    for(var i = 0; i < (geom.xPts.length - 1); i++){
+//                        var lineShape = drawing.createPenLine({x1: geom.xPts[i], y1: geom.yPts[i], x2: geom.xPts[i + 1], y2: geom.yPts[i + 1]});
+//                        //stroke.cap = 'round';
+//                        lineShape.setStroke(stroke);
+//                        //shape.add(lineShape);
+//                    }
+                    worksheet.penLines.push(shape);
                 }
             }
         } else if(geom.shapeType === 'clear'){
@@ -347,6 +350,8 @@ Worksheet.prototype.drawFromJSON = function(geom,drawing,strong) {
             if(shapeToUpdate){
                 shapeToUpdate.moveTo(geom.xPts, geom.yPts);
             }
+        } else if (geom.shapeType === 'recognition') {
+
         }
 
         if(shape){
@@ -408,6 +413,8 @@ Worksheet.prototype.initGfx = function(){
             worksheet.points = [pt];
             worksheet.mouseDown = true;
             worksheet.overlayShape = false;
+            worksheet.process = true;
+            worksheet.penLines = [];
 
             worksheet.selectedShape = getHoveredShape(worksheet.drawing,pt);
         }
@@ -423,7 +430,7 @@ Worksheet.prototype.initGfx = function(){
         var board = worksheet.drawing; // overlayDrawing drawing
 
         if(worksheet.mouseDown){
-            if((worksheet.tool === 'pen') && pointInDrawing(pt) && !worksheet.selectedShape ){
+            if((worksheet.tool === 'pen' || worksheet.tool === 'visionobjects') && pointInDrawing(pt) && !worksheet.selectedShape ){
                 if((worksheet.points[worksheet.points.length - 1].x !== pt.x) || (worksheet.points[worksheet.points.length - 1].y !== pt.y)){
                     worksheet.points.push(pt);
 
@@ -440,7 +447,7 @@ Worksheet.prototype.initGfx = function(){
                 }
             }else{
                 var bounds = {x1:worksheet.mouseDownPt.x, y1:worksheet.mouseDownPt.y, x2: pt.x, y2: pt.y};
-                if(worksheet.tool !== 'pen'){
+                if(worksheet.tool !== 'pen'|| worksheet.tool === 'visionobjects'){
                     board.remove(worksheet.overlayShape);
                 }
                 if(worksheet.tool === 'rect' && !worksheet.selectedShape ){
@@ -511,6 +518,7 @@ Worksheet.prototype.initGfx = function(){
 
         var pt = getGfxMouse(evt);
         worksheet.mouseDown = false;
+        worksheet.process = false;
         //console.dir(pt);
         var geom = false;
         var shape = false;
@@ -519,6 +527,9 @@ Worksheet.prototype.initGfx = function(){
         //always clear the overlay
         //worksheet.overlayDrawing.clear();
         board.remove(worksheet.overlayShape);
+        dojo.forEach(worksheet.penLines, function(overlayLine){
+            board.remove(overlayLine);
+        });
 
         if(worksheet.mouseDownPt){
             //make sure mouse was released inside of drawing area
@@ -581,9 +592,11 @@ Worksheet.prototype.initGfx = function(){
                     dijit.byId('GraphInput').focus();
                     GraphPreview.Update();
                 }else if(worksheet.tool === 'visionobjects'){
-                    worksheet.textPoint = pt;
-                    dijit.byId('visionobjectsDialog').show();
-                    visionObjects.init();
+//                    worksheet.textPoint = pt;
+//                    dijit.byId('visionobjectsDialog').show();
+                    geom = createPenJSON(worksheet.points);
+                    geom = moduleRecognition.process(geom, worksheet.drawing);
+                    //visionObjects.init();
                 }
                 //worksheet.points = [];
                 if(geom){
@@ -1103,6 +1116,7 @@ Worksheet.prototype.init = function(){
         dijit.byId('visionobjectsDialog').hide();
         worksheet.textPoint = null;
         visionObjects.clear();
+        moduleRecognition.process();
     };
     var doVisionObjectInput = function(){
         dijit.byId('visionobjectsDialog').hide();
