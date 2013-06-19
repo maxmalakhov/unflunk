@@ -16,6 +16,7 @@ var tools = [{name: 'hand'}
             ,{name: 'equation', showLineColor: true}
             ,{name: 'graph', showLineColor: true, showLineThickness: true}
             ,{name: 'visionobjects', showLineColor: true, showLineThickness: true}
+            ,{name: 'highlighter', showLineColor: true, showLineThickness: true}
             ];
 
 // multiple instances
@@ -29,9 +30,11 @@ function Worksheet(id, room) {
     this.drawing = null;
     this.overlayContainer = null;
     this.overlayDrawing = null;
-    this.lineColor = "#000000";
     this.fillColor = "#FFFFFF";
+    this.lineColor = "#000000";
     this.lineStroke = 3;
+    this.highlighterColor = "#FFFF00";
+    this.highlighterStroke = 5;
     this.fontSize = 12;
     this.tool = 'pen';
     this.points = [];
@@ -338,8 +341,6 @@ Worksheet.prototype.drawFromJSON = function(geom,drawing,strong) {
             if(shapeToUpdate){
                 shapeToUpdate.moveTo(geom.xPts, geom.yPts);
             }
-        } else if (geom.shapeType === 'recognition') {
-
         }
 
         if(shape){
@@ -418,9 +419,16 @@ Worksheet.prototype.initGfx = function(){
         var board = worksheet.drawing; // overlayDrawing drawing
 
         if(worksheet.mouseDown){
-            if((worksheet.tool === 'pen' || worksheet.tool === 'visionobjects') && pointInDrawing(pt) && !worksheet.selectedShape ){
+            if((worksheet.tool === 'pen' || worksheet.tool === 'visionobjects' || worksheet.tool === 'highlighter')
+                && pointInDrawing(pt) && !worksheet.selectedShape ){
                 if((worksheet.points[worksheet.points.length - 1].x !== pt.x) || (worksheet.points[worksheet.points.length - 1].y !== pt.y)){
                     worksheet.points.push(pt);
+
+                    var stroke = {};
+                    if (worksheet.tool === 'highlighter') {
+                        stroke.width = worksheet.highlighterStroke;
+                        stroke.color = worksheet.highlighterColor;
+                    }
 
                     if(worksheet.points.length > 1){
                         //make sure its not the same point as last time
@@ -428,15 +436,16 @@ Worksheet.prototype.initGfx = function(){
                             {x1: worksheet.points[worksheet.points.length - 2].x,
                                 y1: worksheet.points[worksheet.points.length - 2].y,
                                 x2: worksheet.points[worksheet.points.length - 1].x,
-                                y2: worksheet.points[worksheet.points.length - 1].y }
+                                y2: worksheet.points[worksheet.points.length - 1].y },
+                            stroke
                         );
                         geom.shapeType = 'pen';
                     }
                 }
             }else{
                 var bounds = {x1:worksheet.mouseDownPt.x, y1:worksheet.mouseDownPt.y, x2: pt.x, y2: pt.y};
-                if(worksheet.tool !== 'pen'|| worksheet.tool === 'visionobjects'){
-                    board.remove(worksheet.overlayShape);
+                if(!(worksheet.tool === 'pen' || worksheet.tool === 'visionobjects' || worksheet.tool === 'highlighter')){
+                    board.remove(worksheet.overlayShape); // remove the prev. shape if it isn't freehand drawing
                 }
                 if(worksheet.tool === 'rect' && !worksheet.selectedShape ){
                     geom  = createRectJSON(bounds,false);
@@ -580,11 +589,11 @@ Worksheet.prototype.initGfx = function(){
                     dijit.byId('GraphInput').focus();
                     GraphPreview.Update();
                 }else if(worksheet.tool === 'visionobjects'){
-//                    worksheet.textPoint = pt;
-//                    dijit.byId('visionobjectsDialog').show();
                     geom = createPenJSON(worksheet.points);
                     geom = moduleRecognition.process(geom, worksheet.drawing);
-                    //visionObjects.init();
+                }else if(worksheet.tool === 'highlighter') {
+                    geom = createPenJSON(worksheet.points,
+                        {width: worksheet.highlighterStroke, color: worksheet.highlighterColor});
                 }
                 //worksheet.points = [];
                 if(geom){
@@ -790,19 +799,21 @@ Worksheet.prototype.initGfx = function(){
 
         return worksheet.addTimeRand(geom);
     };
-    var createLineJSON = function(bounds){
+    var createLineJSON = function(bounds, myStroke){
+        var stroke = myStroke || {};
         var geom = {
                 xPts: [bounds.x1,bounds.x2],
                 yPts: [bounds.y1,bounds.y2]
         };
         geom.shapeType = 'line';
         geom.fillColor = worksheet.fillColor;
-        geom.lineColor = worksheet.lineColor;
-        geom.lineStroke = worksheet.lineStroke;
+        geom.lineColor = stroke.color || worksheet.lineColor;
+        geom.lineStroke = stroke.width || worksheet.lineStroke;
 
         return worksheet.addTimeRand(geom);
     };
-    var createPenJSON = function(points){
+    var createPenJSON = function(points, myStroke){
+          var stroke = myStroke || {};
           var xPts = [];
           var yPts = [];
           dojo.forEach(points, function(point){
@@ -811,8 +822,8 @@ Worksheet.prototype.initGfx = function(){
           });
         var geom = {shapeType: 'pen',
                     fillColor: worksheet.fillColor,
-                    lineColor: worksheet.lineColor,
-                    lineStroke: worksheet.lineStroke,
+                    lineColor: stroke.color || worksheet.lineColor,
+                    lineStroke: stroke.width || worksheet.lineStroke,
                     xPts: xPts,
                     yPts: yPts
                 };
@@ -955,7 +966,11 @@ Worksheet.prototype.init = function(){
         var cp = worksheet.getDialogWidget(type + 'ColorPaletteWidget');
         //console.log(cp);
         dojo.style(worksheet.getNode(type + 'Swatch'),{backgroundColor: cp.value});
-        worksheet[type + 'Color'] = cp.value;
+        if (worksheet.tool === 'highlighter') {
+            worksheet.highlighterColor = cp.value;
+        } else {
+            worksheet[type + 'Color'] = cp.value;
+        }
         dijit.popup.close(worksheet.getDialogWidget(type + "ColorPaletteDialog"));
     };
     var cancelChooseColor = function(type) {
@@ -985,6 +1000,15 @@ Worksheet.prototype.init = function(){
             } else {
                 worksheet.drawing.drawMode = true;
                 worksheet.overlayContainer.style.cursor="crosshair";
+            }
+            if (toolName === 'highlighter') {
+                worksheet.getWidget('lineStrokeSelect').set('value',worksheet.highlighterStroke);
+                worksheet.getDialogWidget('lineColorPaletteWidget').set('value',worksheet.highlighterColor);
+                dojo.style(worksheet.getNode('lineSwatch'),{backgroundColor: worksheet.highlighterColor});
+            } else {
+                worksheet.getWidget('lineStrokeSelect').set('value',worksheet.lineStroke);
+                worksheet.getDialogWidget('lineColorPaletteWidget').set('value',worksheet.lineColor);
+                dojo.style(worksheet.getNode('lineSwatch'),{backgroundColor: worksheet.lineColor});
             }
         }
         hide("lineColorDisplay");
@@ -1044,7 +1068,7 @@ Worksheet.prototype.init = function(){
         }
     };
     var incrementMovie = function(){
-        var indexEnd = Math.round(dijit.byId('movieSlider').getValue());
+        var indexEnd = Math.round(dijit.byId('movieSlider').get('value'));
         worksheet.movieDrawing.clear();
         for(var i =0; i < indexEnd; i++){
             worksheet.drawFromJSON(worksheet.room.geomMessageList[i].geometry, worksheet.movieDrawing);
@@ -1059,7 +1083,7 @@ Worksheet.prototype.init = function(){
         worksheet.textPoint = null;
     };
     var doAddText = function(){
-        var text = dijit.byId('wbText').getValue();
+        var text = dijit.byId('wbText').get('value');
         if((text !== '') && (worksheet.textPoint)){
             dijit.byId('textDialog').hide();
             var geom = createTextJSON(worksheet.textPoint,text);
@@ -1122,7 +1146,7 @@ Worksheet.prototype.init = function(){
 
     var doIncrementalText = function(){
         //worksheet.overlayDrawing.clear();
-        var text = dijit.byId('wbText').getValue();
+        var text = dijit.byId('wbText').get('value');
         if((text !== '') && (worksheet.textPoint)){
             var geom = createTextJSON(worksheet.textPoint,text);
             worksheet.drawFromJSON(geom,worksheet.overlayDrawing);
@@ -1233,10 +1257,14 @@ Worksheet.prototype.init = function(){
     dojo.connect(dijit.byId('movieSlider'),'onChange',incrementMovie);
     
     dojo.connect(worksheet.getWidget('lineStrokeSelect'),'onChange',function(){
-        worksheet.lineStroke = Math.floor(1.0 * worksheet.getWidget('lineStrokeSelect').getValue());
+        if (worksheet.tool === 'highlighter') {
+            worksheet.highlighterStroke = Math.floor(1.0 * worksheet.getWidget('lineStrokeSelect').get('value'));
+        } else {
+            worksheet.lineStroke = Math.floor(1.0 * worksheet.getWidget('lineStrokeSelect').get('value'));
+        }
     });
     dojo.connect(worksheet.getNode('fontSizeSelect'),'onChange',function(){
-        worksheet.fontSize = Math.floor(1.0 * worksheet.getWidget('fontSizeSelect').getValue());
+        worksheet.fontSize = Math.floor(1.0 * worksheet.getWidget('fontSizeSelect').get('value'));
     });
     dojo.connect(worksheet.getDialogWidget('clearDrawingNoBtn'),'onClick',function(){
         dijit.popup.close(worksheet.getWidget("clearDrawingDialog"));

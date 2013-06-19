@@ -12,11 +12,14 @@
         <button id="penToolBtn_${worksheetId}" dojoType="dijit.form.Button" class="penToolBtn"><img border="0" src="/images/pencil.png"></button>
         <div dojoType="dijit.Tooltip" connectId="penToolBtn_${worksheetId}" position="above" showDelay="0">Pencil<br>(freehand drawing)</div>
 
-        <button id="lineToolBtn_${worksheetId}" dojoType="dijit.form.Button" class="lineToolBtn"><img border="0" src="/images/line.png"></button>
-        <div dojoType="dijit.Tooltip" connectId="lineToolBtn_${worksheetId}" position="above" showDelay="0">Line</div>
+        <button id="highlighterToolBtn_${worksheetId}" dojoType="dijit.form.Button" class="highlighterToolBtn"><img border="0" src="/images/highlighter.png" height="16" width="16"></button>
+        <div dojoType="dijit.Tooltip" connectId="highlighterToolBtn_${worksheetId}" position="above" showDelay="0">Highlighter</div>
 
         <button id="textToolBtn_${worksheetId}" dojoType="dijit.form.Button" class="textToolBtn"><img border="0" src="/images/text.png"></button>
-        <div dojoType="dijit.Tooltip" connectId="textToolBtn_${worksheetId}" position="above" showDelay="0">Draw Text</div>
+        <div dojoType="dijit.Tooltip" connectId="textToolBtn_${worksheetId}" position="above" showDelay="0">Text</div>
+
+        <button id="lineToolBtn_${worksheetId}" dojoType="dijit.form.Button" class="lineToolBtn"><img border="0" src="/images/line.png"></button>
+        <div dojoType="dijit.Tooltip" connectId="lineToolBtn_${worksheetId}" position="above" showDelay="0">Line</div>
 
         <button id="triangleToolBtn_${worksheetId}" dojoType="dijit.form.Button" class="triangleToolBtn"><img border="0" src="/images/icon_triangle2.png"></button>
         <div dojoType="dijit.Tooltip" connectId="triangleToolBtn_${worksheetId}" position="above" showDelay="0">Triangle</div>
@@ -28,15 +31,30 @@
         <div dojoType="dijit.Tooltip" connectId="circleToolBtn_${worksheetId}" position="above" showDelay="0">Circle</div>
 
         <button id="equationToolBtn_${worksheetId}" dojoType="dijit.form.Button" class="equationToolBtn"><img border="0" src="/images/edit-mathematics.png"></button>
-        <div dojoType="dijit.Tooltip" connectId="equationToolBtn_${worksheetId}" position="above" showDelay="0">Equation Input</div>
+        <div dojoType="dijit.Tooltip" connectId="equationToolBtn_${worksheetId}" position="above" showDelay="0">Equation</div>
 
         <button id="graphToolBtn_${worksheetId}" dojoType="dijit.form.Button" class="graphToolBtn"><img border="0" src="/images/chart_curve.png"></button>
-        <div dojoType="dijit.Tooltip" connectId="graphToolBtn_${worksheetId}" position="above" showDelay="0">Graph Input</div>
+        <div dojoType="dijit.Tooltip" connectId="graphToolBtn_${worksheetId}" position="above" showDelay="0">Graph</div>
+
+        <div class="clearDrawingDisplay" dojoType="dijit.form.DropDownButton">
+            <span class="colorText">clear</span>
+            <div dojoType="dijit.TooltipDialog" class="clearDrawingDialog ${worksheetId}" title="Clear Drawing">
+                Clear Drawing?<br>
+                <button class="clearDrawingYesBtn  ${worksheetId}" dojoType="dijit.form.Button">Yes</button> &nbsp;&nbsp;&nbsp;
+                <button class="clearDrawingNoBtn  ${worksheetId}" dojoType="dijit.form.Button">No</button>
+            </div>
+        </div>
+
+        <button id="exportImgBtn_${worksheetId}" dojoType="dijit.form.Button" class="exportImgBtn"><img src="/images/export-icon.png"></button>
+        <div dojoType="dijit.Tooltip" connectId="exportImgBtn_${worksheetId}" position="below" showDelay="0">Export the drawing surface.</div>
+
+        <button id="showMovieBtn_${worksheetId}" dojoType="dijit.form.Button" class="showMovieBtn"><img src="/images/movie-icon.png"></button>
+        <div dojoType="dijit.Tooltip" connectId="showMovieBtn_${worksheetId}" position="below" showDelay="0">View all steps that made this drawing.</div>
 
         <button id="visionobjectsToolBtn_${worksheetId}" dojoType="dijit.form.Button" class="visionobjectsToolBtn"><img border="0" src="/images/visionobjects.png" height="16" width="16"></button>
-        <div dojoType="dijit.Tooltip" connectId="visionobjectsToolBtn_${worksheetId}" position="above" showDelay="0">Vision Objects</div>
+        <div dojoType="dijit.Tooltip" connectId="visionobjectsToolBtn_${worksheetId}" position="above" showDelay="0">Recognition</div>
 
-        <%--<button id="rectToolBtn_${worksheetId}" dojoType="dijit.form.Button" class="rectToolBtn"><img border="0" src="/images/rect.png"></button>--%>
+    <%--<button id="rectToolBtn_${worksheetId}" dojoType="dijit.form.Button" class="rectToolBtn"><img border="0" src="/images/rect.png"></button>--%>
         <%--<div dojoType="dijit.Tooltip" connectId="rectToolBtn_${worksheetId}" position="above" showDelay="0">Rectangle</div>--%>
 
         <%--<button id="filledRectToolBtn_${worksheetId}" dojoType="dijit.form.Button" class="filledRectToolBtn"><img border="0" src="/images/filledRect.png"></button>--%>
@@ -61,22 +79,6 @@
         <%--<div dojoType="dijit.Tooltip" connectId="deleteToolBtn_${worksheetId}" position="above" showDelay="0">Delete a shape</div>--%>
 
         <%--<br>--%>
-
-        <button id="exportImgBtn_${worksheetId}" dojoType="dijit.form.Button" class="exportImgBtn"><img src="/images/export-icon.png"></button>
-        <div dojoType="dijit.Tooltip" connectId="exportImgBtn_${worksheetId}" position="below" showDelay="0">Export the drawing surface.</div>
-
-        <button id="showMovieBtn_${worksheetId}" dojoType="dijit.form.Button" class="showMovieBtn"><img src="/images/movie-icon.png"></button>
-        <div dojoType="dijit.Tooltip" connectId="showMovieBtn_${worksheetId}" position="below" showDelay="0">View all steps that made this drawing.</div>
-
-        <div class="clearDrawingDisplay" dojoType="dijit.form.DropDownButton">
-            <span class="colorText">clear</span>
-            <div dojoType="dijit.TooltipDialog" class="clearDrawingDialog ${worksheetId}" title="Clear Drawing">
-                Clear Drawing?<br>
-                <button class="clearDrawingYesBtn  ${worksheetId}" dojoType="dijit.form.Button">Yes</button> &nbsp;&nbsp;&nbsp;
-                <button class="clearDrawingNoBtn  ${worksheetId}" dojoType="dijit.form.Button">No</button>
-            </div>
-        </div>
-
         <br>
 
         <div class="lineColorDisplay" style="background-color: #FFFFFF; border-color: black; border-width: 1px;" dojoType="dijit.form.DropDownButton">
