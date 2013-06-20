@@ -54,6 +54,9 @@
         <button id="visionobjectsToolBtn_${worksheetId}" dojoType="dijit.form.Button" class="visionobjectsToolBtn"><img border="0" src="/images/visionobjects.png" height="16" width="16"></button>
         <div dojoType="dijit.Tooltip" connectId="visionobjectsToolBtn_${worksheetId}" position="above" showDelay="0">Recognition</div>
 
+        <button id="documentToolBtn_${worksheetId}" dojoType="dijit.form.Button" class="documentToolBtn"><img border="0" src="/images/open-share.png" height="16" width="16"></button>
+        <div dojoType="dijit.Tooltip" connectId="documentToolBtn_${worksheetId}" position="above" showDelay="0">Document</div>
+
     <%--<button id="rectToolBtn_${worksheetId}" dojoType="dijit.form.Button" class="rectToolBtn"><img border="0" src="/images/rect.png"></button>--%>
         <%--<div dojoType="dijit.Tooltip" connectId="rectToolBtn_${worksheetId}" position="above" showDelay="0">Rectangle</div>--%>
 

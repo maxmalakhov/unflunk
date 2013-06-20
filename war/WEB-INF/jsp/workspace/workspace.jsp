@@ -93,6 +93,7 @@ var workspace; // window scope
 <script type="text/javascript" src="/js/workspace/function.js"></script>
 <script type="text/javascript" src="/js/workspace/math-processor.js"></script>
 <script type="text/javascript" src="/js/modules/recognition.js"></script>
+<script type="text/javascript" src="/js/modules/serializer.js"></script>
 
 <style>
 #header{
@@ -185,5 +186,9 @@ var workspace; // window scope
     <div dojoType="dijit.Tooltip" connectId="exportMovieImgBtn">Export this snapshot of the drawing surface.</div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
     user: <span id="movieUser">user</span><br>
 </div>
+
+<%--<div id="documentDialog" dojoType="dijit.Dialog" title="Your Google Drive Files" style="display: none; height: 520px; width: 520px">--%>
+    <%--<div id="documents" dojoType="dijit.layout.ContentPane" style="height: 100%; width: 100%"></div>--%>
+<%--</div>--%>
 
 <jsp:include page="../footer.jsp"/>

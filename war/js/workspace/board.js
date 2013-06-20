@@ -107,38 +107,33 @@ Whiteboard.prototype.createPdf = function(params) {
     var text = this._board.create('text', [0, 70, '<canvas id="' + id + '"></canvas>'], { display : 'html' });
 
     PDFJS.disableWorker = true;
-    PDFJS.getDocument(params.src).then(function getPdfHelloWorld(pdf) {
-          //
-          // Fetch the first page
-          //
-          pdf.getPage(1).then(function getPageHelloWorld(page) {
-            var scale = 1.0;
-            var viewport = page.getViewport(scale);
-            if ( viewport.width > viewport.height ) {
-                scale = 700 / viewport.width;
-            } else {
-                scale = 700 / viewport.height;
-            }
-            viewport = page.getViewport(scale);
-            //
-            // Prepare canvas using PDF page dimensions
-            //
-            var canvas = dojo.query("#" + id)[0];//.getElementById('the-canvas');
-            canvas.parentElement.style.zIndex = -1;
-            
-            var context = canvas.getContext('2d');
-            canvas.height = viewport.height;
-            canvas.width = viewport.width;
+    PDFJS.getDocument(params.src).
+        then(function getPdfHelloWorld(pdf) {
+            var canvas = dojo.query("#" + id)[0];
+            if(canvas) { // if the document wasn't removed
+                // Fetch the first page
+                pdf.getPage(1).then(function getPageHelloWorld(page) {
+                    var scale = 1.0;
+                    var viewport = page.getViewport(scale);
+                    if ( viewport.width > viewport.height ) {
+                        scale = 700 / viewport.width;
+                    } else {
+                        scale = 700 / viewport.height;
+                    }
+                    viewport = page.getViewport(scale);
 
-            //
-            // Render PDF page into canvas context
-            //
-            page.render({canvasContext: context, viewport: viewport});
-          });
-          
-          return this._createElement(text);
-    });
-    
+                    // Prepare canvas using PDF page dimensions
+                    canvas.parentElement.style.zIndex = -1;
+                    var context = canvas.getContext('2d');
+                    canvas.height = viewport.height;
+                    canvas.width = viewport.width;
+
+                    // Render PDF page into canvas context
+                    page.render({canvasContext: context, viewport: viewport});
+                });
+            }
+        });
+
     return this._createElement(text);
 };
 

@@ -5,6 +5,7 @@ function Room(id, token, messages, worksheets) {
 
     this.worksheetIdList = worksheets;
     this.worksheetList = {};
+    this.currentWorksheet = false;
     this.chatMessageList = [];
     this.geomMessageList = [];
     this.messageList = messages;
@@ -32,7 +33,9 @@ function Room(id, token, messages, worksheets) {
                 worksheet.init();
                 worksheet.initGfx();
                 room.addWorksheet(worksheet);
-
+                if(Object.keys(room.worksheetList).length === 1 || show) {
+                    room.currentWorksheet = worksheet;
+                }
                 worksheetTabs.resize();
             },
             selected: true,
@@ -123,6 +126,8 @@ Room.prototype.init = function(){
     dojo.connect(dijit.byId(room.id),'onClose', function() {
         workspace.removeRoom(room.id);
     });
+
+    getDocs(room);
 };
 Room.prototype.drawFromJSON = function(worksheetId, geom) {
     if(this.worksheetList[worksheetId]) {

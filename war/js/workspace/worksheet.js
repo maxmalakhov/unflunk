@@ -17,6 +17,7 @@ var tools = [{name: 'hand'}
             ,{name: 'graph', showLineColor: true, showLineThickness: true}
             ,{name: 'visionobjects', showLineColor: true, showLineThickness: true}
             ,{name: 'highlighter', showLineColor: true, showLineThickness: true}
+            ,{name: 'document'}
             ];
 
 // multiple instances
@@ -162,32 +163,8 @@ Worksheet.prototype.drawFromJSON = function(geom,drawing,strong) {
         if(geom.shapeType === 'rect'){
             shape = drawing.createRect({x: geom.xPts[0], y: geom.yPts[0], width: (geom.xPts[1] - geom.xPts[0]), height: (geom.yPts[1] - geom.yPts[0]) });
         } else if(geom.shapeType === 'image'){
-            var imgData = geom.dataStr || ((geom.data) ? geom.data.value : null);
-            if(imgData && strong){
-                window.URL = window.URL || window.webkitURL;
-
-                var href2 = "/images/save.png";
-
-                // TODO: It's work fine
-                try {
-                    var img = new Image();
-                    img.type = "image/svg+xml";
-                    img.addEventListener("load", function(){
-                        shape = drawing.createImage({
-                            x:xSize[0],
-                            y:ySize[0],
-                            width: xSize[1],
-                            height: ySize[1],
-                            src: href2
-                        });
-                        //window.URL.revokeObjectURL(href);
-                    });
-                    img.src = href2;
-                } catch(ex) {
-                    console.error(ex);
-                    console.trace();
-                }
-            }
+            shape = drawing.createImage({src:geom.text, x:geom.xPts[0], y:geom.yPts[0], width: (geom.xPts[1] - geom.xPts[0]), height: (geom.yPts[1] - geom.yPts[0]) });
+//            shape = drawing.createImage({src:geom.text, x:geom.xPts[0], y:geom.yPts[0], width: 70, height: 70 });
         } else if(geom.shapeType === 'pdf'){
             shape = drawing.createPdf({src:geom.text, x:geom.xPts[0], y:geom.yPts[0]});
         } else if ( geom.shapeType === 'video' ) {
@@ -379,23 +356,21 @@ Worksheet.prototype.sendMessage = function(message){
     delete message.geometry.key;
     this.room.sendMessage(dojo.mixin(message, { worksheetId: this.id }));
 };
+Worksheet.prototype.getGfxMouse = function(evt){
+    var worksheet = this;
+    var coordsM = dojo.position(worksheet.container);
+    var coords = new JXG.Coords(JXG.COORDS_BY_SCREEN, [Math.round(evt.clientX - coordsM.x), Math.round(evt.clientY - coordsM.y)], worksheet.drawing._board);
+    return coords ? { x : coords.usrCoords[1], y : coords.usrCoords[2] } : null;
+};
 Worksheet.prototype.initGfx = function(){
     var worksheet = this;
     // private methods
-    var getGfxMouse = function(evt){
-        var coordsM = dojo.position(worksheet.container);//dojo.coords(worksheet.container);
-        //TODO: SXGraph
-        var coords = new JXG.Coords(JXG.COORDS_BY_SCREEN, [Math.round(evt.clientX - coordsM.x), Math.round(evt.clientY - coordsM.y)], worksheet.drawing._board);
-          //console.dir(coords);
-        return coords ? { x : coords.usrCoords[1], y : coords.usrCoords[2] } : null;
-//        return {x: Math.round(evt.clientX - coordsM.x), y: Math.round(evt.clientY - coordsM.y)};
-    };
     var doGfxMouseDown = function(evt) {
         if (worksheet.tool === 'hand') {
             return;
         }
 
-        var pt = getGfxMouse(evt);
+        var pt = worksheet.getGfxMouse(evt);
         //console.dir(pt);
         if(pointInDrawing(pt)){
             worksheet.mouseDownPt = pt;
@@ -413,7 +388,7 @@ Worksheet.prototype.initGfx = function(){
             return;
         }
 
-        var pt = getGfxMouse(evt);
+        var pt = worksheet.getGfxMouse(evt);
         var geom = false;
         var shape = false;
         var board = worksheet.drawing; // overlayDrawing drawing
@@ -513,7 +488,7 @@ Worksheet.prototype.initGfx = function(){
             return;
         }
 
-        var pt = getGfxMouse(evt);
+        var pt = worksheet.getGfxMouse(evt);
         worksheet.mouseDown = false;
         worksheet.process = false;
         //console.dir(pt);
@@ -594,6 +569,11 @@ Worksheet.prototype.initGfx = function(){
                 }else if(worksheet.tool === 'highlighter') {
                     geom = createPenJSON(worksheet.points,
                         {width: worksheet.highlighterStroke, color: worksheet.highlighterColor});
+                }else if(worksheet.tool === 'document'){
+//                    worksheet.textPoint = pt;
+//                    dijit.byId('postmentDialog').show();
+//                    dijit.byId('documents').show();
+                    //getDocs();
                 }
                 //worksheet.points = [];
                 if(geom){
@@ -926,8 +906,8 @@ Worksheet.prototype.initGfx = function(){
     worksheet.movieContainer.style.width = worksheet.width + 'px';
     worksheet.movieContainer.style.height = worksheet.height + 'px';
 
-//    worksheet.movieDrawing = new Whiteboard("movieWhiteboardContainer");
-    worksheet.movieDrawing = dojox.gfx.createSurface(worksheet.movieContainer, worksheet.width, worksheet.height);
+    worksheet.movieDrawing = new Whiteboard("movieWhiteboardContainer");
+//    worksheet.movieDrawing = dojox.gfx.createSurface(worksheet.movieContainer, worksheet.width, worksheet.height);
 
     //draw any saved objects
     dojo.forEach(worksheet.room.messageList, function(message){
