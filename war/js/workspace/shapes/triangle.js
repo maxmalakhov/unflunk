@@ -4,20 +4,27 @@
         this._p3 = p3 || [200.0, 250.0];
         
         var triangle = this;
+        var calcAngle = function(a, b, c) {
+            var angle = JXG.Math.Geometry.trueAngle(a, b, c);
+            if(angle > 180) {
+                angle = 360 - angle;
+            }
+            return angle.toFixed(2) + "&deg;";
+        };
         
         this._p1 = board.create('point', this._p1,
                   { name : function() {
-                      return JXG.Math.Geometry.trueAngle(triangle._p2, triangle._p1, triangle._p3).toFixed(2) + "&deg;";
+                      return calcAngle(triangle._p2, triangle._p1, triangle._p3);
                   },size:0.5
               });
         this._p2 = board.create('point', this._p2,
                   { name : function() {
-                      return JXG.Math.Geometry.trueAngle(triangle._p3, triangle._p2, triangle._p1).toFixed(2) + "&deg;";
+                      return calcAngle(triangle._p3, triangle._p2, triangle._p1);
                   },size:0.5
               });
         this._p3 = board.create('point', this._p3,
                     { name : function() {
-                          return JXG.Math.Geometry.trueAngle(triangle._p1, triangle._p3, triangle._p2).toFixed(2) + "&deg;";
+                          return calcAngle(triangle._p1, triangle._p3, triangle._p2);
                     },size:0.5
                 });
 
