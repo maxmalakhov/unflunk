@@ -1,6 +1,7 @@
 package com.azprogrammer.qgf.auth;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
@@ -251,8 +252,17 @@ public class CredentialMediator {
 	      // available.
 	      // If an authorizationCode is present, upgrade it into an
 	      // access token and hopefully a refresh token.
+          StringBuffer redirectUri = new StringBuffer();
+          redirectUri.append(request.getScheme()+"://");
+          redirectUri.append(request.getServerName());
+          if(!"80".equals(request.getServerPort())) {
+            redirectUri.append(":"+request.getServerPort());
+          }
+          redirectUri.append("/oauth2callback");
+          secrets.getWeb().setRedirectUris(Arrays.asList(new String[] {redirectUri.toString()}));
 	      if ((credential == null || credential.getRefreshToken() == null)
 	          && request.getParameter("code") != null) {
+
 	        credential = exchangeCode(request.getParameter("code"));
 	        if (credential != null) {
 	          Userinfo userInfo = getUserInfo(credential);
