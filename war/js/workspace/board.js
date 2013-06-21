@@ -49,7 +49,7 @@ Whiteboard.prototype.remove = function(shape) {
 
 Whiteboard.prototype.createEquation = function(params) {
     var data = '$'+dojox.html.entities.decode(params.data.value || params.data)+'$';
-    var equation = this._board.create('text', [params.x, params.y, function () { return data; }]);
+    var equation = this._createElement(this._createText(params.x,params.y,data));
     return this._createElement(equation);
 };
 
@@ -92,19 +92,25 @@ Whiteboard.prototype.createGraph = function(params) {
 
 
 Whiteboard.prototype.createImage = function(params) {
-    var image = this._board.create('image', [params.src, [params.x, params.y], [params.width, params.height]]);
+    var point = this._board.create('point', [params.x, params.y], {visible: false});
+    //var text = this._board.create('image', [function() { return point.X(); }, function() { return point.Y(); }, function() { return data;}],options);
+    var image = this._board.create('image', [params.src, [function() { return point.X(); }, function() { return point.Y(); }], [params.width, params.height]]);
+    image.isDraggable = true;
+    image.pointList = [point];
     return this._createElement(image);
 };
 
 Whiteboard.prototype.createVideo = function(params) {
     var id = "video" + Math.floor(Math.random()*100000);
-    var text = this._board.create('text', [params.x, params.y, '<video id="' + id + '" width="640" controls><source src="' + params.src + '" type="video/mp4"/></canvas>'], { display : 'html' });
-    return this._createElement(text);
+    var data = '<video id="' + id + '" width="640" controls><source src="' + params.src + '" type="video/mp4"/></canvas>';
+    var video = this._createText(params.x,params.y,data,{ display : 'html' });
+    return this._createElement(video);
 };
 
 Whiteboard.prototype.createPdf = function(params) {
     var id = "pdf" + Math.floor(Math.random()*100000);
-    var text = this._board.create('text', [0, 70, '<canvas id="' + id + '"></canvas>'], { display : 'html' });
+    var data = '<canvas id="' + id + '"></canvas>';
+    var doc = this._createText(params.x,params.y,data,{ display : 'html' });
 
     PDFJS.disableWorker = true;
     PDFJS.getDocument(params.src).
@@ -134,7 +140,7 @@ Whiteboard.prototype.createPdf = function(params) {
             }
         });
 
-    return this._createElement(text);
+    return this._createElement(doc);
 };
 
 Whiteboard.prototype.createLine = function(xPts, yPts) {
@@ -165,9 +171,16 @@ Whiteboard.prototype.createPenLine = function(xPts, yPts, withPoints) {
 };
 
 Whiteboard.prototype.createText = function(params) {
-    var text = this._board.create('text', [params.x, params.y, params.text]);
+    return this._createElement(this._createText(params.x,params.y,params.text));
+};
 
-    return this._createElement(text);
+Whiteboard.prototype._createText = function(x,y,data,myOptions) {
+    var options = myOptions || {};
+    var point = this._board.create('point', [x, y], {visible: false});
+    var text = this._board.create('text', [function() { return point.X(); }, function() { return point.Y(); }, function() { return data;}],options);
+    text.isDraggable = true;
+    text.pointList = [point];
+    return text;
 };
 
 Whiteboard.prototype.createEllipse = function(params) {
@@ -259,33 +272,37 @@ Whiteboard.prototype._createElement = function(element) {
     element.moveTo = function(xPts, yPts) {
         //var pointList = (element.elType === 'text') ? [element] : element.pointList;
         if(element.pointList) {
+            console.debug("Move '",element.elType,"' by points to",xPts[0],",",yPts[0]);
             for(var i = 0; i<xPts.length && i<yPts.length && i<element.pointList.length; i++) {
                 element.pointList[i].setPosition(JXG.COORDS_BY_USER, [xPts[i],yPts[i]]);
             }
-        } else {
-            if(element.elType === 'text') {
-//                var offset = board.create('transform', [xPts[0],yPts[0]], {type:'translate'});
-//                offset.bindTo(element);
-                element.coords.usrCoords[1] = xPts[0];
-                element.coords.usrCoords[2] = yPts[0];
-                element.coords.usr2screen();
-            }
-        }
+        } else if(element.coords) {
+            console.debug("Move '",element.elType,"' by coords to",xPts[0],",",yPts[0]);
+            element.coords.setCoordinates(JXG.COORDS_BY_USER, [xPts[0], yPts[0]]);
+//            var offset = board.create('transform', [xPts[0],yPts[0]], {type:'translate'});
+//            offset.bindTo(element);
+    }
         board.update();
     };
 
     var callback = function(evt) {
         var newXPts = [], newYPts = [];
-        var pointList = (element.elType === 'text') ? [element] : element.pointList;
-        dojo.forEach(pointList, function(point){
-            newXPts.push(point.X());
-            newYPts.push(point.Y());
-        });
-        var newGeom = dojo.clone(element.geom);
-        newGeom.shapeType = 'update';
-        newGeom.xPts = newXPts;
-        newGeom.yPts = newYPts;
-        element.worksheet.sendMessage({geometry:newGeom});
+        if(element.coords) {
+            newXPts.push(element.X());
+            newYPts.push(element.Y());
+        } else if(element.pointList) {
+            dojo.forEach(element.pointList, function(point){
+                newXPts.push(point.X());
+                newYPts.push(point.Y());
+            });
+        }
+        if(newXPts.length > 0 && newYPts.length > 0) {
+            var newGeom = dojo.clone(element.geom);
+            newGeom.shapeType = 'update';
+            newGeom.xPts = newXPts;
+            newGeom.yPts = newYPts;
+            element.worksheet.sendMessage({geometry:newGeom});
+        }
     };
     // add an event to the shape and its points
     dojo.forEach(element.pointList, function(point){
@@ -300,6 +317,14 @@ Whiteboard.prototype._createElement = function(element) {
         }
     });
     element.on("up", callback);
+    if(element.coords){
+        element.coords.on('update', function (ou, os) {
+            if(drawing.drawMode) {
+                this.usrCoords = ou;
+                this.usr2screen();
+            }
+        });
+    }
     
     this.children.push(element);
     return element;
