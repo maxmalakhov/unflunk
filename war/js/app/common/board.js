@@ -235,6 +235,35 @@ Whiteboard.prototype.getUsrCoordsOfMouse = function(evt) {
     return this._board.getUsrCoordsOfMouse(evt);
 };
 
+Whiteboard.prototype.getHoveredShape = function(pt){
+    var ptInBox = function(pt, box){
+        if(pt && box){
+            if((pt.x >= box.x1) && (pt.x <= box.x2) && (pt.y >= box.y1) && (pt.y <= box.y2)){
+                return true;
+            }else{
+                return false;
+            }
+        }else{
+            return false;
+        }
+    };
+
+    try{
+        var children = this.children;
+        if(children){
+            for(var i = children.length; i > 0; i--){
+                var child = children[i - 1];
+                if(ptInBox(pt,child.wbbb)){
+                    return child;
+                }
+            }
+        }
+    }catch(e){
+        console.debug('error finding shape',e);
+    }
+    return null;
+};
+
 Whiteboard.prototype._createElement = function(element) {
     var drawing = this;
     var board = this._board;

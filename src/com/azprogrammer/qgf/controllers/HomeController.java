@@ -114,10 +114,10 @@ public class HomeController
         
     }
     
-    @RequestMapping(value="/*")
-    public String doHome(ModelMap model, HttpServletRequest req){
-        return "home";
-    }
+//    @RequestMapping(value="/*")
+//    public String doHome(ModelMap model, HttpServletRequest req){
+//        return "home";
+//    }
     
     @RequestMapping(value="/whiteboard/{wbId}")
     public ModelAndView doWhiteboardREST(ModelMap model, HttpServletRequest req,@PathVariable String wbId){

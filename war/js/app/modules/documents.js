@@ -20,7 +20,6 @@ var getDocs = function(room) {
                     thumbnail.style.borderWidth = "1px";
                     thumbnail.style.borderStyle = "solid";
 
-
                     var mimeType = this.getAttribute("data-mime-type");
                     var url = this.getAttribute("data-url") + "&mimeType=" + mimeType;
 
@@ -38,18 +37,8 @@ var getDocs = function(room) {
                     };
                     thumbnail.onmouseup = function(evt) {
                         document.body.removeChild(thumbnail);
-                        var geom;
-                        var coords = worksheet.getGfxMouse(evt);
-                        console.dir(coords);
-                        if ( mimeType == "application/pdf" ) {
-                            geom = moduleSerializer.createPdfJSON(coords.x, coords.y, url);
-                        } else if ( mimeType == "video/mp4") {
-                            geom = moduleSerializer.createVideoJSON(coords.x, coords.y, url);
-                        } else {
-                            geom = moduleSerializer.createImageJSON({x1 : coords.x, y1 : coords.y, x2 : coords.x + 30, y2 : coords.y - 30}, url);
-                        }
-                        worksheet.drawFromJSON(geom, worksheet.drawing);
-                        worksheet.sendMessage({geometry:geom});
+                        var point = worksheet.getGfxMouse(evt);
+                        worksheet.events.doAddDocument(mimeType, url, point);
                     };
                     document.body.appendChild(thumbnail);
                 });

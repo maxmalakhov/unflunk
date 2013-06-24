@@ -25,6 +25,20 @@ public class WebUtil
             return false;
         }
     }
+
+    public static boolean isMobile(String userAgent){
+        if(userAgent == null){
+            userAgent = "";
+        }
+        userAgent = userAgent.toUpperCase ();
+
+        if((userAgent.indexOf ("ANDROID") > -1) || (userAgent.indexOf ("IPHONE") > -1) || (userAgent.indexOf ("IPAD") > -1)){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
     
     public static String getMobileTheme(HttpServletRequest req){
         String agent = req.getHeader ("user-agent");
@@ -34,6 +48,20 @@ public class WebUtil
         agent = agent.toUpperCase ();
         
         if(agent.indexOf ("ANDROID") > -1){
+            return "android";
+        }
+        else{
+            return "iphone";
+        }
+    }
+
+    public static String getMobileTheme(String userAgent){
+        if(userAgent == null){
+            userAgent = "";
+        }
+        userAgent = userAgent.toUpperCase ();
+
+        if(userAgent.indexOf ("ANDROID") > -1){
             return "android";
         }
         else{

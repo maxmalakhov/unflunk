@@ -36,6 +36,7 @@ package com.azprogrammer.qgf.controllers;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 import com.azprogrammer.qgf.model.*;
+import com.azprogrammer.qgf.util.WebUtil;
 import com.google.appengine.api.channel.ChannelMessage;
 import com.google.appengine.api.channel.ChannelService;
 import com.google.appengine.api.channel.ChannelServiceFactory;
@@ -79,8 +80,6 @@ public class WorkspaceController {
     private static final String PARAM_ROOM_ID = "roomId";
 
     private static final String URL_WORKSPACE_ROOT = "/workspace";
-    private static final String URL_WORKSPACE_LOGIN = URL_WORKSPACE_ROOT + "/login";
-    private static final String URL_WORKSPACE_LOGOUT = URL_WORKSPACE_ROOT + "/logout";
     private static final String URL_WORKSPACE_HOME = URL_WORKSPACE_ROOT + "/{"+PARAM_WORKSPACE_ID+"}";
     private static final String URL_WORKSPACE_ROOM = URL_WORKSPACE_HOME + "/room/{"+PARAM_ROOM_ID+"}";
     private static final String URL_WORKSPACE_ROOM_NEW = URL_WORKSPACE_HOME + "/room";
@@ -102,70 +101,19 @@ public class WorkspaceController {
         binder.registerCustomEditor(String.class, new StringTrimmerEditor(true));
     }
 
-    @RequestMapping(value = URL_WORKSPACE_LOGIN, method = RequestMethod.GET)
-    public String login(@RequestHeader(required = false) String referer,
-                              @RequestHeader("User-Agent") String userAgent,
-                              HttpSession session) {
-
-        return "workspace/login";
-    }
-
-    @RequestMapping(value = URL_WORKSPACE_LOGOUT, method = RequestMethod.POST)
-    @ResponseStatus(HttpStatus.OK)
-    public void logout(HttpSession session) {
-
-        session.removeAttribute("userName");
-    }
-
-    @RequestMapping(value = URL_WORKSPACE_LOGIN, method = RequestMethod.POST, consumes = APPLICATION_JSON_VALUE)
-    @ResponseBody
-    public String login(@RequestHeader(required = false) String referer,
-                              @RequestHeader("User-Agent") String userAgent,
-                              @RequestParam String userName,
-                              HttpSession session) throws IOException {
-
-        Map<String, Object> model = new HashMap<String, Object>(1);
-
-        String workspaceId = null;
-        synchronized (this) {
-            try {
-                List<Workspace> workspaces = (List<Workspace>) persistenceManager.find(
-                        Workspace.class,
-                        "this.user == userName",
-                        "String userName",
-                        new Object[] { userName },
-                        "creationDate desc");
-
-                if(workspaces.isEmpty()) {
-                    Workspace newWorkspace = new Workspace(userName);
-                    persistenceManager.makePersistent(newWorkspace);
-                    workspaceId = newWorkspace.getStringKey();
-                } else {
-                    workspaceId = workspaces.get(0).getStringKey();
-                }
-                session.setAttribute("userName", userName);
-            } catch(Exception ex) {
-                model.put("error", ex.getMessage());
-            }
-        }
-
-        if(workspaceId != null) {
-            model.put("workspaceId", workspaceId);
-        }
-
-        ObjectMapper mapper = new ObjectMapper();
-        String response = mapper.writeValueAsString(model);
-
-        return response;
-    }
-
     @RequestMapping(value = URL_WORKSPACE_HOME, method = RequestMethod.GET)
     public ModelAndView showWorkspacePage(@RequestHeader(required = false) String referer,
                                     @RequestHeader("User-Agent") String userAgent,
                                     @PathVariable String workspaceId,
                                     HttpSession session) throws IOException {
 
-        ModelAndView view = new ModelAndView("workspace/workspace");
+        ModelAndView view = new ModelAndView();
+        if(WebUtil.isMobile(userAgent)){
+            view.addObject("mobileTheme", WebUtil.getMobileTheme(userAgent));
+            view.setViewName("mobileboard");
+        }else{
+            view.setViewName("workspace/workspace");
+        }
 
         Workspace workspace = null;
         synchronized (this) {

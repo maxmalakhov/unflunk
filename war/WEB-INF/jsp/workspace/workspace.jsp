@@ -61,13 +61,6 @@ var workspace; // window scope
 <%--<script src="/js/libs/jsxgraphsrc.js"></script>--%>
 
 <%--<script src="/js/azp/WBCommon.js"></script>--%>
-<script src="/js/workspace/worksheet.js"></script>
-<script src="/js/workspace/room.js"></script>
-<script src="/js/workspace/workspace.js"></script>
-<script src="/js/workspace/board.js"></script>
-<script src="/js/workspace/documents.js"></script>
-
-<script src="/js/workspace/shapes/triangle.js"></script>
 
 <!-- Call specific libs and styles -->
 <script src="/js/azp/adapter.js"></script>
@@ -83,17 +76,29 @@ var workspace; // window scope
         "HTML-CSS": { scale: 90 }
     });
 </script>
-<script type="text/javascript" src="/js/workspace/equation.js"></script>
 
 <%-- JSXGraph, http://jsxgraph.uni-bayreuth.de --%>
 <link rel="stylesheet" type="text/css" href="http://jsxgraph.uni-bayreuth.de/distrib/jsxgraph.css" />
 <%--<script type="text/javascript" src="http://jsxgraph.uni-bayreuth.de/distrib/jsxgraphcore.js"></script>--%>
 <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/jsxgraph/0.96/jsxgraphcore.js"></script>
-<script type="text/javascript" src="/js/workspace/graph.js"></script>
-<script type="text/javascript" src="/js/workspace/function.js"></script>
-<script type="text/javascript" src="/js/workspace/math-processor.js"></script>
-<script type="text/javascript" src="/js/modules/recognition.js"></script>
-<script type="text/javascript" src="/js/modules/serializer.js"></script>
+
+<script type="text/javascript" src="/js/app/common/former.js"></script>
+<script type="text/javascript" src="/js/app/common/drawer.js"></script>
+<script type="text/javascript" src="/js/app/common/events.js"></script>
+<script type="text/javascript" src="/js/app/common/board.js"></script>
+
+<script type="text/javascript" src="/js/app/shapes/triangle.js"></script>
+
+<script type="text/javascript" src="/js/app/modules/graph.js"></script>
+<script type="text/javascript" src="/js/app/modules/function.js"></script>
+<script type="text/javascript" src="/js/app/modules/math-processor.js"></script>
+<script type="text/javascript" src="/js/app/modules/recognition.js"></script>
+<script type="text/javascript" src="/js/app/modules/equation.js"></script>
+<script type="text/javascript" src="/js/app/modules/documents.js"></script>
+
+<script type="text/javascript" src="/js/app/regular/worksheet.js"></script>
+<script type="text/javascript" src="/js/app/regular/room.js"></script>
+<script type="text/javascript" src="/js/app/regular/workspace.js"></script>
 
 <style>
 #header{
