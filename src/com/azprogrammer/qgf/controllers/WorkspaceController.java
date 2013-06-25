@@ -111,7 +111,7 @@ public class WorkspaceController {
         if(WebUtil.isMobile(userAgent)){
             view.addObject("mobileTheme", WebUtil.getMobileTheme(userAgent));
             //view.setViewName("mobile/workspace");
-            view.setViewName("mobileboard");
+            view.setViewName("mobile/workspace");
         }else{
             view.setViewName("regular/workspace");
         }
@@ -128,7 +128,7 @@ public class WorkspaceController {
         if (workspace != null) {
             view.addObject("userName",workspace.getUser());
             view.addObject("workspaceId",workspace.getStringKey());
-            view.addObject("roomList",  new ObjectMapper().writeValueAsString(workspace.getRoomList()));
+            view.addObject("roomList",  workspace.getRoomList());//new ObjectMapper().writeValueAsString(workspace.getRoomList()));
             session.setAttribute("userName", workspace.getUser());
         }
 

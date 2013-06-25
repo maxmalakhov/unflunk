@@ -1,6 +1,7 @@
 package com.azprogrammer.qgf.controllers;
 
 import com.azprogrammer.qgf.model.Workspace;
+import com.azprogrammer.qgf.util.WebUtil;
 import com.google.appengine.repackaged.org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
@@ -9,6 +10,7 @@ import org.springframework.orm.jdo.JdoTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
@@ -39,11 +41,18 @@ public class LoginController {
     }
 
     @RequestMapping(value = { "/", URL_WORKSPACE_LOGIN }, method = RequestMethod.GET)
-    public String login(@RequestHeader(required = false) String referer,
+    public ModelAndView login(@RequestHeader(required = false) String referer,
                         @RequestHeader("User-Agent") String userAgent,
                         HttpSession session) {
 
-        return "regular/login";
+        ModelAndView mav = new ModelAndView();
+        if(WebUtil.isMobile(userAgent)){
+            mav.addObject("mobileTheme", WebUtil.getMobileTheme(userAgent));
+            mav.setViewName("mobile/login");
+        }else{
+            mav.setViewName("regular/login");
+        }
+        return mav;
     }
 
     @RequestMapping(value = URL_WORKSPACE_LOGOUT, method = RequestMethod.POST)

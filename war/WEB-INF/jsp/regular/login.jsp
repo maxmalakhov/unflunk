@@ -3,23 +3,16 @@
 <%
  String hostName=request.getServerName();
 %>
-
-<script>
-
-var wbId = '${wbId}';
-var token = '${token}';
-var userName = '${userName}';
-var error = '${errorMsg}';
-</script>
-<%--<script src="/js/azp/WBCommon.js"></script>--%>
-<script src="/js/app/regular/login.js"></script>
-
 <script type="text/javascript">
+    var userName = '${userName}';
+
     dojo.require("dijit.layout.TabContainer");
     dojo.require("dojox.layout.TableContainer");
     dojo.require("dijit.layout.ContentPane");
     dojo.require("dijit.form.ValidationTextBox");
 </script>
+
+<script src="/js/app/common/login.js"></script>
 
 <style>
 #header{

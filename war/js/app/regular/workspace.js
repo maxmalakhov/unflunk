@@ -72,7 +72,7 @@ function Workspace(id, roomIdList) {
             handleAs: "json",
             preventCache: true
         }).then(function(resp){
-            window.location.href = "/workspace";
+            window.location.href = "/";
         }, function(e){
             console.info("post error",e);
         });

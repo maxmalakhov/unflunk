@@ -6,14 +6,14 @@
 
 <script src='/_ah/channel/jsapi'></script>
 <script>
-//dojo.require('workspace.BBCodeEditor');
 
 var userName = '${userName}';
 var workspaceId = '${workspaceId}';
-var roomIdList = [];
-<c:if test="${not empty roomList}">
-roomIdList = ${roomList}; // json array
-</c:if>
+var roomIdList = [
+    <c:forEach items="${roomList}" var="room">
+    '${room}',
+    </c:forEach>
+];
 var error = '${errorMsg}';
 var workspace; // window scope
 
@@ -58,9 +58,6 @@ var workspace; // window scope
 
 <script src="/js/libs/pdf.js"></script>
 <script src="/js/libs/compatibility.js"></script>
-<%--<script src="/js/libs/jsxgraphsrc.js"></script>--%>
-
-<%--<script src="/js/azp/WBCommon.js"></script>--%>
 
 <!-- Call specific libs and styles -->
 <script src="/js/azp/adapter.js"></script>
@@ -101,15 +98,6 @@ var workspace; // window scope
 <script type="text/javascript" src="/js/app/regular/workspace.js"></script>
 
 <style>
-#header{
-	font-size: 3em;
-	text-align: center;
-
-}
-
-#setUserDiv{
-	text-align: center;
-}
 
 ._webstore_badge {
   width: 128px;
@@ -191,9 +179,5 @@ var workspace; // window scope
     <div dojoType="dijit.Tooltip" connectId="exportMovieImgBtn">Export this snapshot of the drawing surface.</div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
     user: <span id="movieUser">user</span><br>
 </div>
-
-<%--<div id="documentDialog" dojoType="dijit.Dialog" title="Your Google Drive Files" style="display: none; height: 520px; width: 520px">--%>
-    <%--<div id="documents" dojoType="dijit.layout.ContentPane" style="height: 100%; width: 100%"></div>--%>
-<%--</div>--%>
 
 <jsp:include page="../footer.jsp"/>
