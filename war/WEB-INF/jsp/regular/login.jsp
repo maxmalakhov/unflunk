@@ -12,7 +12,7 @@ var userName = '${userName}';
 var error = '${errorMsg}';
 </script>
 <%--<script src="/js/azp/WBCommon.js"></script>--%>
-<script src="/js/workspace/login.js"></script>
+<script src="/js/app/regular/login.js"></script>
 
 <script type="text/javascript">
     dojo.require("dijit.layout.TabContainer");

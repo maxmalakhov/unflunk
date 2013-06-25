@@ -43,7 +43,7 @@ public class LoginController {
                         @RequestHeader("User-Agent") String userAgent,
                         HttpSession session) {
 
-        return "workspace/login";
+        return "regular/login";
     }
 
     @RequestMapping(value = URL_WORKSPACE_LOGOUT, method = RequestMethod.POST)

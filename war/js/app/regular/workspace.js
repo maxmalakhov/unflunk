@@ -13,20 +13,17 @@ function Workspace(id, roomIdList) {
     this.removeRoom = function(roomId) {
         var workspace = this;
         console.debug('removeRoom()');
-        dojo.xhrDelete({
-            url: "/workspace/"+workspace.id+"/room/"+roomId,
-            load: function(resp){
-                if(resp.error){
-                    console.error(resp.error);
-                } else {
-                    // ok
-                }
-            },
-            error: function(e){
-                console.info("post error",e);
-            },
+        dojo.request.delete("/workspace/"+workspace.id+"/room/"+roomId, {
             handleAs: "json",
             preventCache: true
+        }).then(function(resp){
+            if(resp.error){
+                console.error(resp.error);
+            } else {
+                // ok
+            }
+        },function(ex){
+            console.error(ex);
         });
     };
 
@@ -35,55 +32,49 @@ function Workspace(id, roomIdList) {
         console.debug('newRoom()');
         var roomTabs = dijit.byId("rooms");
         try {
-            dojo.xhrPost({
-                url: "/workspace/"+workspace.id+"/room/"+(roomId || ''),
-                load: function(resp){
-                    if(resp.error){
-                        console.error(resp.error);
-                    } else {
-                        var roomTab = new dijit.layout.ContentPane({
-                            id: resp.roomId,
-                            title: "Room #"+(++workspace.roomCount),
-                            href: "/workspace/"+workspace.id+"/room/"+resp.roomId,
-                            onDownloadEnd: function() {
-                                var room = new Room(resp.roomId, resp.token, resp.messages, resp.worksheets);
-                                if (room.token) {
-                                    room.openChannel();
-                                    room.init();
-                                }
-                                workspace.addRoom(room);
-                                dijit.byId('applicationArea').resize();
-                            },
-                            selected: true,
-                            closable: true
-                        });
-                        roomTabs.addChild(roomTab);
-                        if(!roomId) {
-                            roomTabs.selectChild(roomTab);
-                        }
-                    }
-                },
-                error: function(e){
-                    console.info("post error",e);
-                },
+            dojo.request.post("/workspace/"+workspace.id+"/room/"+(roomId || ''), {
                 handleAs: "json",
                 preventCache: true
+            }).then(function(resp){
+                if(resp.error){
+                    console.error(resp.error);
+                } else {
+                    var roomTab = new dijit.layout.ContentPane({
+                        id: resp.roomId,
+                        title: "Room #"+(++workspace.roomCount),
+                        href: "/workspace/"+workspace.id+"/room/"+resp.roomId,
+                        onDownloadEnd: function() {
+                            var room = new Room(resp.roomId, resp.token, resp.messages, resp.worksheets);
+                            if (room.token) {
+                                room.openChannel();
+                                room.init();
+                            }
+                            workspace.addRoom(room);
+                            dijit.byId('applicationArea').resize();
+                        },
+                        selected: true,
+                        closable: true
+                    });
+                    roomTabs.addChild(roomTab);
+                    if(!roomId) {
+                        roomTabs.selectChild(roomTab);
+                    }
+                }
+            }, function(ex){
+                console.error(ex);
             });
         } catch(ex) {
             console.error(ex);
         }
     };
     this.exit = function() {
-        dojo.xhrPost({
-            url: "/workspace/logout",
-            load: function(resp){
-                window.location.href = "/workspace";
-            },
-            error: function(e){
-                console.info("post error",e);
-            },
+        dojo.request.post("/workspace/logout", {
             handleAs: "json",
             preventCache: true
+        }).then(function(resp){
+            window.location.href = "/workspace";
+        }, function(e){
+            console.info("post error",e);
         });
     };
 }

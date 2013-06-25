@@ -111,7 +111,7 @@ public class RoomController {
 
     @RequestMapping(value = URL_ROOM_WORKSHEET, method = RequestMethod.GET)
     public ModelAndView getWorksheetPage(@PathVariable String roomId, @PathVariable String worksheetId) {
-        return new ModelAndView("workspace/worksheet")
+        return new ModelAndView("regular/worksheet")
                 .addObject("roomId", roomId)
                 .addObject("worksheetId", worksheetId);
     }

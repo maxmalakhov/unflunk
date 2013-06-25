@@ -64,39 +64,33 @@ Room.prototype.init = function(){
     // private methods
     var sendEmail = function() {
         console.debug('sendEmail()');
-        dojo.xhrPost({
-            url: '/wbmail',
-            content: {
+        dojo.request.post('/wbmail', {
+            handleAs: "json",
+            preventCache: true,
+            data: {
                 wbId: room.id,
                 email: room.getWidget("email").getValue()
-            },
-            load: function(resp){
-                if(resp.error) {
-                    console.info("error on email server",resp.error);
-                }
-            },
-            error: function(e){
-                console.info("post error email server",e);
-            },
-            handleAs: "json",
-            preventCache: true
+            }
+        }).then(function(resp){
+            if(resp.error) {
+                console.debug("error on email server", resp.error);
+            }
+        }, function(ex){
+            console.error(ex);
         });
     };
     var createWorksheet = function() {
         console.debug('newWorksheet()');
-        dojo.xhrPost({
-            url: "/room/"+room.id+"/worksheet/new",
-            load: function(resp){
-                if(resp.error) {
-                    console.info("error on new worksheet",resp.error);
-                }
-                room.newWorksheet(resp.worksheetId, true);
-            },
-            error: function(e){
-                console.info("post error new worksheet server",e);
-            },
+        dojo.request.post("/room/"+room.id+"/worksheet/new", {
             handleAs: "json",
             preventCache: true
+        }).then(function(resp){
+            if(resp.error) {
+                console.debug("error on new worksheet",resp.error);
+            }
+            room.newWorksheet(resp.worksheetId, true);
+        }, function(ex) {
+            console.error(ex);
         });
     };
     var call = function(){
@@ -148,69 +142,60 @@ Room.prototype.sendMessage = function(message){
             console.error(e);
         }
     };
-    dojo.xhrPost({
-        url: "/room/"+room.id+"/message",
-        postData: dojo.toJson(message),
+    dojo.request.post("/room/"+room.id+"/message",{
+        data: dojo.toJson(message),
         headers: { "Content-Type": "application/json"},
-        load: function(resp){
-            console.log("post response",resp);
-            if(resp.message){
-                room.messageList.push(resp.message);
-            }
-            clearChatUI();
-        },
-        error: function(e){
-            console.info("post error",e);
-            clearChatUI();
-        },
         handleAs: "json",
         preventCache: true
+    }).then(function(resp){
+        console.debug("post response",resp);
+        if(resp.message){
+            room.messageList.push(resp.message);
+        }
+        clearChatUI();
+    }, function(ex){
+        clearChatUI();
+        console.error(ex);
     });
 };
 Room.prototype.pingServer = function() {
     console.debug('pingServer()');
     var room = this;
-    dojo.xhrGet({
-        url: "/room/"+room.id+"/ping", //'/wbping',
-        load: function(resp){
-            if(resp.error) {
-                console.info("error pinging server",resp.error);
-            }
-            setTimeout(function(){
-                room.pingServer();
-            }, room.pingInterval);
-       },
-       error: function(e){
-            console.info("post error on pinging server",e);
-            setTimeout(room.pingServer, room.pingInterval);
-       },
-       handleAs: "json",
-       preventCache: true
-    });
+    dojo.request.get("/room/"+room.id+"/ping", {
+        handleAs: "json",
+        preventCache: true
+    }).then(function(resp){
+        if(resp.error) {
+            console.debug("error pinging server",resp.error);
+        }
+        setTimeout(function(){
+            room.pingServer();
+        }, room.pingInterval);
+   }, function(ex){
+        console.error(ex);
+        setTimeout(room.pingServer, room.pingInterval);
+   });
 };
 Room.prototype.getUserList = function() {
     console.debug('getUserList()');
     var room = this;
-    dojo.xhrGet({
-        url: "/room/"+room.id+"/users", //'/wbgetUsers',
-        load: function(resp){
-            if(resp.error) {
-                console.info("error getting users",resp.error);
-            }
-            room.populateUserList(resp.userList);
-            setTimeout(function() {
-                room.getUserList();
-            },room.userCheckInterval);
-       },
-       error: function(e){
-            console.info("post error on gettingUsers",e);
-            setTimeout(function() {
-                room.getUserList();
-            },room.userCheckInterval);
-       },
-       handleAs: "json",
-       preventCache: true
-    });
+    dojo.request.get("/room/"+room.id+"/users", {
+        handleAs: "json",
+        preventCache: true
+    }).then(function(resp){
+        if(resp.error) {
+            console.debug("error getting users",resp.error);
+        }
+        room.populateUserList(resp.userList);
+        setTimeout(function() {
+            room.getUserList();
+        },room.userCheckInterval);
+   },function(ex){
+        console.error(ex);
+        setTimeout(function() {
+            room.getUserList();
+        },room.userCheckInterval);
+   });
 };
 Room.prototype.populateUserList = function(userList){
     try{
@@ -244,7 +229,7 @@ Room.prototype.openChannel = function() {
         console.debug("onMessage", message);
 
         var obj = dojo.fromJson(message.data);
-        console.log(obj);
+        console.debug(obj);
         if(obj.chatMessage){
             printChatMessage(obj);
         }
@@ -345,14 +330,14 @@ Room.prototype.openChannel = function() {
         'onopen': onOpened,
         'onmessage': onMessage,
         'onerror': function(e) {
-            console.log("channel error",e);
+            console.debug("channel error",e);
         },
         'onclose': function(c) {
-            console.log("channel close",c);
+            console.debug("channel close",c);
         }
     };
     var socket = channel.open(handler);
-    console.log(socket);
+    console.debug(socket);
     socket.onopen = onOpened;
     socket.onmessage = onMessage;
 };

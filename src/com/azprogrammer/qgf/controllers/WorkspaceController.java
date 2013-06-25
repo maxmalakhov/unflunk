@@ -110,9 +110,10 @@ public class WorkspaceController {
         ModelAndView view = new ModelAndView();
         if(WebUtil.isMobile(userAgent)){
             view.addObject("mobileTheme", WebUtil.getMobileTheme(userAgent));
+            //view.setViewName("mobile/workspace");
             view.setViewName("mobileboard");
         }else{
-            view.setViewName("workspace/workspace");
+            view.setViewName("regular/workspace");
         }
 
         Workspace workspace = null;
@@ -137,7 +138,7 @@ public class WorkspaceController {
 
     @RequestMapping(value = URL_WORKSPACE_ROOM, method = RequestMethod.GET)
     public ModelAndView getRoomPage(@PathVariable String workspaceId, @PathVariable String roomId) {
-        return new ModelAndView("workspace/room", "roomId", roomId);
+        return new ModelAndView("regular/room", "roomId", roomId);
     }
 
     @RequestMapping(value = URL_WORKSPACE_ROOM_NEW, method = RequestMethod.POST)
