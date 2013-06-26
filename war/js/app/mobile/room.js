@@ -24,11 +24,26 @@ function Room(id, token, messages, worksheets) {
         var room = this;
         console.debug("newWorksheet() "+"/room/"+room.id+"/worksheet/"+worksheetId);
         var worksheetTabs = room.getWidget('worksheets');
-        var worksheetTab = new dijit.layout.ContentPane({
+        var view = new dojox.mobile.View({
+            id: 'worksheet_'+worksheetId,
+            onAfterTransitionIn: function(evt) {
+                console.debug("Focus1");
+            },
+            onAfterTransitionOut: function(evt) {
+                console.debug("Focu2s");
+            }
+        });
+        var heading = new dojox.mobile.Heading({
+            back: 'Worksheets',
+            moveTo: 'room_'+room.id,
+            label: 'Worksheet #'+worksheetId
+        });
+        view.addChild(heading);
+        var worksheetTab = new dojox.mobile.ContentPane({
             id: worksheetId,
             title: worksheetId,
             href: "/room/"+room.id+"/worksheet/"+worksheetId,
-            onDownloadEnd: function() {
+            onLoad: function() {
                 var worksheet = new Worksheet(worksheetId, room);
                 worksheet.init();
                 worksheet.initGfx();
@@ -36,14 +51,13 @@ function Room(id, token, messages, worksheets) {
                 if(Object.keys(room.worksheetList).length === 1 || show) {
                     room.currentWorksheet = worksheet;
                 }
-                worksheetTabs.resize();
-            },
-            selected: true,
-            closable: true
+                view.startup();
+            }
         });
-        worksheetTabs.addChild(worksheetTab);
+        view.addChild(worksheetTab);
+        worksheetTabs.addChild(view);
         if(show) {
-            worksheetTabs.selectChild(worksheetTab);
+            //worksheetTabs.selectChild(worksheetTab);
         }
     };
 }
@@ -97,8 +111,8 @@ Room.prototype.init = function(){
         try{
             var call = new Call(room.id);
             call.new();
-        }catch(e) {
-            console.error(e);
+        }catch(ex) {
+            console.error(ex.message);
         }
     };
     // method body
@@ -135,11 +149,11 @@ Room.prototype.sendMessage = function(message){
     var clearChatUI = function(){
         try{
             //room.getNode('chatText').setAttribute('disabled',false);
-            room.getWidget('chatText').set('value','');
+//            room.getWidget('chatText').set('value','');
             //room.getNode('chatBtn').setAttribute('disabled',false);
-            room.getNode('chatWaitMessage').innerHTML = '';
-        }catch(e){
-            console.error(e);
+//            room.getNode('chatWaitMessage').innerHTML = '';
+        }catch(ex){
+            console.error(ex.message);
         }
     };
     dojo.request.post("/room/"+room.id+"/message",{
@@ -204,9 +218,9 @@ Room.prototype.populateUserList = function(userList){
             output += ('<span class=\"userListItem' + user + '\" style=\"background-color: #FFFFFF;\">' + user + '</span>');
             output += ('<br>');
         });
-        this.getNode("userListDiv").innerHTML = output;
-    }catch(e){
-        console.info("error filling user list div",e);
+        //TODO this.getNode("userListDiv").innerHTML = output;
+    }catch(ex){
+        console.error(ex.message);
     }
 };
 Room.prototype.openChannel = function() {
@@ -320,8 +334,8 @@ Room.prototype.openChannel = function() {
                     }
                 }).play();
             }
-        }catch(e) {
-            console.info("couldn\'t animate " + user, e);
+        }catch(ex) {
+            console.error(ex.message);
         }
     };
     // method body

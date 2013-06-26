@@ -258,8 +258,8 @@ Whiteboard.prototype.getHoveredShape = function(pt){
                 }
             }
         }
-    }catch(e){
-        console.debug('error finding shape',e);
+    }catch(ex){
+        console.error(ex.message);
     }
     return null;
 };

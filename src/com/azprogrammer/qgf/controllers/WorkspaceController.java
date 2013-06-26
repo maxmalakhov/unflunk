@@ -137,8 +137,30 @@ public class WorkspaceController {
 
 
     @RequestMapping(value = URL_WORKSPACE_ROOM, method = RequestMethod.GET)
-    public ModelAndView getRoomPage(@PathVariable String workspaceId, @PathVariable String roomId) {
-        return new ModelAndView("regular/room", "roomId", roomId);
+    public ModelAndView getRoomPage(@PathVariable String workspaceId, @PathVariable String roomId,
+                                    @RequestHeader("User-Agent") String userAgent) {
+
+        ModelAndView mav = new ModelAndView();
+        if(WebUtil.isMobile(userAgent)){
+            mav.addObject("mobileTheme", WebUtil.getMobileTheme(userAgent));
+            //view.setViewName("mobile/workspace");
+            mav.setViewName("mobile/room");
+        }else{
+            mav.setViewName("regular/room");
+        }
+        mav.addObject("roomId", roomId);
+
+        synchronized (this) {
+            try {
+                Key key = KeyFactory.stringToKey(roomId);
+                WhiteBoard room = persistenceManager.getObjectById(WhiteBoard.class, key);
+                mav.addObject("worksheetList", room.getWorksheetList());
+            } catch(Exception e) {
+
+            }
+        }
+
+        return mav;
     }
 
     @RequestMapping(value = URL_WORKSPACE_ROOM_NEW, method = RequestMethod.POST)

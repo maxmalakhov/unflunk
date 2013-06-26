@@ -30,7 +30,12 @@
     dojo.require("dojox.mobile.TextBox");
     dojo.require("dojox.mobile.FormLayout");
     dojo.require("dojox.mobile.RadioButton");
-    dojo.require("dojox/mobile/ToolBarButton");
+    dojo.require("dojox.mobile.ToolBarButton");
+    dojo.require("dojox.mobile.ContentPane");
+    dojo.require("dojox.mobile.ViewController");
+    dojo.require("dojox.mobile.ComboBox");
+    dojo.require("dijit.form.DataList");
+
 </script>
 
 <script src="/js/libs/pdf.js"></script>
@@ -53,8 +58,8 @@
 
 <%-- JSXGraph, http://jsxgraph.uni-bayreuth.de --%>
 <link rel="stylesheet" type="text/css" href="http://jsxgraph.uni-bayreuth.de/distrib/jsxgraph.css" />
-<%--<script type="text/javascript" src="http://jsxgraph.uni-bayreuth.de/distrib/jsxgraphcore.js"></script>--%>
-<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/jsxgraph/0.96/jsxgraphcore.js"></script>
+<script type="text/javascript" src="/js/libs/jsxgraphsrc-0.96.js"></script>
+<%--<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/jsxgraph/0.96/jsxgraphcore.js"></script>--%>
 
 <script type="text/javascript" src="/js/app/common/former.js"></script>
 <script type="text/javascript" src="/js/app/common/drawer.js"></script>
@@ -70,8 +75,8 @@
 <%--<script type="text/javascript" src="/js/app/modules/equation.js"></script>--%>
 <script type="text/javascript" src="/js/app/modules/documents.js"></script>
 
-<%--<script type="text/javascript" src="/js/app/mobile/worksheet.js"></script>--%>
-<%--<script type="text/javascript" src="/js/app/mobile/room.js"></script>--%>
+<script type="text/javascript" src="/js/app/mobile/worksheet.js"></script>
+<script type="text/javascript" src="/js/app/mobile/room.js"></script>
 <script type="text/javascript" src="/js/app/mobile/workspace.js"></script>
 
 <%-- Old libs --%>
@@ -83,10 +88,10 @@
         <h1 dojoType="dojox.mobile.Heading">Draw it Live !</h1>
         <ul dojoType="dojox.mobile.RoundRectList">
             <%--<ul dojoType="dojox.mobile.EdgeToEdgeList">--%>
-                <li dojoType="dojox.mobile.ListItem" icon="/images/search.png" moveTo="new">New Drawing</li>
-                <li dojoType="dojox.mobile.ListItem" icon="/images/collection.png" moveTo="roomList">Room List</li>
+                <li id="mainmenu.new" dojoType="dojox.mobile.ListItem" icon="/images/search.png" moveTo="facke">New Drawing</li>
+                <li dojoType="dojox.mobile.ListItem" icon="/images/collection.png" moveTo="open">Open Recent</li>
                 <li dojoType="dojox.mobile.ListItem" icon="/images/collection.png" moveTo="join">Join Room</li>
-                <li dojoType="dojox.mobile.ListItem" icon="/images/collection.png" moveTo="exit">Exit</li>
+                <li id="mainmenu.exit" dojoType="dojox.mobile.ListItem" icon="/images/collection.png">Exit</li>
             <%--</ul>--%>
         </ul>
     </div>
@@ -106,14 +111,28 @@
         </div>
     </div>
 
-    <div id="roomList" dojoType="dojox.mobile.View" style="display: none;">
-        <h1 dojoType="dojox.mobile.Heading" back="Home" moveTo="main">Existing Rooms</h1>
+    <div id="open" dojoType="dojox.mobile.View" style="display: none;">
+        <h1 dojoType="dojox.mobile.Heading" back="Home" moveTo="main">Recent Rooms</h1>
         <ul dojoType="dojox.mobile.RoundRectList">
             <c:forEach items="${roomList}" var="room" varStatus="status">
-                <li dojoType="dojox.mobile.ListItem" icon="/images/search.png" moveTo="main">Room #${status.index}</li>
+                <li dojoType="dojox.mobile.ListItem" icon="/images/search.png" moveTo="room_${room}">Room #${status.index+1}</li>
             </c:forEach>
         </ul>
     </div>
+
+    <div id="rooms" dojoType="dojox.mobile.View" style="display: none;"></div>
+
+<%--<c:forEach items="${roomList}" var="room" varStatus="status">--%>
+    <%--&lt;%&ndash;<li dojoType="dojox.mobile.ListItem" icon="/images/search.png" moveTo="main">Room #${status.index+1}</li>&ndash;%&gt;--%>
+    <%--<div id="room${status.index+1}" dojoType="dojox.mobile.View" style="display: none;">--%>
+        <%--<h1 dojoType="dojox.mobile.Heading" back="Home" moveTo="main">--%>
+            <%--<span data-dojo-type="dojox/mobile/ToolBarButton"data-dojo-props='arrow:"left",moveTo:"main",transition:"slide"'>Home</span>--%>
+        <%--</h1>--%>
+        <%--<div style="overflow: auto;">--%>
+            <%--<div class="whiteboardContainer" style="border: 2px blue solid; background-color: white;"></div>--%>
+        <%--</div>--%>
+    <%--</div>--%>
+<%--</c:forEach>--%>
 
     <div id="join" dojoType="dojox.mobile.View" style="display: none;">
         <h1 dojoType="dojox.mobile.Heading" back="Home" moveTo="main">Join Room</h1>

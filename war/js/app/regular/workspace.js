@@ -13,7 +13,7 @@ function Workspace(id, roomIdList) {
     this.removeRoom = function(roomId) {
         var workspace = this;
         console.debug('removeRoom()');
-        dojo.request.delete("/workspace/"+workspace.id+"/room/"+roomId, {
+        dojo.request.del("/workspace/"+workspace.id+"/room/"+roomId, {
             handleAs: "json",
             preventCache: true
         }).then(function(resp){

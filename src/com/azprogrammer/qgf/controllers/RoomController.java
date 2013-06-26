@@ -39,6 +39,7 @@ import com.azprogrammer.qgf.model.WBMessage;
 import com.azprogrammer.qgf.model.WhiteBoard;
 import com.azprogrammer.qgf.text.InputValidator;
 import com.azprogrammer.qgf.text.TextFormatter;
+import com.azprogrammer.qgf.util.WebUtil;
 import com.google.appengine.api.channel.ChannelMessage;
 import com.google.appengine.api.channel.ChannelService;
 import com.google.appengine.api.channel.ChannelServiceFactory;
@@ -110,10 +111,19 @@ public class RoomController {
     }
 
     @RequestMapping(value = URL_ROOM_WORKSHEET, method = RequestMethod.GET)
-    public ModelAndView getWorksheetPage(@PathVariable String roomId, @PathVariable String worksheetId) {
-        return new ModelAndView("regular/worksheet")
-                .addObject("roomId", roomId)
-                .addObject("worksheetId", worksheetId);
+    public ModelAndView getWorksheetPage(@PathVariable String roomId, @PathVariable String worksheetId,
+            @RequestHeader("User-Agent") String userAgent) {
+
+            ModelAndView mav = new ModelAndView();
+            if(WebUtil.isMobile(userAgent)){
+                mav.addObject("mobileTheme", WebUtil.getMobileTheme(userAgent));
+                //view.setViewName("mobile/workspace");
+                mav.setViewName("mobile/worksheet");
+            }else{
+                mav.setViewName("regular/worksheet");
+            }
+            mav.addObject("worksheetId", worksheetId);
+            return mav;
     }
 
     @RequestMapping(value = URL_ROOM_WORKSHEET_NEW, method = RequestMethod.POST, produces = APPLICATION_JSON_VALUE)
