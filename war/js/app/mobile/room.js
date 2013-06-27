@@ -132,8 +132,10 @@ Room.prototype.init = function(){
     dojo.connect(room.getWidget('newWorksheetButton'),'onClick', createWorksheet);
 
     if(room.worksheetIdList.length > 0) {
+        var first = true;
         dojo.forEach(room.worksheetIdList, function(worksheetId) {
-            room.newWorksheet(worksheetId, false);
+            room.newWorksheet(worksheetId, first);
+            first = false;
         });
     } else {
         createWorksheet();

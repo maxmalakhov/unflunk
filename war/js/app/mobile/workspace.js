@@ -36,7 +36,7 @@ function Workspace(id, roomIdList) {
             });
     };
 
-    this.newRoom = function(roomId) {
+    this.newRoom = function(roomId, show) {
         var workspace = this;
         console.debug('newRoom()');
         var roomTabs = dijit.byId("viewContainer"); //rooms");
@@ -62,6 +62,14 @@ function Workspace(id, roomIdList) {
                                     room.init();
                                 }
                                 workspace.addRoom(room);
+                                if(!roomId || show) {
+                                    console.debug("Goto",'room_'+room.id);
+                                    var vc = dojox.mobile.ViewController.getInstance();
+                                    var main = vc.findTransitionViews('main')[0];
+                                    setTimeout(function() {
+                                        main.performTransition('worksheet_'+room.currentWorksheet.id);
+                                    }, 1000);
+                                }
                             }
                         });
                         view.addChild(roomTab);
@@ -90,8 +98,10 @@ function Workspace(id, roomIdList) {
 }
 Workspace.prototype.init = function() {
     var workspace = this;
+    var first = true;
     dojo.forEach(workspace.roomIdList, function(roomId){
-        workspace.newRoom(roomId);
+        workspace.newRoom(roomId,first);
+        first = false;
     });
 
     dojo.connect(dijit.byId('mainmenu.new'),'onClick',function() {
@@ -101,7 +111,7 @@ Workspace.prototype.init = function() {
     dojo.connect(dijit.byId('mainmenu.join'),'onClick', function() {
         var roomKey=prompt("Please enter room key","");
         if (roomKey !== null && roomKey !== "") {
-            workspace.newRoom(roomKey);
+            workspace.newRoom(roomKey, true);
         }
     });
     dojo.connect(dijit.byId('mainmenu.exit'),'onClick',function() {
