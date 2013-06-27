@@ -21,6 +21,7 @@
 
 <script type="text/javascript">
     dojo.require("dojox.mobile.View");
+    dojo.require("dojox.mobile.ScrollableView");
     dojo.require("dojox.mobile.Heading");
     dojo.require("dojox.mobile.RoundRect");
     dojo.require("dojox.mobile.RoundRectList");
@@ -35,6 +36,8 @@
     dojo.require("dojox.mobile.ViewController");
     dojo.require("dojox.mobile.ComboBox");
     dojo.require("dijit.form.DataList");
+    dojo.require("dojox.mobile.TabBar");
+    dojo.require("dojox.mobile.TabBarButton");
 
 </script>
 
@@ -79,11 +82,7 @@
 <script type="text/javascript" src="/js/app/mobile/room.js"></script>
 <script type="text/javascript" src="/js/app/mobile/workspace.js"></script>
 
-<%-- Old libs --%>
-<%--<script src="/js/azp/WBCommon.js"></script>--%>
-<%--<script src="/js/azp/MobileWhiteboard.js"></script>--%>
-
-
+<div id="viewContainer" dojoType="dojox.mobile.Container">
     <div id="main" dojoType="dojox.mobile.View" selected="true">
         <h1 dojoType="dojox.mobile.Heading">Draw it Live !</h1>
         <ul dojoType="dojox.mobile.RoundRectList">
@@ -111,7 +110,7 @@
         </div>
     </div>
 
-    <div id="open" dojoType="dojox.mobile.View" style="display: none;">
+    <div id="open" dojoType="dojox.mobile.ScrollableView" style="display: none;">
         <h1 dojoType="dojox.mobile.Heading" back="Home" moveTo="main">Recent Rooms</h1>
         <ul dojoType="dojox.mobile.RoundRectList">
             <c:forEach items="${roomList}" var="room" varStatus="status">
@@ -120,7 +119,7 @@
         </ul>
     </div>
 
-    <div id="rooms" dojoType="dojox.mobile.View" style="display: none;"></div>
+    <%--<div id="rooms" dojoType="dojox.mobile.Container" style="display: none;"></div>--%>
 
 <%--<c:forEach items="${roomList}" var="room" varStatus="status">--%>
     <%--&lt;%&ndash;<li dojoType="dojox.mobile.ListItem" icon="/images/search.png" moveTo="main">Room #${status.index+1}</li>&ndash;%&gt;--%>
@@ -193,6 +192,6 @@
         The drawitlive.com Collaborative Whiteboard was created by Luis Montes<br><br>
         Follow Luis on twitter <a href="http://twitter.com/monteslu">@monteslu</a> for updates.
     </div>
-
+</div>
 
 <jsp:include page="../mobilefooter.jsp"/>

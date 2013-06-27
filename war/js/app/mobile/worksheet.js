@@ -29,8 +29,8 @@ function Worksheet(id, room) {
     // params
     this.width = 700;
     this.height = 400;
-    this.container = null;
-    this.board = null;
+    this.container = false;
+    this.board = false;
     this.tool = 'pen';
 
     // services
@@ -58,7 +58,11 @@ Worksheet.prototype.sendMessage = function(message){
 Worksheet.prototype.getGfxMouse = function(evt){
     var worksheet = this;
     var coordsM = dojo.position(worksheet.container);
-    var coords = new JXG.Coords(JXG.COORDS_BY_SCREEN, [Math.round(evt.clientX - coordsM.x), Math.round(evt.clientY - coordsM.y)], worksheet.board._board);
+    var coords = new JXG.Coords(JXG.COORDS_BY_SCREEN, [Math.round(evt.changedTouches[0].clientX - coordsM.x), Math.round(evt.changedTouches[0].clientY - coordsM.y)], worksheet.board._board);
+
+    console.debug("mouse",coords.usrCoords[0], coords.usrCoords[1], coords.usrCoords[2]);
+//    var coords = worksheet.board.getUsrCoordsOfMouse(evt);
+//    return coords ? { x : coords[0], y : coords[1] } : null;
     return coords ? { x : coords.usrCoords[1], y : coords.usrCoords[2] } : null;
 };
 Worksheet.prototype.initEvent = function(board) {
@@ -75,13 +79,20 @@ Worksheet.prototype.initGfx = function(){
 
     // method body
     worksheet.container = worksheet.getNode("whiteboardContainer");
-    worksheet.container.style.width = worksheet.width + 'px';
-    worksheet.container.style.height = worksheet.height + 'px';
+//    worksheet.container.style.width = worksheet.width + 'px';
+//    console.debug("Board Height",worksheet.getNode("container").offsetHeight + 'px');
+    worksheet.container.style.height = worksheet.getNode("container").offsetHeight + 'px';
     worksheet.container.style.cursor="pointer";
 
     // create a board board
+    worksheet.container.style.height = worksheet.getNode("container").offsetHeight + 'px';
     worksheet.board = new Whiteboard("whiteboardContainer_" + worksheet.id, {boundingbox:[0,100,100,0], axis: true});
     worksheet.initEvent();
+
+    setTimeout(function() {
+        worksheet.container.style.top = '0px';
+        worksheet.container.style.left = '0px';
+    }, 500);
 
     //for playback
 //TODO

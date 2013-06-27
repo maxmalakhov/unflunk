@@ -103,4 +103,17 @@ public class LoginController {
 
         return response;
     }
+
+    @RequestMapping(value = { "/test/" }, method = RequestMethod.GET)
+    public ModelAndView test(@RequestHeader("User-Agent") String userAgent) {
+
+        ModelAndView mav = new ModelAndView();
+        if(WebUtil.isMobile(userAgent)){
+            mav.addObject("mobileTheme", WebUtil.getMobileTheme(userAgent));
+            mav.setViewName("mobile/test");
+        }else{
+            mav.setViewName("regular/test");
+        }
+        return mav;
+    }
 }

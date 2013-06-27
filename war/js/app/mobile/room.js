@@ -22,15 +22,26 @@ function Room(id, token, messages, worksheets) {
 
     this.newWorksheet = function(worksheetId, show) {
         var room = this;
+        var worksheet;
         console.debug("newWorksheet() "+"/room/"+room.id+"/worksheet/"+worksheetId);
-        var worksheetTabs = room.getWidget('worksheets');
+        var worksheetTabs = dijit.byId("viewContainer"); //room.getWidget('worksheets');
         var view = new dojox.mobile.View({
             id: 'worksheet_'+worksheetId,
-            onAfterTransitionIn: function(evt) {
-                console.debug("Focus1");
+            onAfterTransitionIn: function(moveTo, dir, transition, context, method) {
+                console.debug("Show View");
+                if(!worksheet.board) {
+                    console.debug("Init",worksheetId);
+                    setTimeout(function() {
+                        worksheet.init();
+                    }, 500);
+                    setTimeout(function() {
+                        worksheet.initGfx();
+                    }, 1000);
+                }
+                room.currentWorksheet = worksheet;
             },
-            onAfterTransitionOut: function(evt) {
-                console.debug("Focu2s");
+            onStartView: function() {
+                console.debug("onStartView");
             }
         });
         var heading = new dojox.mobile.Heading({
@@ -44,14 +55,11 @@ function Room(id, token, messages, worksheets) {
             title: worksheetId,
             href: "/room/"+room.id+"/worksheet/"+worksheetId,
             onLoad: function() {
-                var worksheet = new Worksheet(worksheetId, room);
-                worksheet.init();
-                worksheet.initGfx();
+                worksheet = new Worksheet(worksheetId, room);
                 room.addWorksheet(worksheet);
                 if(Object.keys(room.worksheetList).length === 1 || show) {
                     room.currentWorksheet = worksheet;
                 }
-                view.startup();
             }
         });
         view.addChild(worksheetTab);

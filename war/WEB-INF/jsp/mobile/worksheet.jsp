@@ -1,12 +1,15 @@
 <%--<div dojoType="dijit.layout.ContentPane" style="padding:0; height: 800px;" closable="true" id="${worksheetId}">--%>
 <!-- Draw Area -->
+
+<div dojoType="dojox.mobile.Container" class="container" style="height: 90%">
+
     <%--<div style="position: relative">--%>
-<div dojoType="dojox.mobile.RoundRect">
-        <div class="whiteboardContainer" id="whiteboardContainer_${worksheetId}" style="border: 1px #B5BCC7 solid; background-color: white; z-index: 1;"></div>
+        <div class="whiteboardContainer" id="whiteboardContainer_${worksheetId}"style="border: 1px #B5BCC7 solid; background-color: white;"></div>
         <%--<div class="whiteboardOverlayContainer" id="whiteboardOverlayContainer_${worksheetId}" style="border: 1px indianred solid; background: transparent"></div>--%>
     <%--</div>--%>
     <%--<form onsubmit="return false" dojoType="dijit.form.Form" class="toolForm">--%>
-
+</div>
+<div data-dojo-type="dojox/mobile/TabBar" data-dojo-props='barType:"slimTab", center:false, fixed:"bottom"'>
         <button id="handToolBtn_${worksheetId}" dojoType="dojox.mobile.Button" class="handToolBtn"><img border="0" src="/images/hand-point.png"></button>
         <%--<div dojoType="dijit.Tooltip" connectId="handToolBtn_${worksheetId}" position="above" showDelay="0">Hand</div>--%>
 
@@ -138,5 +141,5 @@
         <%--</select>--%>
 
     <%--</form>--%>
-<div>
+</div>
 <%--</div>--%>

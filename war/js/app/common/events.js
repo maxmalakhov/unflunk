@@ -21,6 +21,8 @@ function BoardEvents(worksheet) {
 }
 
 BoardEvents.prototype.doGfxMouseDown = function(evt) {
+    evt.preventDefault();
+
     if (this.worksheet.tool === 'hand') {
         return;
     }
@@ -39,6 +41,8 @@ BoardEvents.prototype.doGfxMouseDown = function(evt) {
 };
 
 BoardEvents.prototype.doGfxMouseMove = function(evt) {
+    evt.preventDefault();
+
     if (this.worksheet.tool === 'hand') {
         return;
     }
@@ -153,6 +157,8 @@ BoardEvents.prototype.doGfxMouseMove = function(evt) {
 };
 
 BoardEvents.prototype.doGfxMouseUp = function(evt) {
+    evt.preventDefault();
+
     if (this.worksheet.tool === 'hand') {
         return;
     }

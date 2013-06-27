@@ -39,7 +39,7 @@ function Workspace(id, roomIdList) {
     this.newRoom = function(roomId) {
         var workspace = this;
         console.debug('newRoom()');
-        var roomTabs = dijit.byId("rooms");
+        var roomTabs = dijit.byId("viewContainer"); //rooms");
         try {
             dojo.request.post("/workspace/"+workspace.id+"/room/"+(roomId || ''), {
                 handleAs: "json",
@@ -69,7 +69,6 @@ function Workspace(id, roomIdList) {
                         if(!roomId) {
                             //roomTabs.selectChild(roomTab);
                         }
-                        view.startup();
                     }
                 }, function(ex){
                     console.error(ex.message);
@@ -119,6 +118,16 @@ Workspace.prototype.init = function() {
 //    Preview.Update();
 
 //    GraphPreview.Init();
+
+    dojo.subscribe("/dojox/mobile/afterTransitionIn",
+        function(view, moveTo, dir, transition, context, method){
+            console.debug("global afterTransitionIn", moveTo);
+        });
+
+    dojo.subscribe("/dojox/mobile/beforeTransitionIn",
+        function(view, moveTo, dir, transition, context, method){
+            console.debug("global beforeTransitionIn", moveTo);
+        });
 };
 
 // drag and drop common method
