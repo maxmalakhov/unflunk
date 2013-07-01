@@ -1,3 +1,5 @@
+dojo.require("dojox.html.entities");
+
 function Whiteboard(name, params) {
     JXG.Options.renderer = 'canvas';
     JXG.Options.text.useMathJax = true;

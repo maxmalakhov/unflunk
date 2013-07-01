@@ -393,6 +393,18 @@ Worksheet.prototype.init = function(){
         worksheet.events.resetTextPoint();
     });
 
+    dojo.connect(dijit.byId("clearToolBtn_"+worksheet.id), 'onClick', function(evt) {
+        dijit.byId("clearDrawingDialog").show();
+    });
+    dojo.connect(dijit.byId("cancelClearBtn"), 'onClick', function(evt) {
+        dijit.byId('clearDrawingDialog').hide();
+    });
+    dojo.connect(dijit.byId("okClearBtn"), 'onClick', function(evt) {
+        worksheet.events.doClearBoard();
+        dijit.byId('clearDrawingDialog').hide();
+    });
+
+
     try{
         var reader = new FileReader();
         reader.onload = function(e) {

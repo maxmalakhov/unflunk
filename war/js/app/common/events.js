@@ -287,7 +287,6 @@ BoardEvents.prototype.doEquationInput = function(data) {
 };
 BoardEvents.prototype.doAddText = function(text) {
     if((text !== '') && (this.textPoint)){
-        dijit.byId('textDialog').hide();
         var geom = this.former.createText(this.textPoint,text);
         this.drawer.draw(geom, this.worksheet.board);
         this.textPoint = null;

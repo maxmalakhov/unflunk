@@ -38,6 +38,9 @@
     dojo.require("dijit.form.DataList");
     dojo.require("dojox.mobile.TabBar");
     dojo.require("dojox.mobile.TabBarButton");
+    dojo.require("dojox.mobile.SimpleDialog");
+    dojo.require("dojox.mobile.ExpandingTextArea");
+    dojo.require("dojox.mobile.TextArea");
 
 </script>
 
@@ -71,11 +74,11 @@
 
 <script type="text/javascript" src="/js/app/shapes/triangle.js"></script>
 
-<%--<script type="text/javascript" src="/js/app/modules/graph.js"></script>--%>
+<script type="text/javascript" src="/js/app/modules/graph.js"></script>
 <script type="text/javascript" src="/js/app/modules/function.js"></script>
 <script type="text/javascript" src="/js/app/modules/math-processor.js"></script>
 <script type="text/javascript" src="/js/app/modules/recognition.js"></script>
-<%--<script type="text/javascript" src="/js/app/modules/equation.js"></script>--%>
+<script type="text/javascript" src="/js/app/modules/equation.js"></script>
 <script type="text/javascript" src="/js/app/modules/documents.js"></script>
 
 <script type="text/javascript" src="/js/app/mobile/worksheet.js"></script>
@@ -86,12 +89,10 @@
     <div id="main" dojoType="dojox.mobile.View" selected="true">
         <h1 dojoType="dojox.mobile.Heading">Draw it Live !</h1>
         <ul dojoType="dojox.mobile.RoundRectList">
-            <%--<ul dojoType="dojox.mobile.EdgeToEdgeList">--%>
-                <li id="mainmenu.new" dojoType="dojox.mobile.ListItem" icon="/images/search.png" moveTo="facke">New Drawing</li>
-                <li dojoType="dojox.mobile.ListItem" icon="/images/collection.png" moveTo="open">Open Recent</li>
-                <li dojoType="dojox.mobile.ListItem" icon="/images/collection.png" moveTo="join">Join Room</li>
-                <li id="mainmenu.exit" dojoType="dojox.mobile.ListItem" icon="/images/collection.png">Exit</li>
-            <%--</ul>--%>
+            <li id="mainmenu.new" dojoType="dojox.mobile.ListItem" icon="/images/search.png" moveTo="facke">New Drawing</li>
+            <li dojoType="dojox.mobile.ListItem" icon="/images/collection.png" moveTo="open">Open Recent</li>
+            <li dojoType="dojox.mobile.ListItem" icon="/images/collection.png" moveTo="join">Join Room</li>
+            <li id="mainmenu.exit" dojoType="dojox.mobile.ListItem" icon="/images/collection.png">Exit</li>
         </ul>
     </div>
 
@@ -141,34 +142,13 @@
                 <label>Room Id</label>
                 <fieldset>
                     <input id="joinRoomId" dojoType="dojox.mobile.TextBox">
-                    <span id="joinSubmitBtn" dojoType="dojox.mobile.Button">Join</span>
+                    <span id="mainmenu.join" id="joinSubmitBtn" dojoType="dojox.mobile.Button">Join</span>
                 </fieldset>
             </div>
         </div>
         </div>
     </div>
-    
-    <div id="tools" dojoType="dojox.mobile.View" style="display: none;">
-        <h1 dojoType="dojox.mobile.Heading" back="Drawing" moveTo="drawing">Drawing Tools</h1>
-        
-        <button dojoType="dojox.mobile.Button" id="penToolBtn"><img border="0" src="/images/pencil.png"> Pencil</button>
-           <button dojoType="dojox.mobile.Button" id="lineToolBtn"><img border="0" src="/images/line.png">Line</button>
-           <button dojoType="dojox.mobile.Button" id="rectToolBtn"><img border="0" src="/images/rect.png">Rectangle</button>
-           <button dojoType="dojox.mobile.Button" id="filledRectToolBtn"><img border="0" src="/images/filledRect.png">Filled Rectangle</button>
-           <button dojoType="dojox.mobile.Button" id="ellipseToolBtn"><img border="0" src="/images/ellipse.png">Ellipse</button>
-           <button dojoType="dojox.mobile.Button" id="filledEllipseToolBtn"><img border="0" src="/images/filledEllipse.png">Filled Ellipse</button>
-           <button dojoType="dojox.mobile.Button" id="textToolBtn"><img border="0" src="/images/text.png">Text</button>
-           <button dojoType="dojox.mobile.Button" id="moveToolBtn"><img border="0" src="/images/move.png">Move a shape</button>
-           <button dojoType="dojox.mobile.Button" id="moveUpToolBtn"><img border="0" src="/images/moveUp.png">Pull a shape</button>
-           <button dojoType="dojox.mobile.Button" id="moveDownToolBtn"><img border="0" src="/images/moveDown.png">Push a shape</button>
-           <button dojoType="dojox.mobile.Button" id="deleteToolBtn"><img border="0" src="/images/delete.png">Delete a shape</button>
-        <ul dojoType="dojox.mobile.EdgeToEdgeList">
-            <li dojoType="dojox.mobile.ListItem" moveTo="drawing"  icon="/images/m_drawing.png">Drawing</li>
-        </ul>
-        <ul dojoType="dojox.mobile.EdgeToEdgeList">
-            <li dojoType="dojox.mobile.ListItem" moveTo="main"  icon="/images/m_drawing.png">home</li>
-        </ul>
-    </div>
+
         
     <div id="chat" dojoType="dojox.mobile.View" style="display: none;">
         <h1 dojoType="dojox.mobile.Heading" back="home" moveTo="main">Chat</h1>
@@ -183,15 +163,48 @@
     
     <div id="share" dojoType="dojox.mobile.View" style="display: none;">
         <h1 dojoType="dojox.mobile.Heading" back="home" moveTo="main">Share</h1>
-        
     </div>
 
-    <div id="about" dojoType="dojox.mobile.View" style="display: none;">
-        <h1 dojoType="dojox.mobile.Heading" back="home" moveTo="main">About</h1>
-        
-        The drawitlive.com Collaborative Whiteboard was created by Luis Montes<br><br>
-        Follow Luis on twitter <a href="http://twitter.com/monteslu">@monteslu</a> for updates.
+</div>  <%-- View Container --%>
+
+
+<div id="textDialog" dojoType="dojox.mobile.SimpleDialog" style="display: none">
+    <div class="mblSimpleDialogTitle">Add Text</div>
+    <div class="mblSimpleDialogText">Type in some text.</div>
+    <input type="text" dojoType="dojox.mobile.TextBox" id="wbText" name="wbText"/>
+    <br><br>
+    <button dojoType="dojox.mobile.Button" id="okTextBtn">OK</button>&nbsp;&nbsp;&nbsp;<button dojoType="dojox.mobile.Button" id="cancelTextBtn">Cancel</button>
+</div>
+
+<div id="equationDialog" dojoType="dojox.mobile.SimpleDialog" style="display: none; width:50%;">
+    <div class="mblSimpleDialogTitle">Add Equation</div>
+    <div class="mblSimpleDialogText">Type in some equation in LaTeX.</div>
+    <textarea id="MathInput" data-dojo-type="dojox.mobile.TextArea" name="wbEquation" rows="10" cols="70"
+        >\left( \sum_{k=1}^n a_k b_k \right)^2 \leq \left( \sum_{k=1}^n a_k^2 \right) \left( \sum_{k=1}^n b_k^2 \right)</textarea><br>
+     <div id="MathPreview" dojoType="dojox.mobile.RoundRect" ></div>
+    <div id="MathBuffer" dojoType="dojox.mobile.RoundRect" style="color: black; visibility:hidden; position:absolute;"></div>
+    <button dojoType="dojox.mobile.Button" id="okEquationBtn">OK</button>&nbsp;&nbsp;&nbsp;<button dojoType="dojox.mobile.Button" id="cancelEquationBtn">Cancel</button>
+</div>
+
+<div id="graphBox" style="height: 520px; width: 520px;"></div>
+<div id="graphDialog" dojoType="dojox.mobile.SimpleDialog" style="display: none; width:50%;">
+    <div class="mblSimpleDialogTitle">Add Graph</div>
+    <div class="mblSimpleDialogText">Type in some graph relation.</div>
+    <div class="dijitDialogPaneContentArea">
+        <input id="GraphInput" type="text" data-dojo-type="dojox.mobile.TextBox" name="wbGraph" value="x^2 + x - 2"/><br>
+        <div id="GraphPreview" dojoType="dojox.mobile.RoundRect" style="border:1px solid; padding: 3px; height: 300px; width:400px !important; margin-top:5px;"></div>
+        <div id="GraphBuffer" dojoType="dojox.mobile.RoundRect" style="border:1px solid; padding: 3px; height: 300px; width:400px !important; margin-top:5px; visibility:hidden; position:absolute;"></div>
     </div>
+    <div class="dijitDialogPaneActionBar">
+        <button dojoType="dojox.mobile.Button" id="okGraphBtn">OK</button>&nbsp;&nbsp;&nbsp;<button dojoType="dojox.mobile.Button" id="cancelGraphBtn">Cancel</button>
+    </div>
+</div>
+
+<div id="clearDrawingDialog" dojoType="dojox.mobile.SimpleDialog" style="display: none">
+    <div class="mblSimpleDialogTitle">Clear Drawing</div>
+    <div class="mblSimpleDialogText">Are you sure you want to clear the board?</div>
+    <button id="okClearBtn" dojoType="dojox.mobile.Button">Yes</button> &nbsp;&nbsp;&nbsp;<button id="cancelClearBtn" dojoType="dojox.mobile.Button">No</button>
+</div>
 </div>
 
 <jsp:include page="../mobilefooter.jsp"/>

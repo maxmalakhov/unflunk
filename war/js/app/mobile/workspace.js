@@ -109,7 +109,7 @@ Workspace.prototype.init = function() {
     });
 
     dojo.connect(dijit.byId('mainmenu.join'),'onClick', function() {
-        var roomKey=prompt("Please enter room key","");
+        var roomKey= dijit.byId('joinRoomId').get('value');//prompt("Please enter room key","");
         if (roomKey !== null && roomKey !== "") {
             workspace.newRoom(roomKey, true);
         }
@@ -118,16 +118,16 @@ Workspace.prototype.init = function() {
         workspace.exit();
     });
     dojo.connect(dijit.byId('wbEquation'),'onkeyup',function() {
-//        Preview.Update();
+        Preview.Update();
     });
     dojo.connect(dijit.byId('wbGraph'),'onkeyup',function() {
-//        GraphPreview.Update();
+        GraphPreview.Update();
     });
 
-//    Preview.Init();
-//    Preview.Update();
+    Preview.Init();
+    Preview.Update();
 
-//    GraphPreview.Init();
+    GraphPreview.Init();
 
     dojo.subscribe("/dojox/mobile/afterTransitionIn",
         function(view, moveTo, dir, transition, context, method){

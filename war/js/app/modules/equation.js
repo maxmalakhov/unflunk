@@ -76,6 +76,12 @@ var Preview = {
     PreviewDone: function () {
         this.mjRunning = false;
         this.SwapBuffers();
+//        console.debug("Success equation",dojo.query("nobr",this.preview).length);
+//        if(dojo.query("nobr",this.preview).length === 0) {
+//            this.preview.style.color="red";
+//        } else {
+//            this.preview.style.color="black";
+//        }
     },
 
     getSize: function() {

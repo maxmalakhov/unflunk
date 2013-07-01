@@ -8,5 +8,3 @@
         </c:forEach>
     </ul>
 </div>
-
-<%--<div class="worksheets" dojoType="dojox.mobile.Container"></div>--%>

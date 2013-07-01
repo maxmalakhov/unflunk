@@ -125,7 +125,7 @@ Room.prototype.init = function(){
 };
 Room.prototype.drawOnWorksheet = function(worksheetId, geom) {
     if(this.worksheetList[worksheetId]) {
-        this.worksheetList[worksheetId].drawer.draw(geom, this.worksheetList[worksheetId].drawing);
+        this.worksheetList[worksheetId].drawer.draw(geom, this.worksheetList[worksheetId].board);
     } else {
         this.newWorksheet(worksheetId);
     }

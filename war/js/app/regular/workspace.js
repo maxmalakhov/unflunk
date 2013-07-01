@@ -1,3 +1,5 @@
+dojo.require("dojo.request");
+
 // single instance only
 function Workspace(id, roomIdList) {
     this.id = id;

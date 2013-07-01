@@ -29,8 +29,6 @@ var workspace; // window scope
     dojo.require("dijit.form.ToggleButton");
     dojo.require("dijit.ToolbarSeparator");
 
-    dojo.require("dojox.html.entities");
-
     dojo.require('dijit.form.ValidationTextBox');
     dojo.require('dijit.form.Button');
     dojo.require('dijit.Dialog');
@@ -53,7 +51,6 @@ var workspace; // window scope
     dojo.require("dijit.form.SimpleTextarea");
     dojo.require("dijit.form.Textarea");
 
-    dojo.require("dojo.request");
 </script>
 
 <script src="/js/libs/pdf.js"></script>
