@@ -49,6 +49,11 @@ function Room(id, token, messages, worksheets) {
             moveTo: 'room_'+room.id,
             label: 'Worksheet #'+worksheetId
         });
+        var chatRoomButton = new dojox.mobile.ToolBarButton({
+            label: "Chat",
+            moveTo: 'chat_'+room.id
+        });
+        heading.addChild(chatRoomButton);
         view.addChild(heading);
         var worksheetTab = new dojox.mobile.ContentPane({
             id: worksheetId,
@@ -79,6 +84,12 @@ Room.prototype = {
     },
     "getDialogWidget": function(clazz) {
         return dijit.getEnclosingWidget(dojo.query('.'+clazz+'.'+this.id)[0]);
+    },
+    "getChatNode": function(clazz) {
+        return dojo.query("."+clazz, dojo.byId('#chat_'+this.id))[0];
+    },
+    "getChatWidget": function(clazz) {
+        return dijit.getEnclosingWidget(this.getChatNode(clazz));
     }
 };
 Room.prototype.init = function(){
@@ -91,7 +102,7 @@ Room.prototype.init = function(){
             preventCache: true,
             data: {
                 wbId: room.id,
-                email: room.getWidget("email").getValue()
+                email: room.getWidget("email").get('value')
             }
         }).then(function(resp){
             if(resp.error) {
@@ -158,10 +169,10 @@ Room.prototype.sendMessage = function(message){
     var room = this;
     var clearChatUI = function(){
         try{
-            //room.getNode('chatText').setAttribute('disabled',false);
-//            room.getWidget('chatText').set('value','');
-            //room.getNode('chatBtn').setAttribute('disabled',false);
-//            room.getNode('chatWaitMessage').innerHTML = '';
+            room.getChatNode('chatText').setAttribute('disabled',false);
+            room.getChatWidget('chatText').set('value','');
+            room.getChatNode('chatBtn').setAttribute('disabled',false);
+            room.getChatNode('chatWaitMessage').innerHTML = '';
         }catch(ex){
             console.error(ex.message);
         }
@@ -228,7 +239,7 @@ Room.prototype.populateUserList = function(userList){
             output += ('<span class=\"userListItem' + user + '\" style=\"background-color: #FFFFFF;\">' + user + '</span>');
             output += ('<br>');
         });
-        //TODO this.getNode("userListDiv").innerHTML = output;
+        this.getChatNode("userListDiv").innerHTML = output;
     }catch(ex){
         console.error(ex.message);
     }
@@ -308,26 +319,26 @@ Room.prototype.openChannel = function() {
         outputWidget.scrollTop = outputWidget.scrollHeight;
     };
     var  sendChatMessage = function(){
-        var cwm = room.getNode('chatWaitMessage');
-        var ct = room.getWidget('chatText');
-        var cb = room.getNode('chatBtn');
-        var msg = dojo.trim('' + ct.getValue());
+        var cwm = room.getChatNode('chatWaitMessage');
+        var ct = room.getChatWidget('chatText');
+        var cb = room.getChatNode('chatBtn');
+        var msg = dojo.trim('' + ct.get('value'));
         if(msg === '')
         {
             cwm.innerHTML = 'Cat got your tongue?';
         }else if(msg === room.lastMessage){
             cwm.innerHTML = 'That\'s what you said last time.';
         }else{
-            //ct.setAttribute('disabled',true);
-            //cb.setAttribute('disabled',true);
+//            ct.setAttribute('disabled',true);
+//            cb.setAttribute('disabled',true);
             room.lastMessage = msg;
-            room.getNode('chatWaitMessage').innerHTML = 'sending...';
+            room.getChatNode('chatWaitMessage').innerHTML = 'sending...';
             room.sendMessage({chatMessage:msg});
         }
     };
     var animateUserItem = function(user){
         try{
-            var userNode = this.getNode("userListItem" + user);
+            var userNode = this.getChatNode("userListItem" + user);
             if(userNode){
                 dojo.animateProperty({
                     node: userNode,

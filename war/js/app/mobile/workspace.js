@@ -59,7 +59,9 @@ function Workspace(id, roomIdList) {
                                 var room = new Room(resp.roomId, resp.token, resp.messages, resp.worksheets);
                                 if (room.token) {
                                     room.openChannel();
-                                    room.init();
+                                    setTimeout(function() {
+                                        room.init();
+                                    }, 500);
                                 }
                                 workspace.addRoom(room);
                                 if(!roomId || show) {

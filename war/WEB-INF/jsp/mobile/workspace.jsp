@@ -89,10 +89,10 @@
     <div id="main" dojoType="dojox.mobile.View" selected="true">
         <h1 dojoType="dojox.mobile.Heading">Draw it Live !</h1>
         <ul dojoType="dojox.mobile.RoundRectList">
-            <li id="mainmenu.new" dojoType="dojox.mobile.ListItem" icon="/images/search.png" moveTo="facke">New Drawing</li>
-            <li dojoType="dojox.mobile.ListItem" icon="/images/collection.png" moveTo="open">Open Recent</li>
-            <li dojoType="dojox.mobile.ListItem" icon="/images/collection.png" moveTo="join">Join Room</li>
-            <li id="mainmenu.exit" dojoType="dojox.mobile.ListItem" icon="/images/collection.png">Exit</li>
+            <li id="mainmenu.new" dojoType="dojox.mobile.ListItem" icon="/images/mobile/spinner2.png" moveTo="facke">New Drawing</li>
+            <li dojoType="dojox.mobile.ListItem" icon="/images/mobile/spinner.png" moveTo="open">Open Recent</li>
+            <li dojoType="dojox.mobile.ListItem" icon="/images/mobile/target2.png" moveTo="join">Join Room</li>
+            <li id="mainmenu.exit" dojoType="dojox.mobile.ListItem" icon="/images/mobile/switch2.png">Exit</li>
         </ul>
     </div>
 
@@ -115,7 +115,7 @@
         <h1 dojoType="dojox.mobile.Heading" back="Home" moveTo="main">Recent Rooms</h1>
         <ul dojoType="dojox.mobile.RoundRectList">
             <c:forEach items="${roomList}" var="room" varStatus="status">
-                <li dojoType="dojox.mobile.ListItem" icon="/images/search.png" moveTo="room_${room}">Room #${status.index+1}</li>
+                <li dojoType="dojox.mobile.ListItem" icon="/images/mobile/room.png" moveTo="room_${room}">Room #${status.index+1}</li>
             </c:forEach>
         </ul>
     </div>
@@ -149,18 +149,6 @@
         </div>
     </div>
 
-        
-    <div id="chat" dojoType="dojox.mobile.View" style="display: none;">
-        <h1 dojoType="dojox.mobile.Heading" back="home" moveTo="main">Chat</h1>
-        ...
-        <ul dojoType="dojox.mobile.EdgeToEdgeList">
-            <li dojoType="dojox.mobile.ListItem" moveTo="main"  icon="/images/home.png">Home</li>
-        </ul>
-        <ul dojoType="dojox.mobile.EdgeToEdgeList" style="display: none;">
-            <li dojoType="dojox.mobile.ListItem" moveTo="drawing"  icon="/images/home.png">Drawing</li>
-        </ul>
-    </div>
-    
     <div id="share" dojoType="dojox.mobile.View" style="display: none;">
         <h1 dojoType="dojox.mobile.Heading" back="home" moveTo="main">Share</h1>
     </div>
