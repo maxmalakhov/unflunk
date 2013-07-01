@@ -1,0 +1,73 @@
+div#headings button.baseBtn {
+    display: block;
+    float: left;
+    -webkit-background-clip: padding-box;
+    -webkit-box-align: center;
+    background-clip: padding-box;
+    border-style: solid;
+    border-width: 1px;
+    color: white;
+    font-family: 'Helvetica Neue', HelveticaNeue, Helvetica-Neue, Helvetica, 'BBAlpha Sans';
+    font-size: 32px;
+    height: 32px;
+    font-weight: bold;
+    -webkit-box-shadow: rgba(255, 255, 255, 0.0976563) 0px 0.1em 0px;
+    vertical-align: middle;
+    border-bottom-left-radius: 7px;
+    border-bottom-right-radius: 7px;
+    border-top-left-radius: 7px;
+    border-top-right-radius: 7px;
+}
+button.defaultBtn {
+    text-shadow: rgba(255, 255, 255, 0.246094) 0px 0.08em 0px;
+    border-color: #9CACC0;
+    background-color: #5877A2;
+    background: -webkit-gradient(linear, left top, left bottom, from(#8EA4C1), to(#4A6C9B), color-stop(0.5, #5877A2), color-stop(0.5, #476999));
+    background: linear-gradient(to bottom, #8EA4C1 0%, #5877A2 50%, #476999 50%, #4A6C9B 100%);
+}
+button.orangeBtn{
+    background-image: -webkit-gradient(linear, 0% 0, 0% 100%, from(#fff2cb), color-stop(0.06, #ffcb36), to(#ff8702));
+    background-image: linear-gradient(to bottom, #fff2cb 0%, #ffcb36 6%, #ff8702 100%);
+    border-color: #87653e;
+    border-top-color: #ff8702;
+    text-shadow:0 1px 0 white;
+    color:#6f3e01;
+    background-color: #fff2cb;
+}
+.dj_gecko button.orangeBtn{
+    background-image: -moz-linear-gradient(270deg, #fff2cb, #ffcb36 6%, #ff8702);
+}
+button.orangeBtnSelected{
+    background-image: -webkit-gradient(linear, 0% 0, 0% 100%, from(#ffdfbd), color-stop(0.06, #ff8702), to(#ffcb36));
+    background-image: linear-gradient(to bottom, #ffdfbd 0%, #ff8702 6%, #ffcb36 100%);
+    border-color: #87653e;
+    border-top-color: #ff8702;
+    text-shadow:0 1px 0 white;
+    color:#6f3e01;
+    background-color: #fff2cb;
+}
+.dj_gecko button.orangeBtnSelected{
+    background-image: -moz-linear-gradient(270deg, #ffdfbd, #ff8702 6%, #ffcb36);
+}
+button.whiteBtn{
+    background-image: -webkit-gradient(linear, 0% 0, 0% 100%, from(white), color-stop(0.06, #f2f2f2), to(#b7b7b7));
+    background-image: linear-gradient(to bottom, white 0%, #f2f2f2 6%, #b7b7b7 100%);
+    border-color: #979797;
+    border-bottom-color: #727272;
+    background-color: white;
+}
+.dj_gecko button.whiteBtn{
+    background-image: -moz-linear-gradient(270deg, white, #f2f2f2 6%, #b7b7b7);
+}
+button.whiteBtnSelected{
+    background-image: -webkit-gradient(linear, 0% 0, 0% 100%, from(#ffdfbd), color-stop(0.06, #ff8702), to(#ffcb36));
+    background-image: linear-gradient(to bottom, #ffdfbd 0%, #ff8702 6%, #ffcb36 100%);
+    border-color: #87653e;
+    border-top-color: #ff8702;
+    text-shadow:0 1px 0 white;
+    color:#6f3e01;
+    background-color: #fff2cb;
+}
+.dj_gecko button.whiteBtnSelected{
+    background-image: -moz-linear-gradient(270deg, white, #bbbbbb 6%, #fcfcfc);
+}

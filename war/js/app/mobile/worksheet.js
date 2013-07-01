@@ -230,6 +230,8 @@ Worksheet.prototype.init = function(){
 //TODO
 //            dojo.removeClass(worksheet.getNode(aTool.name + 'ToolBtn'), "selected");
 //            dojo.style(dojo.query("span",worksheet.getNode(aTool.name + 'ToolBtn'))[0],"background-color","");
+            dojo.query(worksheet.getNode(aTool.name + 'ToolBtn')).addClass("whiteBtn");
+            dojo.query(worksheet.getNode(aTool.name + 'ToolBtn')).removeClass("orangeBtn");
         });
 
 
@@ -238,6 +240,8 @@ Worksheet.prototype.init = function(){
 //TODO
 //        dojo.addClass(worksheet.getNode(tool.name + 'ToolBtn'), "selected");
 //        dojo.style(dojo.query("span",worksheet.getNode(tool.name + 'ToolBtn'))[0],"background-color","rgb(226, 94, 152)");
+        dojo.query(worksheet.getNode(tool.name + 'ToolBtn')).removeClass("whiteBtn");
+        dojo.query(worksheet.getNode(tool.name + 'ToolBtn')).addClass("orangeBtn");
         worksheet.tool = tool.name;
 
 //TODO

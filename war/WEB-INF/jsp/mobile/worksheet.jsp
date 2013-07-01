@@ -10,16 +10,16 @@
     <%--<form onsubmit="return false" dojoType="dijit.form.Form" class="toolForm">--%>
 </div>
 <div data-dojo-type="dojox/mobile/TabBar" data-dojo-props='barType:"slimTab", center:false, fixed:"bottom"'>
-        <button id="handToolBtn_${worksheetId}" dojoType="dojox.mobile.Button" class="handToolBtn"><img border="0" src="/images/hand-point.png"></button>
-        <button id="penToolBtn_${worksheetId}" dojoType="dojox.mobile.Button" class="penToolBtn"><img border="0" src="/images/pencil.png"></button>
-        <button id="highlighterToolBtn_${worksheetId}" dojoType="dojox.mobile.Button" class="highlighterToolBtn"><img border="0" src="/images/highlighter.png" height="16" width="16"></button>
-        <button id="textToolBtn_${worksheetId}" dojoType="dojox.mobile.Button" class="textToolBtn"><img border="0" src="/images/text.png"></button>
-        <button id="lineToolBtn_${worksheetId}" dojoType="dojox.mobile.Button" class="lineToolBtn"><img border="0" src="/images/line.png"></button>
-        <button id="triangleToolBtn_${worksheetId}" dojoType="dojox.mobile.Button" class="triangleToolBtn"><img border="0" src="/images/icon_triangle2.png"></button>
-        <button id="quadrangleToolBtn_${worksheetId}" dojoType="dojox.mobile.Button" class="quadrangleToolBtn"><img border="0" src="/images/icon-rectangle.png"></button>
-        <button id="circleToolBtn_${worksheetId}" dojoType="dojox.mobile.Button" class="circleToolBtn"><img border="0" src="/images/icon-elipse.png"></button>
-        <button id="equationToolBtn_${worksheetId}" dojoType="dojox.mobile.Button" class="equationToolBtn"><img border="0" src="/images/edit-mathematics.png"></button>
-        <button id="graphToolBtn_${worksheetId}" dojoType="dojox.mobile.Button" class="graphToolBtn"><img border="0" src="/images/chart_curve.png"></button>
+        <button id="handToolBtn_${worksheetId}" dojoType="dojox.mobile.Button" class="handToolBtn baseBtn whiteBtn"><img border="0" src="/images/hand-point.png"></button>
+        <button id="penToolBtn_${worksheetId}" dojoType="dojox.mobile.Button" class="penToolBtn baseBtn whiteBtn"><img border="0" src="/images/pencil.png"></button>
+        <button id="highlighterToolBtn_${worksheetId}" dojoType="dojox.mobile.Button" class="highlighterToolBtn baseBtn whiteBtn"><img border="0" src="/images/highlighter.png" height="16" width="16"></button>
+        <button id="textToolBtn_${worksheetId}" dojoType="dojox.mobile.Button" class="textToolBtn baseBtn whiteBtn"><img border="0" src="/images/text.png"></button>
+        <button id="lineToolBtn_${worksheetId}" dojoType="dojox.mobile.Button" class="lineToolBtn baseBtn whiteBtn"><img border="0" src="/images/line.png"></button>
+        <button id="triangleToolBtn_${worksheetId}" dojoType="dojox.mobile.Button" class="triangleToolBtn baseBtn whiteBtn"><img border="0" src="/images/icon_triangle2.png"></button>
+        <button id="quadrangleToolBtn_${worksheetId}" dojoType="dojox.mobile.Button" class="quadrangleToolBtn baseBtn whiteBtn"><img border="0" src="/images/icon-rectangle.png"></button>
+        <button id="circleToolBtn_${worksheetId}" dojoType="dojox.mobile.Button" class="circleToolBtn baseBtn whiteBtn"><img border="0" src="/images/icon-elipse.png"></button>
+        <button id="equationToolBtn_${worksheetId}" dojoType="dojox.mobile.Button" class="equationToolBtn baseBtn whiteBtn"><img border="0" src="/images/edit-mathematics.png"></button>
+        <button id="graphToolBtn_${worksheetId}" dojoType="dojox.mobile.Button" class="graphToolBtn baseBtn whiteBtn"><img border="0" src="/images/chart_curve.png"></button>
 
         <%--<div class="clearDrawingDisplay" dojoType="dijit.form.DropDownButton">--%>
             <%--<span class="colorText">clear</span>--%>
@@ -34,8 +34,8 @@
 
         <%--<button id="showMovieBtn_${worksheetId}" dojoType="dojox.mobile.Button" class="showMovieBtn"><img src="/images/movie-icon.png"></button>--%>
 
-        <button id="visionobjectsToolBtn_${worksheetId}" dojoType="dojox.mobile.Button" class="visionobjectsToolBtn"><img border="0" src="/images/visionobjects.png" height="16" width="16"></button>
-        <button id="clearToolBtn_${worksheetId}" dojoType="dojox.mobile.Button" class="clearToolBtn"><img border="0" src="/images/clear.png" height="16" width="16"></button>
+        <button id="visionobjectsToolBtn_${worksheetId}" dojoType="dojox.mobile.Button" class="visionobjectsToolBtn  baseBtn whiteBtn"><img border="0" src="/images/visionobjects.png" height="16" width="16"></button>
+        <button id="clearToolBtn_${worksheetId}" dojoType="dojox.mobile.Button" class="clearToolBtn baseBtn whiteBtn"><img border="0" src="/images/clear.png" height="16" width="16"></button>
 
         <%--<button id="documentToolBtn_${worksheetId}" dojoType="dojox.mobile.Button" class="documentToolBtn"><img border="0" src="/images/open-share.png" height="16" width="16"></button>--%>
         <%--<br>--%>

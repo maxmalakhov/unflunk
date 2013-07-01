@@ -50,7 +50,7 @@
 <!-- Call specific libs and styles -->
 <script src="/js/azp/adapter.js"></script>
 <script src="/js/workspace/call.js"></script>
-<link rel="stylesheet" href="/css/call.css">
+<link rel="stylesheet" href="/css/mobile.css">
 <link rel="stylesheet" href="/css/jsxgraph.css">
 
 <%-- MathJax, http://www.mathjax.org --%>
